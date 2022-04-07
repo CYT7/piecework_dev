@@ -1,16 +1,13 @@
 <template>
   <div class="personal-panel">
     <div class="personal-desc" :style="{'background':this.$store.state.app.themeColor}">
-      <div class="avatar-container">
-        <img class="avatar" :src="require('@/assets/user.png')"  alt="头像"/>
-      </div>
       <div class="name-role">
         <span class="sender">{{ user.username }} - {{ user.roleNames }}</span>
       </div>
       <div class="registe-info">
           <span class="registe-info">
             <li class="fa fa-clock-o"></li>
-            {{ this.dateFormat(user.createTime) }}
+            创建时间-{{ this.dateFormat(user.createTime) }}
           </span>
       </div>
     </div>

@@ -4,7 +4,7 @@
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
 			<el-form-item>
-				<el-input v-model="filters.name" placeholder="用户名"></el-input>
+				<el-input v-model="filters.username" placeholder="用户名"></el-input>
 			</el-form-item>
 			<el-form-item>
 				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:role:view" type="primary" @click="findPage(null)"/>
@@ -47,16 +47,16 @@
 			<el-form-item label="ID" prop="id" v-if="false">
 				<el-input v-model="dataForm.id" :disabled="true" auto-complete="off"></el-input>
 			</el-form-item>
-			<el-form-item label="用户名" prop="name">
-				<el-input v-model="dataForm.name" auto-complete="off"></el-input>
+			<el-form-item label="用户名" prop="username">
+				<el-input v-model="dataForm.username" auto-complete="off"></el-input>
 			</el-form-item>
-			<el-form-item label="昵称" prop="nickName">
-				<el-input v-model="dataForm.nickName" auto-complete="off"></el-input>
+			<el-form-item label="中文名" prop="nickName">
+				<el-input v-model="dataForm.chineseName" auto-complete="off"></el-input>
 			</el-form-item>
 			<el-form-item label="密码" prop="password">
 				<el-input v-model="dataForm.password" type="password" auto-complete="off"></el-input>
 			</el-form-item>
-			<el-form-item label="机构" prop="deptName">
+			<el-form-item label="部门" prop="deptName">
 				<popup-tree-input
 					:data="deptData"
 					:props="deptTreeProps"
@@ -69,7 +69,7 @@
 				<el-input v-model="dataForm.email" auto-complete="off"></el-input>
 			</el-form-item>
 			<el-form-item label="手机" prop="mobile">
-				<el-input v-model="dataForm.mobile" auto-complete="off"></el-input>
+				<el-input v-model="dataForm.phone" auto-complete="off"></el-input>
 			</el-form-item>
 			<el-form-item label="角色" prop="userRoles" v-if="!operation">
 				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择"
@@ -115,14 +115,15 @@ export default {
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
 			dataFormRules: {
-				name: [
+				username: [
 					{ required: true, message: '请输入用户名', trigger: 'blur' }
 				]
 			},
 			// 新增编辑界面数据
 			dataForm: {
 				id: 0,
-				name: '',
+				username: '',
+        chineseName:'',
 				password: '123456',
 				deptId: 1,
 				deptName: '',
@@ -145,7 +146,7 @@ export default {
 			if(data !== null) {
 				this.pageRequest = data.pageRequest
 			}
-			this.pageRequest.params = [{name:'name', value:this.filters.name}]
+			this.pageRequest.params = [{username:'username', value:this.filters.username}]
 			this.$api.user.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
 				this.findUserRoles()
@@ -154,7 +155,7 @@ export default {
 		// 导出Excel用户信息
 		exportUserExcelFile: function () {
 			this.pageRequest.pageSize = 100000
-			this.pageRequest.params = [{name:'name', value:this.filters.name}]
+			this.pageRequest.params = [{username:'username', value:this.filters.username}]
 			this.$api.user.exportUserExcelFile(this.pageRequest).then((res) => {
 				this.$alert(res.data, '导出成功', {
 					confirmButtonText: '确定',
@@ -259,13 +260,12 @@ export default {
 		// 处理表格列过滤显示
       	initColumns: function () {
 			this.columns = [
-				{prop:"id", label:"ID", minWidth:50},
-				{prop:"name", label:"用户名", minWidth:120},
-				{prop:"nickName", label:"昵称", minWidth:120},
-				{prop:"deptName", label:"机构", minWidth:120},
+				{prop:"username", label:"用户名", minWidth:120},
+				{prop:"chineseName", label:"中文名", minWidth:120},
+				{prop:"deptName", label:"部门", minWidth:120},
 				{prop:"roleNames", label:"角色", minWidth:100},
 				{prop:"email", label:"邮箱", minWidth:120},
-				{prop:"mobile", label:"手机", minWidth:100},
+				{prop:"phone", label:"手机", minWidth:100},
 				{prop:"status", label:"状态", minWidth:70},
 				// {prop:"createBy", label:"创建人", minWidth:120},
 				// {prop:"createTime", label:"创建时间", minWidth:120, formatter:this.dateFormat}

@@ -1,6 +1,6 @@
 import axios from '../axios'
 /**
- * 机构管理模块
+ * 部门管理模块
  **/
 //保存
 export const save = (data) => {
