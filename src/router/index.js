@@ -14,18 +14,9 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: '首页',
+      name: '',
       component: Home,
       children: [
-        {
-          path: '',
-          name: '系统介绍',
-          component: Intro,
-          meta: {
-            icon: 'fa fa-home fa-lg',
-            index: 0
-          }
-        }
       ]
     },
     {

@@ -93,7 +93,6 @@ export default {
       this.$api.user.findByName(params).then((res) => {
 				if(res.code === 200) {
           this.user = res.data;
-          this.user.avatar = require("@/assets/user.png")
         }
       })
     }
