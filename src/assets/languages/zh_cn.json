@@ -11,6 +11,8 @@
         "add": "新增",
         "edit": "编辑",
         "delete": "删除",
+        "disable": "禁用",
+        "recover": "恢复",
         "batchDelete": "批量删除",
         "search": "查询",
         "loading": "拼命加载中",

@@ -18,6 +18,22 @@ export const batchDelete = (data) => {
         data
     })
 };
+//批量禁用
+export const batchDisable = (data) => {
+  return axios({
+    url: '/user/disable',
+    method: 'post',
+    data
+  })
+};
+//批量恢复
+export const batchRecover = (data) => {
+  return axios({
+    url: '/user/recover',
+    method: 'post',
+    data
+  })
+};
 //分页查询
 export const findPage = (data) => {
     return axios({

@@ -10,10 +10,12 @@
         :fixed="column.fixed" :key="column.prop" :type="column.type" :formatter="column.formatter"
         :sortable="column.sortable==null?true:column.sortable">
       </el-table-column>
-      <el-table-column :label="$t('action.operation')" width="185" fixed="right" v-if="showOperation" header-align="center" align="center">
+      <el-table-column :label="$t('action.operation')" width="300" fixed="right" v-if="showOperation" header-align="center" align="center">
         <template slot-scope="scope">
           <kt-button icon="fa fa-edit" :label="$t('action.edit')" :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
           <kt-button icon="fa fa-trash" :label="$t('action.delete')" :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
+          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :perms="permsDisable" :size="size" type="danger" @click="handleDisable(scope.$index, scope.row)" />
+          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :perms="permsRecover" :size="size" @click="handleRecover(scope.$index, scope.row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -39,6 +41,8 @@ export default {
     data: Object, //表格分页数据
     permsEdit: String,  //编辑权限标识
     permsDelete: String,  //删除权限标识
+    permsDisable: String,  //禁用权限标识
+    permsRecover: String,  //恢复权限标识
     size: {//尺寸样式
       type: String,
       default: 'mini'
@@ -118,6 +122,14 @@ export default {
 		handleDelete: function (index, row) {
 			this.delete(row.id)
 		},
+    //禁用
+    handleDisable: function (index, row) {
+      this.disable(row.id)
+    },
+    //恢复
+    handleRecover: function (index, row) {
+      this.recover(row.id)
+    },
 		//批量删除
 		handleBatchDelete: function () {
 			let ids = this.selections.map(item => item.id).toString();
@@ -146,7 +158,55 @@ export default {
         this.$emit('handleDelete', {params:params, callback:callback})
 			}).catch(() => {
 			})
-		}
+		},
+		//禁用操作
+    disable: function (ids) {
+      this.$confirm('确认禁用选中的记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        let params = [];
+        let idArray = (ids+'').split(',');
+        for(var i=0; i<idArray.length; i++) {
+          params.push({'id':idArray[i]})
+        }
+        this.loading = true;
+        let callback = res => {
+          if(res.code === 200) {
+            this.$message({message: '禁用成功', type: 'success'});
+            this.findPage()
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          }
+          this.loading = false
+        };
+        this.$emit('handleDisable', {params:params, callback:callback})
+      }).catch(() => {
+      })
+    },
+    //恢复操作
+    recover: function (ids) {
+      this.$confirm('确认恢复选中的记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        let params = [];
+        let idArray = (ids+'').split(',');
+        for(var i=0; i<idArray.length; i++) {
+          params.push({'id':idArray[i]})
+        }
+        this.loading = true;
+        let callback = res => {
+          if(res.code === 200) {
+            this.$message({message: '恢复成功', type: 'success'});
+            this.findPage()
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          }
+          this.loading = false
+        };
+        this.$emit('handleRecover', {params:params, callback:callback})
+      }).catch(() => {
+      })
+    }
   },
   mounted() {
     this.refreshPageRequest(1)

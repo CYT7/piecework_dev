@@ -11,6 +11,8 @@
         "add": "Add",
         "edit": "Edit",
         "delete": "Delete",
+        "disable": "Disable",
+        "recover": "recover",
         "batchDelete": "Batch Delete",
         "search": "Search",
         "loading": "loading",

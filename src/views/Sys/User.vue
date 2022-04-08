@@ -36,9 +36,9 @@
 		</table-column-filter-dialog>
 	</div>
 	<!--表格内容栏-->
-	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete"
+	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete" permsDisable="sys:user:disable" permsRecover="sys:user:recover"
 		:data="pageResult" :columns="filterColumns"
-		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
+		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
@@ -71,7 +71,7 @@
 			<el-form-item label="手机" prop="mobile">
 				<el-input v-model="dataForm.phone" auto-complete="off"></el-input>
 			</el-form-item>
-			<el-form-item label="角色" prop="userRoles" v-if="!operation">
+			<el-form-item label="角色" prop="userRoles">
 				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择"
 					 style="width: 100%;">
 					<el-option v-for="item in roles" :key="item.id"
@@ -87,7 +87,6 @@
 	</el-dialog>
   </div>
 </template>
-
 <script>
 import PopupTreeInput from "@/components/PopupTreeInput"
 import KtTable from "@/views/Core/KtTable"
@@ -109,7 +108,7 @@ export default {
 			},
 			columns: [],
 			filterColumns: [],
-			pageRequest: { pageNum: 1, pageSize: 8 },
+			pageRequest: { pageNum: 1, pageSize: 10 },
 			pageResult: {},
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
@@ -175,6 +174,14 @@ export default {
 		handleDelete: function (data) {
 			this.$api.user.batchDelete(data.params).then(data!=null?data.callback:'')
 		},
+    // 批量禁用
+    handleDisable: function (data) {
+      this.$api.user.batchDisable(data.params).then(data!=null?data.callback:'')
+    },
+    //批量恢复
+    handleRecover: function (data) {
+      this.$api.user.batchRecover(data.params).then(data!=null?data.callback:'')
+    },
 		// 显示新增界面
 		handleAdd: function () {
 			this.dialogVisible = true
@@ -183,10 +190,10 @@ export default {
 				id: 0,
 				name: '',
 				password: '',
-				deptId: 1,
+				deptId: '',
 				deptName: '',
-				email: 'test@qq.com',
-				mobile: '13889700023',
+				email: '',
+				mobile: '',
 				status: 1,
 				userRoles: []
 			}
@@ -267,10 +274,6 @@ export default {
 				{prop:"email", label:"邮箱", minWidth:120},
 				{prop:"phone", label:"手机", minWidth:100},
 				{prop:"status", label:"状态", minWidth:70},
-				// {prop:"createBy", label:"创建人", minWidth:120},
-				// {prop:"createTime", label:"创建时间", minWidth:120, formatter:this.dateFormat}
-				// {prop:"lastUpdateBy", label:"更新人", minWidth:100},
-				// {prop:"lastUpdateTime", label:"更新时间", minWidth:120, formatter:this.dateFormat}
 			]
 			this.filterColumns = JSON.parse(JSON.stringify(this.columns));
       	}

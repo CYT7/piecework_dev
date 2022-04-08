@@ -2,7 +2,7 @@
   <div class="personal-panel">
     <div class="personal-desc" :style="{'background':this.$store.state.app.themeColor}">
       <div class="name-role">
-        <span class="sender">{{ user.username }} - {{ user.roleNames }}</span>
+        <span class="sender">{{ user.chineseName }} - {{ user.roleNames }}</span>
       </div>
       <div class="registe-info">
           <span class="registe-info">
