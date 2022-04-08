@@ -16,18 +16,12 @@
 	</div>
 	<!--表格树内容栏-->
     <el-table :data="tableTreeDdata" stripe size="mini" style="width: 100%;"
-      v-loading="loading" rowKey="id" element-loading-text="$t('action.loading')">
-      <el-table-column
-        prop="id" header-align="center" align="center" width="80" label="ID">
-      </el-table-column>
+      v-loading="loading" element-loading-text="$t('action.loading')">
       <table-tree-column
         prop="name" header-align="center" treeKey="id" width="150" label="名称">
       </table-tree-column>
       <el-table-column
         prop="parentName" header-align="center" align="center" width="120" label="上级机构">
-      </el-table-column>
-      <el-table-column
-        prop="orderNum" header-align="center" align="center" label="排序">
       </el-table-column>
       <el-table-column
         prop="createBy" header-align="center" align="center" label="创建人">
@@ -55,9 +49,6 @@
               :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级菜单':dataForm.parentName"
               :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
             </popup-tree-input>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type !== 2" label="排序编号" prop="orderNum">
-          <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序编号"></el-input-number>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">

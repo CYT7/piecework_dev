@@ -4,7 +4,7 @@
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
 			<el-form-item>
-				<el-input v-model="filters.username" placeholder="用户名"></el-input>
+				<el-input v-model="filters.name" placeholder="用户名"></el-input>
 			</el-form-item>
 			<el-form-item>
 				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:role:view" type="primary" @click="findPage(null)"/>
@@ -145,7 +145,8 @@ export default {
 			if(data !== null) {
 				this.pageRequest = data.pageRequest
 			}
-			this.pageRequest.params = [{username:'username', value:this.filters.username}]
+			this.pageRequest.params = [{username:'userName', value:this.filters.name}]
+      console.log(this.pageRequest.params)
 			this.$api.user.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
 				this.findUserRoles()

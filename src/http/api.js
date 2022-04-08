@@ -7,6 +7,7 @@ import * as dept from './modules/dept'
 import * as role from './modules/role'
 import * as menu from './modules/menu'
 import * as log from './modules/log'
+import * as emp from "./modules/emp";
 //默认全部导出
 export default {
     login,
@@ -15,4 +16,5 @@ export default {
     role,
     menu,
     log,
+    emp,
 }

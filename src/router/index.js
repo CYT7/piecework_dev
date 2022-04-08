@@ -113,16 +113,16 @@ function addDynamicRoutes (menuList = [], routes = []) {
    } else if (menuList[i].url && /\S/.test(menuList[i].url)) {
       menuList[i].url = menuList[i].url.replace(/^\//, '');
       //创建路由配置
-      var route = {
-        path: menuList[i].url,
-        component: null,
-        name: menuList[i].name,
-        meta: {
-          icon: menuList[i].icon,
-          index: menuList[i].id
-        }
-      };
-      let path = getIFramePath(menuList[i].url);
+     let route = {
+       path: menuList[i].url,
+       component: null,
+       name: menuList[i].name,
+       meta: {
+         icon: menuList[i].icon,
+         index: menuList[i].id
+       }
+     };
+     let path = getIFramePath(menuList[i].url);
       if (path) {
         //如果是嵌套页面, 通过iframe展示
         route['path'] = path;

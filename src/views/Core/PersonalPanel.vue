@@ -161,10 +161,6 @@
         return format(date)
       }
     },
-    mounted() {
-      this.countOnlineUser();
-      this.countAccessTimes()
-    }
   }
 </script>
 <style scoped>

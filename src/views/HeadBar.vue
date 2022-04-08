@@ -37,7 +37,7 @@
         </el-menu-item>
         <el-menu-item index="3" v-popover:popover-personal>
           <!-- 用户信息 -->
-          <span class="user-info">{{ user.username }}</span>
+          <span class="user-info fa fa-user"></span>
           <el-popover ref="popover-personal" placement="bottom-end" trigger="click" :visible-arrow="false">
             <personal-panel :user="user"></personal-panel>
           </el-popover>

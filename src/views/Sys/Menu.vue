@@ -16,9 +16,9 @@
 	</div>
 	<!--表格树内容栏-->
     <el-table :data="tableTreeDdata" stripe size="mini" style="width: 100%;"
-      v-loading="loading" rowKey="id" element-loading-text="$t('action.loading')">
+      v-loading="loading" element-loading-text="$t('action.loading')">
       <table-tree-column
-        prop="name" header-align="center" treeKey="id" width="150" label="名称">
+        prop="name" header-align="center" width="150" label="名称">
       </table-tree-column>
       <el-table-column header-align="center" align="center" label="图标">
         <template slot-scope="scope">
@@ -68,7 +68,7 @@
         </el-form-item>
         <el-form-item label="上级菜单" prop="parentName">
             <popup-tree-input
-              :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null||dataForm.parentName==''?'顶级菜单':dataForm.parentName"
+              :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null||dataForm.parentName===''?'顶级菜单':dataForm.parentName"
               :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
             </popup-tree-input>
         </el-form-item>
