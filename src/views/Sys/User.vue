@@ -1,19 +1,19 @@
 <template>
   <div class="page-container">
-	<!--工具栏-->
-	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item>
-				<el-input v-model="filters.name" placeholder="用户名"></el-input>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:role:view" type="primary" @click="findPage(null)"/>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
-			</el-form-item>
-		</el-form>
-	</div>
+    <!--工具栏-->
+    <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
+      <el-form :inline="true" :model="filters" :size="size">
+        <el-form-item>
+          <el-input v-model="filters.name" placeholder="用户名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
+        </el-form-item>
+      </el-form>
+    </div>
 	<div class="toolbar" style="float:right;padding-top:10px;padding-right:15px;">
 		<el-form :inline="true" :size="size">
 			<el-form-item>
@@ -126,8 +126,8 @@ export default {
 				password: '123456',
 				deptId: 1,
 				deptName: '',
-				email: 'test@qq.com',
-				mobile: '13889700023',
+				email: '',
+				mobile: '',
 				status: 1,
 				userRoles: []
 			},
@@ -145,7 +145,7 @@ export default {
 			if(data !== null) {
 				this.pageRequest = data.pageRequest
 			}
-			this.pageRequest.params = [{username:'userName', value:this.filters.name}]
+      this.pageRequest.params = [{username:'username', value:this.filters.name}]
       console.log(this.pageRequest.params)
 			this.$api.user.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
@@ -155,7 +155,7 @@ export default {
 		// 导出Excel用户信息
 		exportUserExcelFile: function () {
 			this.pageRequest.pageSize = 100000
-			this.pageRequest.params = [{username:'username', value:this.filters.username}]
+      this.pageRequest.params = [{username:'username', value:this.filters.name}]
 			this.$api.user.exportUserExcelFile(this.pageRequest).then((res) => {
 				this.$alert(res.data, '导出成功', {
 					confirmButtonText: '确定',
@@ -253,20 +253,20 @@ export default {
         	this.dataForm.deptName = data.name
 		},
 		// 时间格式化
-      	dateFormat: function (row, column, cellValue, index){
-          	return format(row[column.property])
-      	},
+    dateFormat: function (row, column, cellValue, index){
+		  return format(row[column.property])
+    },
 		// 处理表格列过滤显示
-      	displayFilterColumnsDialog: function () {
-			this.$refs.tableColumnFilterDialog.setDialogVisible(true)
-      	},
+    displayFilterColumnsDialog: function () {
+		  this.$refs.tableColumnFilterDialog.setDialogVisible(true)
+    },
 		// 处理表格列过滤显示
-      	handleFilterColumns: function (data) {
+    handleFilterColumns: function (data) {
 			this.filterColumns = data.filterColumns
 			this.$refs.tableColumnFilterDialog.setDialogVisible(false)
-      	},
+    },
 		// 处理表格列过滤显示
-      	initColumns: function () {
+    initColumns: function () {
 			this.columns = [
 				{prop:"username", label:"用户名", minWidth:120},
 				{prop:"chineseName", label:"中文名", minWidth:120},
@@ -277,7 +277,7 @@ export default {
 				{prop:"status", label:"状态", minWidth:70},
 			]
 			this.filterColumns = JSON.parse(JSON.stringify(this.columns));
-      	}
+		}
 	},
 	mounted() {
 		this.findDeptTree()
