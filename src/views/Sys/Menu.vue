@@ -15,7 +15,7 @@
 		</el-form>
 	</div>
 	<!--表格树内容栏-->
-    <el-table :data="tableTreeDdata" stripe size="mini" style="width: 100%;"
+    <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;"
       v-loading="loading" element-loading-text="$t('action.loading')">
       <table-tree-column
         prop="name" header-align="center" width="150" label="名称">
@@ -108,16 +108,17 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button :size="size"  @click="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size"  type="primary" @click="submitForm()">{{$t('action.comfirm')}}</el-button>
+        <el-button :size="size"  type="primary" @click="submitForm()">{{$t('action.confirms')}}</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import KtButton from "@/views/Core/KtButton";
-import TableTreeColumn from "@/views/Core/TableTreeColumn";
-import PopupTreeInput from "@/components/PopupTreeInput";
-import FaIconTooltip from "@/components/FaIconTooltip";
+import PopupTreeInput from "../../components/PopupTreeInput";
+import KtButton from "../Core/KtButton";
+import TableTreeColumn from "../Core/TableTreeColumn";
+import FaIconTooltip from "../../components/FaIconTooltip"
+
 export default {
   components: {
     PopupTreeInput,
@@ -132,7 +133,7 @@ export default {
       filters: {
         name: ""
       },
-      tableTreeDdata: [],
+      tableTreeData: [],
       dialogVisible: false,
       menuTypeList: ["目录", "菜单", "按钮"],
       dataForm: {
@@ -162,17 +163,17 @@ export default {
     findTreeData: function() {
       this.loading = true;
       this.$api.menu.findMenuTree().then(res => {
-        this.tableTreeDdata = res.data;
+        this.tableTreeData = res.data;
         this.popupTreeData = this.getParentMenuTree(res.data);
         this.loading = false;
       });
     },
     //获取上级菜单树
-    getParentMenuTree: function(tableTreeDdata) {
+    getParentMenuTree: function(tableTreeData) {
       let parent = {
         parentId: 0,
         name: "顶级菜单",
-        children: tableTreeDdata
+        children: tableTreeData
       };
       return [parent];
     },
@@ -204,7 +205,7 @@ export default {
         type: "warning"
       }).then(() => {
         let params = this.getDeleteIds([], row);
-        this.$api.menu.batchDelete(params).then(res => {
+        this.$api.menu.batchDelete(params).then(() => {
           this.findTreeData();
           this.$message({ message: "删除成功", type: "success" });
         });
@@ -221,13 +222,9 @@ export default {
       return ids;
     },
     //菜单树选中
-    handleTreeSelectChange(data, node) {
+    handleTreeSelectChange(data) {
       this.dataForm.parentId = data.id;
       this.dataForm.parentName = data.name;
-    },
-    //图标选中
-    iconActiveHandle(iconName) {
-      this.dataForm.icon = iconName;
     },
     //表单提交
     submitForm() {
@@ -238,7 +235,7 @@ export default {
             let params = Object.assign({}, this.dataForm);
             this.$api.menu.save(params).then(res => {
               this.editLoading = false;
-              if (res.code == 200) {
+              if (res.code === 200) {
                 this.$message({ message: "操作成功", type: "success" });
                 this.$refs["dataForm"].resetFields();
                 this.dialogVisible = false;

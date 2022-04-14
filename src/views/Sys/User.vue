@@ -21,23 +21,16 @@
 				<el-tooltip content="刷新" placement="top">
 					<el-button icon="fa fa-refresh" @click="findPage(null)"></el-button>
 				</el-tooltip>
-				<el-tooltip content="列显示" placement="top">
-					<el-button icon="fa fa-filter" @click="displayFilterColumnsDialog"></el-button>
-				</el-tooltip>
 				<el-tooltip content="导出" placement="top">
 					<el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"></el-button>
 				</el-tooltip>
 				</el-button-group>
 			</el-form-item>
 		</el-form>
-		<!--表格显示列界面-->
-		<table-column-filter-dialog ref="tableColumnFilterDialog" :columns="columns"
-			@handleFilterColumns="handleFilterColumns">
-		</table-column-filter-dialog>
 	</div>
 	<!--表格内容栏-->
 	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete" permsDisable="sys:user:disable" permsRecover="sys:user:recover"
-		:data="pageResult" :columns="filterColumns"
+		:data="pageResult" :columns="columns"
 		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
 	</kt-table>
 	<!--新增编辑界面-->
@@ -88,17 +81,15 @@
   </div>
 </template>
 <script>
-import PopupTreeInput from "@/components/PopupTreeInput"
-import KtTable from "@/views/Core/KtTable"
-import KtButton from "@/views/Core/KtButton"
-import TableColumnFilterDialog from "@/views/Core/TableColumnFilterDialog"
-import { format } from "@/utils/datetime"
+import PopupTreeInput from "../../components/PopupTreeInput";
+import KtTable from "../Core/KtTable";
+import KtButton from "../Core/KtButton";
+import {format} from "../../utils/datetime";
 export default {
 	components:{
 		PopupTreeInput,
 		KtTable,
 		KtButton,
-		TableColumnFilterDialog
 	},
 	data() {
 		return {
@@ -106,8 +97,15 @@ export default {
 			filters: {
 				name: ''
 			},
-			columns: [],
-			filterColumns: [],
+			columns: [
+        {prop:"username", label:"用户名", minWidth:'20%'},
+        {prop:"chineseName", label:"中文名", minWidth:'20%'},
+        {prop:"deptName", label:"部门", minWidth:'20%'},
+        {prop:"roleNames", label:"角色", minWidth:'20%'},
+        {prop:"email", label:"邮箱", minWidth:'20%'},
+        {prop:"phone", label:"手机", minWidth:'20%'},
+        {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
+      ],
 			pageRequest: { pageNum: 1, pageSize: 10 },
 			pageResult: {},
 			operation: false, // true:新增, false:编辑
@@ -146,7 +144,6 @@ export default {
 				this.pageRequest = data.pageRequest
 			}
       this.pageRequest.params = [{username:'username', value:this.filters.name}]
-      console.log(this.pageRequest.params)
 			this.$api.user.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
 				this.findUserRoles()
@@ -173,15 +170,15 @@ export default {
 		},
 		// 批量删除
 		handleDelete: function (data) {
-			this.$api.user.batchDelete(data.params).then(data!=null?data.callback:'')
+			this.$api.user.batchDelete(data.params).then(data.callback)
 		},
     // 批量禁用
     handleDisable: function (data) {
-      this.$api.user.batchDisable(data.params).then(data!=null?data.callback:'')
+      this.$api.user.batchDisable(data.params).then(data.callback)
     },
     //批量恢复
     handleRecover: function (data) {
-      this.$api.user.batchRecover(data.params).then(data!=null?data.callback:'')
+      this.$api.user.batchRecover(data.params).then(data.callback)
     },
 		// 显示新增界面
 		handleAdd: function () {
@@ -228,7 +225,7 @@ export default {
 						params.userRoles = userRoles
 						this.$api.user.save(params).then((res) => {
 							this.editLoading = false
-							if(res.code == 200) {
+							if(res.code === 200) {
 								this.$message({ message: '操作成功', type: 'success' })
 								this.dialogVisible = false
 								this.$refs['dataForm'].resetFields()
@@ -248,40 +245,26 @@ export default {
 			})
 		},
 		// 菜单树选中
-      	deptTreeCurrentChangeHandle (data, node) {
+      	deptTreeCurrentChangeHandle (data) {
         	this.dataForm.deptId = data.id
         	this.dataForm.deptName = data.name
 		},
 		// 时间格式化
-    dateFormat: function (row, column, cellValue, index){
+    dateFormat: function (row, column){
 		  return format(row[column.property])
     },
-		// 处理表格列过滤显示
-    displayFilterColumnsDialog: function () {
-		  this.$refs.tableColumnFilterDialog.setDialogVisible(true)
+    // 状态格式化
+    statusFormat: function (row, column){
+      if (row[column.property]===1){
+        return '正常'
+      }
+      if (row[column.property]===0){
+        return '禁用'
+      }
     },
-		// 处理表格列过滤显示
-    handleFilterColumns: function (data) {
-			this.filterColumns = data.filterColumns
-			this.$refs.tableColumnFilterDialog.setDialogVisible(false)
-    },
-		// 处理表格列过滤显示
-    initColumns: function () {
-			this.columns = [
-				{prop:"username", label:"用户名", minWidth:120},
-				{prop:"chineseName", label:"中文名", minWidth:120},
-				{prop:"deptName", label:"部门", minWidth:120},
-				{prop:"roleNames", label:"角色", minWidth:100},
-				{prop:"email", label:"邮箱", minWidth:120},
-				{prop:"phone", label:"手机", minWidth:100},
-				{prop:"status", label:"状态", minWidth:70},
-			]
-			this.filterColumns = JSON.parse(JSON.stringify(this.columns));
-		}
 	},
 	mounted() {
 		this.findDeptTree()
-		this.initColumns()
 	}
 }
 </script>

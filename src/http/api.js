@@ -8,6 +8,8 @@ import * as role from './modules/role'
 import * as menu from './modules/menu'
 import * as log from './modules/log'
 import * as emp from "./modules/emp";
+import * as coefficient from "./modules/coefficient";
+import * as performance from "./modules/performance";
 //默认全部导出
 export default {
     login,
@@ -17,4 +19,6 @@ export default {
     menu,
     log,
     emp,
+    coefficient,
+    performance,
 }

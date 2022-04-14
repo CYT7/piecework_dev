@@ -43,7 +43,7 @@
 			<span><B>角色菜单授权</B></span>
 		</div>
 		<el-tree :data="menuData" size="mini" show-checkbox node-key="id" :props="defaultProps"
-			style="width: 100%;pading-top:20px;" ref="menuTree" :render-content="renderContent"
+			style="width: 100%;padding-top:20px;" ref="menuTree" :render-content="renderContent"
 			v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true"
 			@check-change="handleMenuCheckChange">
 		</el-tree>
@@ -60,10 +60,10 @@
   </div>
 </template>
 <script>
-import KtTable from "@/views/Core/KtTable"
-import KtButton from "@/views/Core/KtButton"
-import TableTreeColumn from '@/views/Core/TableTreeColumn'
-import { format } from "@/utils/datetime"
+import KtTable from "../Core/KtTable";
+import KtButton from "../Core/KtButton";
+import {format} from "../../utils/datetime";
+import TableTreeColumn from "../Core/TableTreeColumn";
 export default {
 	components:{
 		KtTable,
@@ -77,11 +77,11 @@ export default {
 				name: ''
 			},
 			columns: [
-				{prop:"id", label:"ID", minWidth:50},
-				{prop:"name", label:"角色名", minWidth:120},
-				{prop:"remark", label:"备注", minWidth:120},
-				{prop:"createBy", label:"创建人", minWidth:120},
-				{prop:"createTime", label:"创建时间", minWidth:120, formatter:this.dateFormat}
+				{prop:"id", label:"ID", minWidth:'20%'},
+				{prop:"name", label:"角色名", minWidth:'20%'},
+				{prop:"remark", label:"备注", minWidth:'20%'},
+				{prop:"createBy", label:"创建人", minWidth:'20%'},
+				{prop:"createTime", label:"创建时间", minWidth:'20%', formatter:this.dateFormat}
       ],
 			pageRequest: { pageNum: 1, pageSize: 10 },
 			pageResult: {},
@@ -153,7 +153,7 @@ export default {
 						let params = Object.assign({}, this.dataForm)
 						this.$api.role.save(params).then((res) => {
 							this.editLoading = false
-							if(res.code == 200) {
+							if(res.code === 200) {
 								this.$message({ message: '操作成功', type: 'success' })
 								this.dialogVisible = false
 								this.$refs['dataForm'].resetFields()
@@ -186,7 +186,7 @@ export default {
 			})
 		},
 		// 树节点选择监听
-		handleMenuCheckChange(data, check, subCheck) {
+		handleMenuCheckChange(data, check) {
 			if(check) {
 				// 节点选中时同步选中父节点
 				let parentId = data.parentId
@@ -239,7 +239,7 @@ export default {
 				roleMenus.push(roleMenu)
 			}
 			this.$api.role.saveRoleMenus(roleMenus).then((res) => {
-				if(res.code == 200) {
+				if(res.code === 200) {
 					this.$message({ message: '操作成功', type: 'success' })
 				} else {
 					this.$message({message: '操作失败, ' + res.msg, type: 'error'})
@@ -247,22 +247,22 @@ export default {
 				this.authLoading = false
 			})
 		},
-    renderContent(h, { node, data, store }) {
+    renderContent(h, {data}) {
       return (
         <div class="column-container">
-        <span style="text-algin:center;margin-right:80px;">{data.name}</span>
-        <span style="text-algin:center;margin-right:80px;">
+        <span style="text-align:center;margin-right:80px;">{data.name}</span>
+        <span style="text-align:center;margin-right:80px;">
         <el-tag type={data.type === 0?'':data.type === 1?'success':'info'} size="small">
         {data.type === 0?'目录':data.type === 1?'菜单':'按钮'}
         </el-tag>
         </span>
-        <span style="text-algin:center;margin-right:80px;"> <i class={data.icon}></i></span>
-      <span style="text-algin:center;margin-right:80px;">{data.parentName?data.parentName:'顶级菜单'}</span>
-        <span style="text-algin:center;margin-right:80px;">{data.url?data.url:'\t'}</span>
+        <span style="text-align:center;margin-right:80px;"><i class={data.icon}/></span>
+      <span style="text-align:center;margin-right:80px;">{data.parentName?data.parentName:'顶级菜单'}</span>
+        <span style="text-align:center;margin-right:80px;">{data.url?data.url:'\t'}</span>
         </div>);
     },
-		// 时间格式化 
-    dateFormat: function (row, column, cellValue, index){
+		// 时间格式化
+    dateFormat: function (row, column){
 		  return format(row[column.property])
 		}
 	},

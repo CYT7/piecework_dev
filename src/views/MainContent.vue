@@ -82,7 +82,7 @@ export default {
     },
     //tabs, 刷新当前
     tabsRefreshCurrentHandle () {
-      var tempTabName = this.mainTabsActiveName;
+      let tempTabName = this.mainTabsActiveName;
       this.removeTabHandle(tempTabName);
       this.$nextTick(() => {
         this.$router.push({ name: tempTabName })

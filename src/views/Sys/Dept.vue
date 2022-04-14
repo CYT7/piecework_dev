@@ -41,29 +41,29 @@
     <el-dialog :title="!dataForm.id ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()"
         label-width="80px" :size="size" style="text-align:left;">
-        <el-form-item label="名称" prop="name">
+        <el-form-item label="部门名称" prop="name">
           <el-input v-model="dataForm.name" placeholder="名称"></el-input>
         </el-form-item>
         <el-form-item label="上级机构" prop="parentName">
-            <popup-tree-input
-              :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级菜单':dataForm.parentName"
-              :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
-            </popup-tree-input>
+          <popup-tree-input
+            :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级菜单':dataForm.parentName"
+            :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
+          </popup-tree-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button :size="size"  @click="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size"  type="primary" @click="submitForm()">{{$t('action.comfirm')}}</el-button>
+        <el-button :size="size"  type="primary" @click="submitForm()">{{$t('action.confirms')}}</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import KtButton from "@/views/Core/KtButton"
-import TableTreeColumn from '@/views/Core/TableTreeColumn'
-import PopupTreeInput from "@/components/PopupTreeInput"
-import FaIconTooltip from "@/components/FaIconTooltip"
-import { format } from "@/utils/datetime"
+import FaIconTooltip from "../../components/FaIconTooltip"
+import TableTreeColumn from "../Core/TableTreeColumn";
+import PopupTreeInput from "../../components/PopupTreeInput";
+import KtButton from "../Core/KtButton";
+import {format} from "../../utils/datetime";
 export default {
 	components:{
     PopupTreeInput,
@@ -89,11 +89,8 @@ export default {
       },
       dataRule: {
         name: [
-          { required: true, message: '机构名称不能为空', trigger: 'blur' }
+          { required: true, message: '部门名称不能为空', trigger: 'blur' }
         ],
-        parentName: [
-          { required: true, message: '上级机构不能为空', trigger: 'change' }
-        ]
       },
       popupTreeData: [],
       popupTreeProps: {
@@ -113,11 +110,11 @@ export default {
 			})
     },
 		//获取上级机构树
-    getParentMenuTree: function (tableTreeDdata) {
+    getParentMenuTree: function (tableTreeData) {
       let parent = {
         parentId: 0,
-        name: '顶级菜单',
-        children: tableTreeDdata
+        name: '顶级部门',
+        children: tableTreeData
       };
       return [parent]
     },
@@ -143,7 +140,7 @@ export default {
 				type: 'warning'
       }).then(() => {
         let params = this.getDeleteIds([], row);
-        this.$api.dept.batchDelete(params).then( res => {
+        this.$api.dept.batchDelete(params).then(() => {
           this.findTreeData();
           this.$message({message: '删除成功', type: 'success'})
         })
@@ -160,8 +157,8 @@ export default {
       return ids
     },
     //机构树选中
-    handleTreeSelectChange (data, node) {
-      this.dataForm.parentId = data.id;
+    handleTreeSelectChange (data) {
+      this.dataForm.parentId = data.id?data.id:0;
       this.dataForm.parentName = data.name
     },
     //表单提交
@@ -187,7 +184,7 @@ export default {
       })
     },
 		// 时间格式化
-    dateFormat: function (row, column, cellValue, index){
+    dateFormat: function (row, column){
       return format(row[column.property])
     }
 	},

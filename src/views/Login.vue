@@ -6,10 +6,10 @@
     </span>
     <h2 class="title" style="padding-left:22px;" >登录系统</h2>
     <el-form-item prop="account">
-      <el-input type="text" v-model="loginForm.account" auto-complete="on" placeholder="账号"></el-input>
+      <el-input type="text" v-model="loginForm.account" auto-complete="off" placeholder="账号"></el-input>
     </el-form-item>
     <el-form-item prop="password">
-      <el-input type="password" v-model="loginForm.password" auto-complete="on" placeholder="密码"></el-input>
+      <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
     </el-form-item>
     <el-form-item style="width:100%;">
       <el-button type="primary" style="width:48%;" @click.native.prevent="reset">重 置</el-button>
@@ -20,7 +20,7 @@
 <script>
 import { mapState } from 'vuex'
 import Cookies from "js-cookie"
-import ThemePicker from "@/components/ThemePicker"
+import ThemePicker from "../components/ThemePicker";
 export default {
   name: 'Login',
   components:{

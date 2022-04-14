@@ -1,5 +1,5 @@
 <template>
-  <div class="headbar" :style="{'background':themeColor}"
+  <div class="headboard" :style="{'background':themeColor}"
     :class="collapse?'position-collapse-left':'position-left'">
     <!-- 导航收缩 -->
     <span class="hamburg">
@@ -48,14 +48,14 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import Hamburger from "@/components/Hamburger"
-import ThemePicker from "@/components/ThemePicker"
-import PersonalPanel from "@/views/Core/PersonalPanel"
+import Hamburger from "../components/Hamburger";
+import ThemePicker from "../components/ThemePicker";
+import PersonalPanel from "./Core/PersonalPanel";
 export default {
   components:{
-    Hamburger,
+    PersonalPanel,
     ThemePicker,
-    PersonalPanel
+    Hamburger,
   },
   data() {
     return {
@@ -65,9 +65,6 @@ export default {
     }
   },
   methods: {
-    openWindow(url) {
-      window.open(url)
-    },
     selectNavBar(key, keyPath) {
       console.log(key, keyPath)
     },
@@ -81,15 +78,14 @@ export default {
     },
     //语言切换
     changeLanguage(lang) {
-      lang === '' ? 'zh_cn' : lang;
-      this.$i18n.locale = lang;
+      this.$i18n.locale = lang === '' ? 'zh_cn' : lang;
       this.langVisible = false
     }
   },
   mounted() {
-    var user = sessionStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
     if (user) {
-      let params = {name:user};
+      const params = {name:user};
       this.$api.user.findByName(params).then((res) => {
 				if(res.code === 200) {
           this.user = res.data;
@@ -106,7 +102,7 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-.headbar {
+.headboard {
   position: fixed;
   top: 0;
   right: 0;
@@ -145,7 +141,7 @@ export default {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    margin: 10px 0px 10px 10px;
+    margin: 10px 0 10px 10px;
     float: right;
   }
 }

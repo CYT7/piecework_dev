@@ -45,7 +45,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="updatePwdDialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="updatePassword" :loading="updatePwdLoading">{{$t('action.comfirm')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="updatePassword" :loading="updatePwdLoading">{{$t('action.confirms')}}</el-button>
       </div>
     </el-dialog>
   </div>

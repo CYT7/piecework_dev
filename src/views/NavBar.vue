@@ -6,9 +6,9 @@
         <img v-if="collapse" src="@/assets/logo.png" alt="logo"/> <div>{{collapse?'':appName}}</div>
     </div>
     <!-- 导航菜单 -->
-    <el-menu ref="navmenu" default-active="1" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
-      :collapse="collapse" :collapse-transition="false" :unique-opened="true  "
-      @open="handleopen" @close="handleclose" @select="handleselect">
+    <el-menu ref="navMenu" default-active="1" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
+             :collapse="collapse" :collapse-transition="false" :unique-opened="true  "
+             @open="handleOpen" @close="handleClose" @select="handleSelect">
       <!-- 导航菜单树组件，动态加载菜单 -->
       <menu-tree v-for="item in navTree" :key="item.id" :menu="item"></menu-tree>
     </el-menu>
@@ -16,11 +16,9 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import MenuTree from "@/components/MenuTree"
+import MenuTree from "../components/MenuTree";
 export default {
-  components:{
-        MenuTree
-  },
+  components:{MenuTree},
   computed: {
     ...mapState({
       appName: state=>state.app.appName,
@@ -44,19 +42,13 @@ export default {
     this.handleRoute(this.$route)
   },
   methods: {
-    handleopen() {
-      console.log('handleopen')
-    },
-    handleclose() {
-      console.log('handleclose')
-    },
-    handleselect(a, b) {
-      console.log('handleselect')
-    },
+    handleOpen() {},
+    handleClose() {},
+    handleSelect() {},
     // 路由操作处理
     handleRoute (route) {
       // tab标签页选中, 如果不存在则先添加
-      var tab = this.mainTabs.filter(item => item.name === route.name)[0];
+      let tab = this.mainTabs.filter(item => item.name === route.name)[0];
       if (!tab) {
         tab = {
           name: route.name,
@@ -67,9 +59,9 @@ export default {
       }
       this.mainTabsActiveName = tab.name;
       // 切换标签页时同步更新高亮菜单
-      if(this.$refs.navmenu != null) {
-        this.$refs.navmenu.activeIndex = '' + route.meta.index;
-        this.$refs.navmenu.initOpenedMenu()
+      if(this.$refs.navMenu != null) {
+        this.$refs.navMenu.activeIndex = '' + route.meta.index;
+        this.$refs.navMenu.initOpenedMenu()
       }
     }
   }
