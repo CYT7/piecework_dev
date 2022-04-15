@@ -1,5 +1,5 @@
 <template>
-  <el-button :size="size" :type="type" :icon="icon"
+  <el-button :size="size" :type="type" :icon="icon" v-if="hasPerms(perms)?hasPerms(perms):''"
     :loading="loading" :disabled="!hasPerms(perms)" @click="handleClick">
     {{label}}
   </el-button>

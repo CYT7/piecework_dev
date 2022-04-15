@@ -43,9 +43,9 @@ export const findPage = (data) => {
   })
 };
 //导出Excel用户信息
-export const exportUserExcelFile = (data) => {
+export const exportEmpExcelFile = (data) => {
   return axios({
-    url: '/emp/exportUserExcelFile',
+    url: '/emp/exportEmpExcelFile',
     method: 'post',
     data
   })

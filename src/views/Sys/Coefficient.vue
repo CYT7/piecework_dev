@@ -3,24 +3,12 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item>
-          <el-input v-model="filters.name" aria-placeholder="部门名"></el-input>
-        </el-form-item>
+        <el-form-item><el-input v-model="filters.name" aria-placeholder="部门名"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="toolbar" style="float: right;padding-top: 10px;padding-right: 15px;">
-      <el-form :inline="true" :size="size">
-        <el-form-item>
-          <el-button-group>
-            <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-            <el-tooltip content="导出" x-placement="top"><el-button icon="fa fa-file-excel-o" @click="exportCoefficientExcelFile"/></el-tooltip>
-          </el-button-group>
         </el-form-item>
       </el-form>
     </div>
@@ -33,7 +21,12 @@
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
         <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName" :node-key="''+dataForm.deptId" :current-change-handle="deptTreeCurrentChangeHandle"/>
+          <popup-tree-input
+            :data="deptData"
+            :props="deptTreeProps"
+            :prop="dataForm.deptName"
+            :node-key="''+dataForm.deptId"
+            :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
         <el-form-item label="标题" prop="title"><el-input v-model="dataForm.title" auto-complete="off"/></el-form-item>
         <el-form-item label="值" prop="value"><el-input v-model="dataForm.value" auto-complete="off"/></el-form-item>
@@ -100,22 +93,10 @@ export default {
       if(data !== null) {
         this.pageRequest = data.pageRequest
       }
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId',value: this.user.deptId}]
+      this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.$api.coefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
       }).then(data!=null?data.callback:'')
-    },
-    // 导出Excel用户信息
-    exportCoefficientExcelFile: function () {
-      this.pageRequest.pageSize = 100000
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.emp.exportUserExcelFile(this.pageRequest).then((res) => {
-        this.$alert(res.data, '导出成功', {
-          confirmButtonText: '确定',
-          callback: () => {
-          }
-        })
-      })
     },
     // 批量删除
     handleDelete: function (data) {

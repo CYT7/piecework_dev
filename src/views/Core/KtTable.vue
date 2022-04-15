@@ -12,8 +12,8 @@
       </el-table-column>
       <el-table-column :label="$t('action.operation')" width="300" fixed="right" v-if="showOperation" header-align="center" align="center">
         <template slot-scope="scope">
-          <kt-button icon="fa fa-edit" :label="$t('action.edit')" :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
-          <kt-button icon="fa fa-trash" :label="$t('action.delete')" :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
+          <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')" :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
+          <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')" :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
           <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :perms="permsDisable" :size="size" type="danger" @click="handleDisable(scope.$index, scope.row)" />
           <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :perms="permsRecover" :size="size" @click="handleRecover(scope.$index, scope.row)" />
         </template>

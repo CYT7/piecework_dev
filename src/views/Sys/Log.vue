@@ -3,17 +3,14 @@
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
+			<el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
 			<el-form-item>
-				<el-input v-model="filters.name" placeholder="用户名"></el-input>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:log:view" type="primary" @click="findPage(null)"/>
+        <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:log:view" type="primary" @click="findPage(null)"/>
 			</el-form-item>
 		</el-form>
 	</div>
 	<!--表格内容栏-->
-	<kt-table
-    :data="pageResult" :columns="columns" :showOperation="showOperation" @findPage="findPage">
+	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:user:delete" @findPage="findPage" @handleDelete="handleDelete">
 	</kt-table>
   </div>
 </template>
@@ -29,9 +26,7 @@ export default {
 	data() {
 		return {
 			size: 'small',
-			filters: {
-				name: ''
-			},
+			filters: {name: ''},
 			columns: [
 				{prop:"id", label:"ID", minWidth:'20%'},
 				{prop:"userName", label:"用户名", minWidth:'20%'},
@@ -50,15 +45,13 @@ export default {
 	methods: {
 		//获取分页数据
 		findPage: function (data) {
-			if(data !== null) {
-				this.pageRequest = data.pageRequest
-			}
+			if(data !== null) {this.pageRequest = data.pageRequest}
 			this.pageRequest.params = [{name:'userName', value:this.filters.name}];
-			this.$api.log.findPage(this.pageRequest).then((res) => {
-				this.pageResult = res.data
-			}).then(data!=null?data.callback:'')
+			this.$api.log.findPage(this.pageRequest).then((res) => {this.pageResult = res.data}).then(data!=null?data.callback:'')
 		},
-		//时间格式化
+    // 批量删除
+    handleDelete: function (data) {this.$api.log.batchDelete(data.params).then(data.callback)},
+    //时间格式化
     dateFormat: function (row, column){
 		  return format(row[column.property])
 		}

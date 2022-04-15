@@ -3,9 +3,7 @@
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item>
-				<el-input v-model="filters.name" placeholder="角色名"></el-input>
-			</el-form-item>
+			<el-form-item><el-input v-model="filters.name" aria-placeholder="角色名"/></el-form-item>
 			<el-form-item>
 				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:role:view" type="primary" @click="findPage(null)"/>
 			</el-form-item>
@@ -22,15 +20,9 @@
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
 		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
-			<el-form-item label="ID" prop="id" v-if="false">
-				<el-input v-model="dataForm.id" :disabled="true" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="角色名" prop="name">
-				<el-input v-model="dataForm.name" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="备注 " prop="remark">
-				<el-input v-model="dataForm.remark" auto-complete="off" type="textarea"></el-input>
-			</el-form-item>
+			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
+			<el-form-item label="角色名" prop="name"><el-input v-model="dataForm.name" auto-complete="off"/></el-form-item>
+			<el-form-item label="备注 " prop="remark"><el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/></el-form-item>
 		</el-form>
 		<div slot="footer" class="dialog-footer">
 			<el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -51,10 +43,8 @@
 			<el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null"><b>全选</b></el-checkbox>
 		</div>
 		<div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-			<kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection"
-				:disabled="this.selectRole.id == null"/>
-			<kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm"
-				:disabled="this.selectRole.id == null" :loading="authLoading"/>
+			<kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection" :disabled="this.selectRole.id == null"/>
+			<kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading"/>
 		</div>
 	</div>
   </div>
@@ -73,15 +63,12 @@ export default {
 	data() {
 		return {
 			size: 'small',
-			filters: {
-				name: ''
-			},
+			filters: {name: ''},
 			columns: [
-				{prop:"id", label:"ID", minWidth:'20%'},
-				{prop:"name", label:"角色名", minWidth:'20%'},
-				{prop:"remark", label:"备注", minWidth:'20%'},
-				{prop:"createBy", label:"创建人", minWidth:'20%'},
-				{prop:"createTime", label:"创建时间", minWidth:'20%', formatter:this.dateFormat}
+				{prop:"name", label:"角色名", minWidth:'25%'},
+				{prop:"remark", label:"备注", minWidth:'25%'},
+				{prop:"createBy", label:"创建人", minWidth:'25%'},
+				{prop:"createTime", label:"创建时间", minWidth:'25%', formatter:this.dateFormat}
       ],
 			pageRequest: { pageNum: 1, pageSize: 10 },
 			pageResult: {},
@@ -89,9 +76,8 @@ export default {
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
 			dataFormRules: {
-				name: [
-					{ required: true, message: '请输入角色名', trigger: 'blur' }
-				]
+				name: [{ required: true, message: '请输入角色名', trigger: 'blur' }],
+        remark: [{ required: true, message: '请输入备注', trigger: 'blur' }],
 			},
 			// 新增编辑界面数据
 			dataForm: {
@@ -115,9 +101,7 @@ export default {
 	methods: {
 		// 获取分页数据
 		findPage: function (data) {
-			if(data !== null) {
-				this.pageRequest = data.pageRequest
-			}
+			if(data !== null) {this.pageRequest = data.pageRequest}
 			this.pageRequest.params = [{name:'name', value:this.filters.name}]
 			this.$api.role.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
@@ -176,9 +160,7 @@ export default {
 		},
 		// 角色选择改变监听
 		handleRoleSelectChange(val) {
-			if(val == null || val.val == null) {
-				return
-			}
+			if(val == null || val.val == null) {return}
 			this.selectRole = val.val
 			this.$api.role.findRoleMenus({'roleId':val.val.id}).then((res) => {
 				this.currentRoleMenus = res.data
@@ -250,15 +232,15 @@ export default {
     renderContent(h, {data}) {
       return (
         <div class="column-container">
-        <span style="text-align:center;margin-right:80px;">{data.name}</span>
-        <span style="text-align:center;margin-right:80px;">
-        <el-tag type={data.type === 0?'':data.type === 1?'success':'info'} size="small">
-        {data.type === 0?'目录':data.type === 1?'菜单':'按钮'}
-        </el-tag>
-        </span>
-        <span style="text-align:center;margin-right:80px;"><i class={data.icon}/></span>
-      <span style="text-align:center;margin-right:80px;">{data.parentName?data.parentName:'顶级菜单'}</span>
-        <span style="text-align:center;margin-right:80px;">{data.url?data.url:'\t'}</span>
+          <span style="text-align:center;margin-right:80px;">{data.name}</span>
+          <span style="text-align:center;margin-right:80px;">
+            <el-tag type={data.type === 0?'':data.type === 1?'success':'info'} size="small">
+              {data.type === 0?'目录':data.type === 1?'菜单':'按钮'}
+            </el-tag>
+          </span>
+          <span style="text-align:center;margin-right:80px;"><i class={data.icon}/></span>
+          <span style="text-align:center;margin-right:80px;">{data.parentName?data.parentName:'顶级菜单'}</span>
+          <span style="text-align:center;margin-right:80px;">{data.url?data.url:'\t'}</span>
         </div>);
     },
 		// 时间格式化
@@ -266,20 +248,16 @@ export default {
 		  return format(row[column.property])
 		}
 	},
-	mounted() {
-	}
+	mounted() {}
 }
 </script>
 <style scoped>
-.menu-container {
-	margin-top: 10px;
-}
+.menu-container {margin-top: 10px;}
 .menu-header {
 	padding-left: 8px;
 	padding-bottom: 5px;
 	text-align: left;
 	font-size: 16px;
 	color: rgb(20, 89, 121);
-
 }
 </style>

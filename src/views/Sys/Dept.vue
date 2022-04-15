@@ -4,7 +4,7 @@
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
 			<el-form-item>
-				<el-input v-model="filters.name" placeholder="名称"></el-input>
+				<el-input v-model="filters.name" aria-placeholder="名称"></el-input>
 			</el-form-item>
 			<el-form-item>
 				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:dept:view" type="primary" @click="findTreeData(null)"/>
@@ -15,22 +15,12 @@
 		</el-form>
 	</div>
 	<!--表格树内容栏-->
-    <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;"
-              v-loading="loading" element-loading-text="$t('action.loading')">
-      <table-tree-column
-        prop="name" header-align="center" treeKey="id" width="150" label="名称">
-      </table-tree-column>
-      <el-table-column
-        prop="parentName" header-align="center" align="center" width="120" label="上级部门">
-      </el-table-column>
-      <el-table-column
-        prop="createBy" header-align="center" align="center" label="创建人">
-      </el-table-column>
-      <el-table-column
-        prop="createTime" header-align="center" align="center" label="创建时间" :formatter="dateFormat">
-      </el-table-column>
-      <el-table-column
-        fixed="right" header-align="center" align="center" width="185" :label="$t('action.operation')">
+    <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
+      <table-tree-column prop="name" header-align="center" treeKey="id" width="150" label="名称"/>
+      <el-table-column prop="parentName" header-align="center" align="center" width="120" label="上级部门"/>
+      <el-table-column prop="createBy" header-align="center" align="center" label="创建人"/>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间" :formatter="dateFormat"/>
+      <el-table-column fixed="right" header-align="center" align="center" width="185" :label="$t('action.operation')">
         <template slot-scope="scope">
           <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:dept:edit" @click="handleEdit(scope.row)"/>
           <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:dept:delete" type="danger" @click="handleDelete(scope.row)"/>
@@ -39,11 +29,8 @@
     </el-table>
     <!-- 新增修改界面 -->
     <el-dialog :title="!dataForm.id ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()"
-        label-width="80px" :size="size" style="text-align:left;">
-        <el-form-item label="部门名称" prop="name">
-          <el-input v-model="dataForm.name" placeholder="名称"></el-input>
-        </el-form-item>
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" label-width="80px" :size="size" style="text-align:left;">
+        <el-form-item label="部门名称" prop="name"><el-input v-model="dataForm.name" aria-placeholder="名称"/></el-form-item>
         <el-form-item label="上级机构" prop="parentName">
           <popup-tree-input
             :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级菜单':dataForm.parentName"
@@ -75,9 +62,7 @@ export default {
 		return {
 			size: 'small',
 			loading: false,
-			filters: {
-				name: ''
-      },
+			filters: {name: ''},
       tableTreeData: [],
       dialogVisible: false,
       dataForm: {
@@ -85,13 +70,8 @@ export default {
         name: '',
         parentId: 0,
         parentName: '',
-        orderNum: 0
       },
-      dataRule: {
-        name: [
-          { required: true, message: '部门名称不能为空', trigger: 'blur' }
-        ],
-      },
+      dataRule: {name: [{ required: true, message: '部门名称不能为空', trigger: 'blur' }],},
       popupTreeData: [],
       popupTreeProps: {
 				label: 'name',
@@ -126,7 +106,6 @@ export default {
         name: '',
         parentId: 0,
         parentName: '',
-        orderNum: 0
       }
 		},
 		//显示编辑界面
@@ -188,9 +167,7 @@ export default {
       return format(row[column.property])
     }
 	},
-	mounted() {
-    this.findTreeData()
-	}
+	mounted() {this.findTreeData()}
 }
 </script>
 <style scoped>

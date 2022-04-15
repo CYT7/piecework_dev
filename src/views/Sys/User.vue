@@ -3,9 +3,7 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item>
-          <el-input v-model="filters.name" placeholder="用户名"></el-input>
-        </el-form-item>
+        <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
@@ -18,58 +16,37 @@
 		<el-form :inline="true" :size="size">
 			<el-form-item>
 				<el-button-group>
-				<el-tooltip content="刷新" placement="top">
-					<el-button icon="fa fa-refresh" @click="findPage(null)"></el-button>
-				</el-tooltip>
-				<el-tooltip content="导出" placement="top">
-					<el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"></el-button>
-				</el-tooltip>
+				<el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+				<el-tooltip content="导出" x-placement="top"><el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"/></el-tooltip>
 				</el-button-group>
 			</el-form-item>
 		</el-form>
 	</div>
 	<!--表格内容栏-->
 	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete" permsDisable="sys:user:disable" permsRecover="sys:user:recover"
-		:data="pageResult" :columns="columns"
-		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
+            :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
+            @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size"
-			label-position="right">
-			<el-form-item label="ID" prop="id" v-if="false">
-				<el-input v-model="dataForm.id" :disabled="true" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="用户名" prop="username">
-				<el-input v-model="dataForm.username" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="中文名" prop="nickName">
-				<el-input v-model="dataForm.chineseName" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="密码" prop="password">
-				<el-input v-model="dataForm.password" type="password" auto-complete="off"></el-input>
-			</el-form-item>
+		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
+			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
+			<el-form-item label="用户名" prop="username"><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
+			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
+			<el-form-item label="密码" prop="password"><el-input v-model="dataForm.password" type="password" auto-complete="off"/></el-form-item>
 			<el-form-item label="部门" prop="deptName">
-				<popup-tree-input
-					:data="deptData"
+				<popup-tree-input :data="deptData"
 					:props="deptTreeProps"
 					:prop="dataForm.deptName"
 					:nodeKey="''+dataForm.deptId"
 					:currentChangeHandle="deptTreeCurrentChangeHandle">
 				</popup-tree-input>
 			</el-form-item>
-			<el-form-item label="邮箱" prop="email">
-				<el-input v-model="dataForm.email" auto-complete="off"></el-input>
-			</el-form-item>
-			<el-form-item label="手机" prop="mobile">
-				<el-input v-model="dataForm.phone" auto-complete="off"></el-input>
-			</el-form-item>
+			<el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
+			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off"/></el-form-item>
 			<el-form-item label="角色" prop="userRoles">
-				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择"
-					 style="width: 100%;">
-					<el-option v-for="item in roles" :key="item.id"
-						:label="item.remark" :value="item.id">
-					</el-option>
+				<el-select v-model="dataForm.userRoles" multiple aria-placeholder="请选择" style="width: 100%;">
+					<el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
 				</el-select>
 			</el-form-item>
 		</el-form>
@@ -84,7 +61,6 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
-import {format} from "../../utils/datetime";
 export default {
 	components:{
 		PopupTreeInput,
@@ -94,9 +70,7 @@ export default {
 	data() {
 		return {
 			size: 'small',
-			filters: {
-				name: ''
-			},
+			filters: {name: ''},
 			columns: [
         {prop:"username", label:"用户名", minWidth:'20%'},
         {prop:"chineseName", label:"中文名", minWidth:'20%'},
@@ -112,9 +86,7 @@ export default {
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
 			dataFormRules: {
-				username: [
-					{ required: true, message: '请输入用户名', trigger: 'blur' }
-				]
+				username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
 			},
 			// 新增编辑界面数据
 			dataForm: {
@@ -122,10 +94,10 @@ export default {
 				username: '',
         chineseName:'',
 				password: '123456',
-				deptId: 1,
+				deptId: '',
 				deptName: '',
 				email: '',
-				mobile: '',
+				phone: '',
 				status: 1,
 				userRoles: []
 			},
@@ -156,8 +128,7 @@ export default {
 			this.$api.user.exportUserExcelFile(this.pageRequest).then((res) => {
 				this.$alert(res.data, '导出成功', {
 					confirmButtonText: '确定',
-					callback: action => {
-					}
+					callback: () => {}
 				})
 			})
 		},
@@ -169,29 +140,24 @@ export default {
 			})
 		},
 		// 批量删除
-		handleDelete: function (data) {
-			this.$api.user.batchDelete(data.params).then(data.callback)
-		},
+		handleDelete: function (data) {this.$api.user.batchDelete(data.params).then(data.callback)},
     // 批量禁用
-    handleDisable: function (data) {
-      this.$api.user.batchDisable(data.params).then(data.callback)
-    },
+    handleDisable: function (data) {this.$api.user.batchDisable(data.params).then(data.callback)},
     //批量恢复
-    handleRecover: function (data) {
-      this.$api.user.batchRecover(data.params).then(data.callback)
-    },
+    handleRecover: function (data) {this.$api.user.batchRecover(data.params).then(data.callback)},
 		// 显示新增界面
 		handleAdd: function () {
 			this.dialogVisible = true
 			this.operation = true
 			this.dataForm = {
 				id: 0,
-				name: '',
+				username: '',
+        chineseName: '',
 				password: '',
 				deptId: '',
 				deptName: '',
 				email: '',
-				mobile: '',
+				phone: '',
 				status: 1,
 				userRoles: []
 			}
@@ -239,20 +205,12 @@ export default {
 			})
 		},
 		// 获取部门列表
-		findDeptTree: function () {
-			this.$api.dept.findDeptTree().then((res) => {
-				this.deptData = res.data
-			})
-		},
+		findDeptTree: function () {this.$api.dept.findDeptTree().then((res) => {this.deptData = res.data})},
 		// 菜单树选中
-      	deptTreeCurrentChangeHandle (data) {
-        	this.dataForm.deptId = data.id
-        	this.dataForm.deptName = data.name
+    deptTreeCurrentChangeHandle (data) {
+		  this.dataForm.deptId = data.id
+      this.dataForm.deptName = data.name
 		},
-		// 时间格式化
-    dateFormat: function (row, column){
-		  return format(row[column.property])
-    },
     // 状态格式化
     statusFormat: function (row, column){
       if (row[column.property]===1){

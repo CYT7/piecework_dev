@@ -31,8 +31,6 @@ export default {
       resData: {
         coefficientList:"",
       },
-      dataColum:[],
-      columns:['title']
     }
   },
   methods:{
