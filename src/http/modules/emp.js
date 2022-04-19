@@ -50,3 +50,11 @@ export const exportEmpExcelFile = (data) => {
     data
   })
 };
+//根据部门id导出职工列表
+export const findEmpTree =(params) =>{
+  return axios({
+    url: '/emp/findEmpTree',
+    method: 'post',
+    params
+  })
+};
