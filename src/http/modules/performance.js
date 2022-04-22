@@ -5,31 +5,7 @@ import axios from '../axios'
 //保存
 export const save = (data) => {
   return axios({
-    url: '/user/save',
-    method: 'post',
-    data
-  })
-};
-//删除
-export const batchDelete = (data) => {
-  return axios({
-    url: '/user/delete',
-    method: 'post',
-    data
-  })
-};
-//批量禁用
-export const batchDisable = (data) => {
-  return axios({
-    url: '/user/disable',
-    method: 'post',
-    data
-  })
-};
-//批量恢复
-export const batchRecover = (data) => {
-  return axios({
-    url: '/user/recover',
+    url: '/performance/save',
     method: 'post',
     data
   })

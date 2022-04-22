@@ -10,44 +10,72 @@
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:performance:add" type="primary" @click="handleAdd"/>
         </el-form-item>
+        <el-form-item>
+          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+        </el-form-item>
       </el-form>
     </div>
-    <!--表格内容栏-->
-    <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
-      <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center"/>
-      <el-table-column sortable prop="empId" label="职工号" header-align="center" align="center"/>
-      <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center"/>
-      <el-table-column sortable v-for="(item,i) in pageResult[0].coefficientList" :key="i" :label="item.coefficientName" header-align="center" align="center">
-        <template slot-scope="scope">
-          <span>{{scope.row.coefficientList[i]?scope.row.coefficientList[i].value:''}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column header-align="center" align="center" :label="$t('action.operation')">
-        <template slot-scope="scope">
-          <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div>
+      <!--表格内容栏-->
+      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center"/>
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center"/>
+        <el-table-column sortable v-for="(item,i) in pageResult[0].coefficientList" :key="i" :label="item.coefficientName" header-align="center" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.coefficientList[i]?scope.row.coefficientList[i].value:''}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')">
+          <template slot-scope="scope">
+            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!--分页栏-->
+      <div class="toolbar" style="padding:10px;">
+        <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
+                       :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize" style="float:right;">
+        </el-pagination>
+      </div>
+    </div>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
+      <el-form v-if="operation===true" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">
-          <el-select placeholder="选择部门" value-key="id" v-model="dataForm.deptId">
-            <el-option v-for="item in deptData" :key="item.id" :label="item.name" :value="item.id"
-                       @click.native="findEmpTree(item.id),findCoefficientTree(item.id)"/>
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
+                            :nodeKey="''+dataForm.deptId"
+                            :currentChangeHandle="deptTreeCurrentChangeHandle"/>
+        </el-form-item>
+        <el-form-item label="职工" prop="empNo">
+          <el-select style="width: 100%" placeholder="选择职工" value-key="id" v-model="dataForm.empNo">
+            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="职工" prop="empId">
-          <el-select placeholder="选择职工" value-key="id" v-model="dataForm.empId">
-            <el-option v-for="item in empData" :key="item.id" :label="item.name" :value="item.id" @click.native="empCurrentChangeHandle(item)"></el-option>
-          </el-select>
+        <el-form-item label="月份" prop="month">
+          <div class="block">
+            <el-date-picker
+              v-model="dataForm.month"
+              type="month"
+              placeholder="选择月"
+              value-format="yyyy-MM-dd"
+            >
+            </el-date-picker>
+          </div>
         </el-form-item>
-        <div v-if="coeData[0]!=null" >
-          <el-form-item v-for="(item,index) in coeData[0].coefficientList" :key="index" :label="item.title" :prop="dataForm[coeData[0].coefficientList[index].value]">
-            <el-input v-model="item.value"></el-input>
-            <el-input v-if="false" v-model="item.id" ></el-input>
+        <div v-if="coeData[0]!=null">
+          <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName" prop="coefficientList">
+            <el-input v-model="item.value" aria-placeholder="请输入值"></el-input>
           </el-form-item>
         </div>
+      </el-form>
+      <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
+        <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
+        <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
+        <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName">
+          <el-input v-model="item.value"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -66,9 +94,14 @@ export default {
   data(){
     return{
       size: "small",
-      loading: false,
+      loading: false,//加载标识
       filters: {name: ""},
-      pageRequest: { pageNum: 1, pageSize: 10 },
+      //分页信息
+      pageRequest: {
+        pageNum: 1,
+        pageSize: 10
+      },
+      totalSize:0,
       pageResult: {
         coefficientList: {
           coefficientId:'',
@@ -83,8 +116,9 @@ export default {
       dataForm: {
         id: 0,
         deptId: '',
-        empId:'',
+        empNo:'',
         empName: '',
+        month:'',
         coefficientList: {
           coefficientId:'',
           coefficientName:'',
@@ -92,40 +126,58 @@ export default {
         }
       },
       deptData: [],
+      deptTreeProps: {
+        label: 'name',
+        children: 'children'
+      },
       empData:[],
       coeData:{
-        coefficientList:[
-          {
-            id:'',
-            title:'',
-            value:''
-          }
-        ],
+        coefficientList: {
+          coefficientId:'',
+          coefficientName:'',
+          value:'',
+        }
       },
     }
   },
   methods:{
     //获取分页数据
     findPage: function () {
-      this.$api.performance.findPage({ pageNum: 1, pageSize: 10 }).then((res) => {
+      this.loading = true;
+      this.$api.performance.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data.content
+        this.totalSize = res.data.totalSize
+        this.loading = false
       })
+    },
+    //换页刷新
+    refreshPageRequest: function (pageNum) {
+      this.pageRequest.pageNum = pageNum;
+      this.findPage()
     },
     //显示新增界面
     handleAdd: function () {
+      this.coeData = ''
       this.dialogVisible = true
       this.operation = true
       this.dataForm = {
         id: 0,
         deptId: '',
-        empId: '',
+        empNo: '',
         empName: '',
+        month:'',
+        coefficientList: {
+          coefficientId:'',
+          coefficientName:'',
+          value:'',
+        }
       }
     },
     //显示编辑界面
     handleEdit: function(row) {
       this.dialogVisible = true;
-      Object.assign(this.dataForm, row);
+      this.operation = false
+      this.dataForm=Object.assign({}, row);
     },
     // 编辑
     submitForm: function () {
@@ -134,30 +186,72 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
+            let empCoe = []
+            console.log(params.coefficientList)
+            for(let i=0,len = params.coefficientList.length;i<len;i++){
+              let empPer = {
+                coefficientId : params.coefficientList[i].coefficientId,
+                coefficientName: params.coefficientList[i].coefficientName,
+                value: params.coefficientList[i].value,
+              }
+              empCoe.push(empPer)
+            }
+            params.coefficientList = empCoe
             console.log(params)
+            this.$api.performance.save(params).then((res)=>{
+              this.editLoading = false
+              if(res.code === 200) {
+                this.$message({ message: '操作成功', type: 'success' })
+                this.dialogVisible = false
+                this.$refs['dataForm'].resetFields()
+              } else {
+                this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+              }
+              this.findPage(null)
+            })
           })
         }
       })
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findDeptTree().then((res) => {this.deptData = res.data})},
+    // 菜单树选中
+    deptTreeCurrentChangeHandle (data) {
+      this.dataForm.deptId = data.id
+      this.dataForm.deptName = data.name
+      this.findCoefficientTree(data.id)
+      this.findEmpTree(data.id)
+    },
     // 获取职工列表
     findEmpTree: function (deptId){
       this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
     },
     empCurrentChangeHandle: function (data){
-      this.dataForm.empId = data.id
+      this.dataForm.empNo = data.empNo
       this.dataForm.empName = data.name
     },
     // 获取绩效列表
     findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{this.coeData = res.data})
+      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+        let result = res.data[0].coefficientList;
+        this.coeData = res.data
+        let empCoe = []
+        for(let i = 0,len=result.length;i<len;i++){
+          let coefficient = {
+            coefficientId:result[i].id,
+            coefficientName:result[i].title,
+            value:result[i].value
+          }
+          empCoe.push(coefficient)
+        }
+        this.dataForm.coefficientList = empCoe
+        })
     },
   },
   mounted() {
-    this.findPage()
+    this.refreshPageRequest(1)
     this.findDeptTree()
-  }
+  },
 }
 </script>
 <style scoped>
