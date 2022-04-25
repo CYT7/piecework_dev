@@ -19,7 +19,7 @@
         "submit": "提交",
         "confirms": "确定",
         "cancel": "取消",
-        "reset": "重置"
-
+        "reset": "重置",
+        "agree": "确认"
     }
 }

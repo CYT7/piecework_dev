@@ -19,6 +19,7 @@
         "submit": "Submit",
         "confirms": "confirm",
         "cancel": "Cancel",
-        "reset": "Reset"
+        "reset": "Reset",
+        "agree": "confirm"
     }
 }

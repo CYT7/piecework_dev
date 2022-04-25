@@ -6,6 +6,9 @@
 export function format (datetime) {
   return formatWithSeperator(datetime, "/", ":");
 }
+export function formats (datetime) {
+  return formatWithSeperators(datetime, "/");
+}
 
 //时间格式化
 export function formatWithSeperator (datetime, dateSeprator, timeSeprator) {
@@ -18,6 +21,15 @@ export function formatWithSeperator (datetime, dateSeprator, timeSeprator) {
     const mm = dateMat.getMinutes();
     const ss = dateMat.getSeconds();
     const timeFormat = year + dateSeprator + month + dateSeprator + day + " " + hh + timeSeprator + mm + timeSeprator + ss;
+    return timeFormat;
+  }
+}
+export function formatWithSeperators (datetime, dateSeprator) {
+  if (datetime != null) {
+    const dateMat = new Date(datetime);
+    const year = dateMat.getFullYear();
+    const month = dateMat.getMonth() + 1;
+    const timeFormat = year + dateSeprator + month;
     return timeFormat;
   }
 }

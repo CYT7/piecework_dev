@@ -25,3 +25,10 @@ export const findPages = (data) => {
     data
   })
 };
+export const confirm = (data) => {
+  return axios({
+    url: '/performance/confirm',
+    method: 'post',
+    data
+  })
+};

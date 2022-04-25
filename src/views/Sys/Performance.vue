@@ -18,18 +18,26 @@
     <div>
       <!--表格内容栏-->
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center"/>
-        <el-table-column sortable v-for="(item,i) in pageResult[0].coefficientList" :key="i" :label="item.coefficientName" header-align="center" align="center">
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="60%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="60%">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0" size="small">不可编辑</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="small">可编辑</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column sortable v-for="(item,i) in pageResult[0].coefficientList" :key="i" :label="item.coefficientName" header-align="center" align="center" min-width="80%">
           <template slot-scope="scope">
             <span>{{scope.row.coefficientList[i]?scope.row.coefficientList[i].value:''}}</span>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')">
-          <template slot-scope="scope">
+        <el-table-column sortable prop="score" label="绩效分" header-align="center" align="center"/>
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
+          <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
+            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" @click="handleConfirm(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -88,6 +96,7 @@
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
+import {formats} from "../../utils/datetime";
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -147,6 +156,7 @@ export default {
       this.$api.performance.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data.content
         this.totalSize = res.data.totalSize
+        console.log(this.pageResult)
         this.loading = false
       })
     },
@@ -178,6 +188,18 @@ export default {
       this.dialogVisible = true;
       this.operation = false
       this.dataForm=Object.assign({}, row);
+    },
+    // 确认
+    handleConfirm(row){
+      this.$confirm("确认此条信息无误吗？","提示",{
+        type:"warning"
+      }).then(()=>{
+        console.log(row)
+        this.$api.performance.confirm(row).then(()=>{
+          this.findPage();
+          this.$message({ message: "确认成功", type: "success" });
+        })
+      })
     },
     // 编辑
     submitForm: function () {
@@ -247,6 +269,10 @@ export default {
         this.dataForm.coefficientList = empCoe
         })
     },
+    // 时间格式化
+    dateFormat: function (row, column){
+      return formats(row[column.property])
+    }
   },
   mounted() {
     this.refreshPageRequest(1)
