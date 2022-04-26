@@ -152,10 +152,6 @@
         myDate.setTime(-1000); // 设置过期时间
         document.cookie = name+"=''; expires="+myDate.toGMTString();
       },
-      openOnlinePage() {
-        //通过菜单URL跳转至指定路由
-        this.$router.push('/sys/online')
-      },
       //时间格式化
       dateFormat(date){
         return format(date)

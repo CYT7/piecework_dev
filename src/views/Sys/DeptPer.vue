@@ -98,7 +98,7 @@ import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
 import {formats} from "../../utils/datetime";
 export default {
-  name: "Performance",
+  name: "DeptPer",
   components: {PopupTreeInput, KtButton, KtTable},
   data(){
     return{
@@ -108,7 +108,7 @@ export default {
       //分页信息
       pageRequest: {
         pageNum: 1,
-        pageSize: 10
+        pageSize: 10,
       },
       totalSize:0,
       pageResult: {
@@ -153,7 +153,8 @@ export default {
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.$api.performance.findPage(this.pageRequest).then((res) => {
+      console.log(this.pageRequest)
+      this.$api.performance.findPageByDept(this.pageRequest).then((res) => {
         this.pageResult = res.data.content
         this.totalSize = res.data.totalSize
         this.loading = false
@@ -266,7 +267,7 @@ export default {
           empCoe.push(coefficient)
         }
         this.dataForm.coefficientList = empCoe
-        })
+      })
     },
     // 时间格式化
     dateFormat: function (row, column){

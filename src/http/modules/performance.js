@@ -18,9 +18,16 @@ export const findPage = (data) => {
     data
   })
 };
+export const findPageByDept = (data) => {
+  return axios({
+    url: '/performance/findPageByDept',
+    method: 'post',
+    data
+  })
+};
 export const findPages = (data) => {
   return axios({
-    url: '/performance/findPages',
+    url: '/performance/findPageByDept',
     method: 'post',
     data
   })
