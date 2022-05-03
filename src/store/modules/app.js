@@ -23,6 +23,5 @@ export default {
             state.menuRouteLoaded = menuRouteLoaded;
         }
     },
-    actions: {
-    }
+    actions: {}
 }

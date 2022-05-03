@@ -4,9 +4,8 @@
       <div class="name-role">
         <span class="sender">{{ user.chineseName }} - {{ user.roleNames }}</span>
       </div>
-      <div class="registe-info">
-          <span class="registe-info">
-            <li class="fa fa-clock-o"></li>
+      <div class="register-info">
+          <span class="register-info fa fa-clock-o">
             创建时间-{{ this.dateFormat(user.createTime) }}
           </span>
       </div>
@@ -15,20 +14,22 @@
         <span class="main-operation-item" @click="openPersonCenter">
           <el-button size="small" icon="fa fa-male" > 个人中心</el-button>
         </span>
-      <span class="main-operation-item" @click="openupdatePasswordDialog">
+      <span class="main-operation-item" @click="updatePasswordDialog">
           <el-button size="small" icon="fa fa-key"> 修改密码</el-button>
         </span>
     </div>
     <div class="other-operation">
       <div class="other-operation-item" @click="clearCache">
-        <li class="fa fa-eraser"></li>
-        清除缓存
+        <ul>
+          <li class="fa fa-eraser">清除缓存</li>
+        </ul>
       </div>
 
     </div>
     <div class="personal-footer" @click="logout">
-      <li class="fa fa-sign-out"></li>
-      {{$t("common.logout")}}
+      <ul>
+        <li class="fa fa-sign-out">{{$t("common.logout")}}</li>
+      </ul>
     </div>
     <!--修改密码界面-->
     <el-dialog title="修改密码" width="40%" :visible.sync="updatePwdDialogVisible" :close-on-click-modal="false" :modal="false">
@@ -39,8 +40,8 @@
         <el-form-item label="新密码" prop="newPassword">
           <el-input v-model="updatePwdDataForm.newPassword" type="password" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="确认新密码" prop="comfirmPassword">
-          <el-input v-model="updatePwdDataForm.comfirmPassword" type="password" auto-complete="off"></el-input>
+        <el-form-item label="确认新密码" prop="confirmPassword">
+          <el-input v-model="updatePwdDataForm.confirmPassword" type="password" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -51,7 +52,7 @@
   </div>
 </template>
 <script>
-  import { format } from "@/utils/datetime"
+  import {format} from "../../utils/datetime";
   export default {
     name: 'PersonalPanel',
     components:{},
@@ -68,7 +69,7 @@
         updatePwdDataForm: {
           password: '',
           newPassword: '',
-          comfirmPassword: ''
+          confirmPassword: ''
         },
         updatePwdDataFormRules: {
           password: [
@@ -77,7 +78,7 @@
           newPassword: [
             { required: true, message: '请输入新密码', trigger: 'blur' }
           ],
-          comfirmPassword: [
+          confirmPassword: [
             { required: true, message: '请确认密码', trigger: 'blur' }
           ]
         },
@@ -89,14 +90,14 @@
         alert('待开发')
       },
       //打开修改密码对话框
-      openupdatePasswordDialog: function () {
+      updatePasswordDialog: function () {
         this.updatePwdDialogVisible = true
       },
       //修改密码
       updatePassword: function () {
         this.$refs.updatePwdDataForm.validate((valid) => {
           if (valid) {
-            if(this.updatePwdDataForm.newPassword != this.updatePwdDataForm.comfirmPassword) {
+            if(this.updatePwdDataForm.newPassword !== this.updatePwdDataForm.confirmPassword) {
               this.$message({message: '新密码与确认新密码不一致', type: 'error'});
               return
             }
@@ -142,13 +143,13 @@
       logoutApi() {
         sessionStorage.removeItem("user");
         this.$router.push("/login");
-        this.$api.login.logout().then((res) => {
+        this.$api.login.logout().then(() => {
         }).catch(function(res) {
         })
       },
       //清除Cookie
       deleteCookie(name){
-        var myDate = new Date();
+        let myDate = new Date();
         myDate.setTime(-1000); // 设置过期时间
         document.cookie = name+"=''; expires="+myDate.toGMTString();
       },
@@ -173,11 +174,6 @@
   .personal-desc {
     padding: 15px;
     color: #fff;
-  }
-  .avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 90px;
   }
   .name-role {
     font-size: 16px;

@@ -1,7 +1,7 @@
 /**
  * 嵌套页面IFrame模块
  **/
-import { baseUrl } from '@/utils/global'
+import { baseUrl } from './global'
 
 //嵌套页面URL地址
 export function getIFramePath (url) {

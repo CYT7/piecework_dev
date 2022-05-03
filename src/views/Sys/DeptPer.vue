@@ -97,6 +97,7 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
 import {formats} from "../../utils/datetime";
+const user = sessionStorage.getItem("user");
 export default {
   name: "DeptPer",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -153,7 +154,7 @@ export default {
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      console.log(this.pageRequest)
+      this.pageRequest.params = [{name:'user', value:user}];
       this.$api.performance.findPageByDept(this.pageRequest).then((res) => {
         this.pageResult = res.data.content
         this.totalSize = res.data.totalSize

@@ -4,14 +4,14 @@
 
 //时间格式化
 export function format (datetime) {
-  return formatWithSeperator(datetime, "/", ":");
+  return formatWithSeparator(datetime, "/", ":");
 }
 export function formats (datetime) {
-  return formatWithSeperators(datetime, "/");
+  return formatWithSeparators(datetime, "/");
 }
 
 //时间格式化
-export function formatWithSeperator (datetime, dateSeprator, timeSeprator) {
+export function formatWithSeparator (datetime, dateSeparator, timeSeparator) {
   if (datetime != null) {
     const dateMat = new Date(datetime);
     const year = dateMat.getFullYear();
@@ -20,16 +20,14 @@ export function formatWithSeperator (datetime, dateSeprator, timeSeprator) {
     const hh = dateMat.getHours();
     const mm = dateMat.getMinutes();
     const ss = dateMat.getSeconds();
-    const timeFormat = year + dateSeprator + month + dateSeprator + day + " " + hh + timeSeprator + mm + timeSeprator + ss;
-    return timeFormat;
+    return year + dateSeparator + month + dateSeparator + day + " " + hh + timeSeparator + mm + timeSeparator + ss;
   }
 }
-export function formatWithSeperators (datetime, dateSeprator) {
+export function formatWithSeparators (datetime, dateSeparator) {
   if (datetime != null) {
     const dateMat = new Date(datetime);
     const year = dateMat.getFullYear();
     const month = dateMat.getMonth() + 1;
-    const timeFormat = year + dateSeprator + month;
-    return timeFormat;
+    return year + dateSeparator + month;
   }
 }

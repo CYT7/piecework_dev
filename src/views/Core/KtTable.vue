@@ -30,11 +30,12 @@
   </div>
 </template>
 <script>
-import KtButton from "@/views/Core/KtButton"
+import KtButton from "./KtButton";
 export default {
   name: 'KtTable',
   components:{
-			KtButton
+    KtButton
+
 	},
   props: {
     columns: Array, //表格列配置
@@ -95,7 +96,7 @@ export default {
     //分页查询
     findPage: function () {
         this.loading = true;
-        let callback = res => {
+        let callback = () => {
           this.loading = false
         };
       this.$emit('findPage', {pageRequest:this.pageRequest, callback:callback})
@@ -142,7 +143,7 @@ export default {
 			}).then(() => {
 				let params = [];
 				let idArray = (ids+'').split(',');
-				for(var i=0; i<idArray.length; i++) {
+				for(let i=0; i<idArray.length; i++) {
 					params.push({'id':idArray[i]})
         }
         this.loading = true;
@@ -166,7 +167,7 @@ export default {
       }).then(() => {
         let params = [];
         let idArray = (ids+'').split(',');
-        for(var i=0; i<idArray.length; i++) {
+        for(let i=0; i<idArray.length; i++) {
           params.push({'id':idArray[i]})
         }
         this.loading = true;
@@ -190,7 +191,7 @@ export default {
       }).then(() => {
         let params = [];
         let idArray = (ids+'').split(',');
-        for(var i=0; i<idArray.length; i++) {
+        for(let i=0; i<idArray.length; i++) {
           params.push({'id':idArray[i]})
         }
         this.loading = true;
@@ -208,9 +209,7 @@ export default {
       })
     }
   },
-  mounted() {
-    this.refreshPageRequest(1)
-  }
+  mounted() {this.refreshPageRequest(1)}
 }
 </script>
 <style scoped>

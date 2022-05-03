@@ -1,6 +1,6 @@
 <template>
   <div class="iframe-container">
-    <iframe :src="src" scrolling="auto" frameborder="0" class="frame" :onload="onloaded()">
+    <iframe :src="src" :scrolling="auto" :frameborder="0"  class="frame" :onload="onload()">
     </iframe>
   </div>
 </template>
@@ -9,6 +9,7 @@
     data() {
       return {
         src: "",
+        auto:"auto",
         loading: null
       }
     },
@@ -27,7 +28,7 @@
           target: document.querySelector("#main-container ")
         })
       },
-      onloaded: function() {
+      onload: function() {
         if(this.loading) {
           this.loading.close()
         }
@@ -38,7 +39,7 @@
     },
     watch: {
       $route: {
-        handler: function(val, oldVal) {
+        handler: function() {
           //如果是跳转到嵌套页面，切换iframe的url
           this.resetSrc(this.$store.state.iframe.iframeUrl);
         }

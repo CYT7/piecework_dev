@@ -5,7 +5,7 @@
   </el-button>
 </template>
 <script>
-import { hasPermission } from '@/permission/index.js'
+import {hasPermission} from "../../permission";
 export default {
   name: 'KtButton',
   props: {
@@ -38,9 +38,7 @@ export default {
       default: null
     }
   },
-  data() {
-    return {}
-  },
+  data() {return {}},
   methods: {
     handleClick: function () {
       //按钮操作处理函数

@@ -19,10 +19,11 @@ export const findPage = (data) => {
   })
 };
 export const findPageByDept = (data) => {
+  console.log('data',data)
   return axios({
     url: '/performance/findPageByDept',
     method: 'post',
-    data
+    data,
   })
 };
 export const findPages = (data) => {

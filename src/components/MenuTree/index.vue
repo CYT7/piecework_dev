@@ -12,7 +12,7 @@
   </el-menu-item>
 </template>
 <script>
-import { getIFramePath } from '@/utils/iframe'
+import {getIFramePath} from "../../utils/iframe";
 export default {
   name: 'MenuTree',
   props: {

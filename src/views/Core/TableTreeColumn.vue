@@ -64,12 +64,12 @@
       },
       //移除子节点
       removeChildNode (data, parentId) {
-        var parentIds = isArray(parentId) ? parentId : [parentId];
+        let parentIds = isArray(parentId) ? parentId : [parentId];
         if (parentId.length <= 0) {
           return data
         }
-        var ids = [];
-        for (var i = 0; i < data.length; i++) {
+        let ids = [];
+        for (let i = 0; i < data.length; i++) {
           if (parentIds.indexOf(data[i][this.parentKey]) !== -1 && parentIds.indexOf(data[i][this.treeKey]) === -1) {
             ids.push(data.splice(i, 1)[0][this.treeKey]);
             i--

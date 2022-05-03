@@ -33,7 +33,7 @@ export default {
 				{prop:"method", label:"方法", minWidth:'20%'},
 				{prop:"params", label:"参数", minWidth:'20%'},
 				{prop:"ip", label:"IP", minWidth:'20%'},
-				{prop:"time", label:"耗时", minWidth:'20%'},
+				{prop:"time", label:"耗时", minWidth:'20%',formatter:this.timeFormat},
 				{prop:"createBy", label:"创建人", minWidth:'20%'},
 				{prop:"createTime", label:"创建时间", minWidth:'20%', formatter:this.dateFormat},
       ],
@@ -54,7 +54,11 @@ export default {
     //时间格式化
     dateFormat: function (row, column){
 		  return format(row[column.property])
-		}
+		},
+    //耗时格式化
+    timeFormat: function (row,column){
+		  return row[column.property]/1000 + 's';
+    }
 	},
 	mounted() {}
 }
