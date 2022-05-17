@@ -18,6 +18,13 @@
     <div>
       <!--表格内容栏-->
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-form label-position="left" inline style="font-size: 0">
+              <el-form-item v-for="(item,i) in scope.row.empList" :key="i" :label="item.coefficientName">{{item.value}}</el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="60%"/>
         <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="60%"/>
@@ -28,12 +35,13 @@
             <el-tag v-else-if="scope.row.status === 1" size="small">可编辑</el-tag>
           </template>
         </el-table-column>
-        <el-table-column sortable v-for="(item,i) in pageResult[0].coefficientList" :key="i" :label="item.coefficientName" header-align="center" align="center" min-width="80%">
-          <template slot-scope="scope">
-            <span>{{scope.row.coefficientList[i]?scope.row.coefficientList[i].value:''}}</span>
-          </template>
+        <el-table-column label="分数" header-align="center" align="center" min-width="60%">
+          <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i" :label="statusFormat(item.points)" header-align="center" align="center" min-width="80%">
+            <template slot-scope="scope">
+              <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
+            </template>
+          </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="score" label="绩效分" header-align="center" align="center"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
@@ -97,6 +105,7 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
 import {formats} from "../../utils/datetime";
+import {string} from "mockjs";
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -112,7 +121,11 @@ export default {
       },
       totalSize:0,
       pageResult: {
-        coefficientList: {
+        scoreList:{
+          points:'',
+          score:'',
+        },
+        empList: {
           coefficientId:'',
           coefficientName:'',
           value:'',
@@ -154,8 +167,9 @@ export default {
     findPage: function () {
       this.loading = true;
       this.$api.performance.findPage(this.pageRequest).then((res) => {
-        this.pageResult = res.data.content
-        this.totalSize = res.data.totalSize
+        this.pageResult = res.data
+        console.log(res.data)
+        this.totalSize = res.totalSize
         this.loading = false
       })
     },
@@ -271,7 +285,17 @@ export default {
     // 时间格式化
     dateFormat: function (row, column){
       return formats(row[column.property])
-    }
+    },
+    statusFormat: function (item){
+      if(item===1){
+        return '加分'
+      }else if (item === 2){
+        return '扣分'
+      }
+      else{
+        return '其他'
+      }
+    },
   },
   mounted() {
     this.refreshPageRequest(1)

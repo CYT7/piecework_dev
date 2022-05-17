@@ -117,7 +117,7 @@ export default {
 			}
       this.pageRequest.params = [{username:'username', value:this.filters.name}]
 			this.$api.user.findPage(this.pageRequest).then((res) => {
-				this.pageResult = res.data
+				this.pageResult = res
 				this.findUserRoles()
 			}).then(data!=null?data.callback:'')
 		},

@@ -37,7 +37,7 @@ export default {
     //获取分页数据
     findCoefficientTree: function () {
       this.$api.performance.findPage({ pageNum: 1, pageSize: 10 }).then((res) => {
-        this.resData = res.data.content
+        this.resData = res.data
       })
     },
     // findCoefficientTree: function () {
