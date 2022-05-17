@@ -17,12 +17,19 @@
     </div>
     <div>
       <!--表格内容栏-->
-      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
+      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')"
+                @selection-change="selectionChange">
+        <el-table-column type="selection" width="40"/>
         <el-table-column type="expand">
-          <template slot-scope="scope">
-            <el-form label-position="left" inline style="font-size: 0">
-              <el-form-item v-for="(item,i) in scope.row.empList" :key="i" :label="item.coefficientName">{{item.value}}</el-form-item>
-            </el-form>
+          <template slot-scope="props">
+            <el-table stripe :data="[[]]" width="100%">
+              <el-table-column v-for="(item,i) in props.row.empList" :key="i" :label="item.coefficientName" aria-rowcount="1" header-align="center" align="center" min-width="50%">
+                {{item.value}}
+              </el-table-column>
+            </el-table>
+<!--            <el-form label-position="left" inline style="font-size: 0">-->
+<!--              <el-form-item v-for="(item,i) in props.row.empList" :key="i" :label="item.coefficientName">{{item.value}}</el-form-item>-->
+<!--            </el-form>-->
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
@@ -51,6 +58,8 @@
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
+        <kt-button :label="$t('action.batchDelete')" perms="sys:performance:confirm" :size="size" type="danger" @click="handleBatchConfirm()"
+                   :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete"/>
         <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
                        :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize" style="float:right;">
         </el-pagination>
@@ -105,10 +114,15 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
 import {formats} from "../../utils/datetime";
-import {string} from "mockjs";
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
+  props:{
+    showBatchDelete: {//是否显示操作组件
+      type: Boolean,
+      default: true
+    }
+  },
   data(){
     return{
       size: "small",
@@ -160,6 +174,7 @@ export default {
           value:'',
         }
       },
+      selections: []//列表选中列
     }
   },
   methods:{
@@ -202,15 +217,45 @@ export default {
       this.operation = false
       this.dataForm=Object.assign({}, row);
     },
+    //选择切换
+    selectionChange: function (selections) {
+      this.selections = selections;
+      this.$emit('selectionChange', {selections:selections})
+    },
+    //选择切换
+    handleCurrentChange: function (val) {
+      this.$emit('handleCurrentChange', {val:val})
+    },
+    //批量确认
+    handleBatchConfirm: function () {
+      let Params = []
+      this.selections.forEach(t=>{
+        let params = {
+          "empNo":t.empNo,
+          "month":t.month,
+        }
+        Params.push(params)
+      })
+      this.confirm(Params)
+    },
     // 确认
     handleConfirm(row){
+      let params = [{"empNo":row.empNo,"month":row.month}];
+      this.confirm(params)
+    },
+    confirm: function (params) {
       this.$confirm("确认此条信息无误吗？","提示",{
         type:"warning"
       }).then(()=>{
-        console.log(row)
-        this.$api.performance.confirm(row).then(()=>{
+        this.loading = true;
+        this.$api.performance.confirm(params).then((res)=>{
+          if (res.code===200){
+            this.$message({ message: "确认成功", type: "success" });
+          }else{
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          }
           this.findPage();
-          this.$message({ message: "确认成功", type: "success" });
+          this.loading = false
         })
       })
     },
