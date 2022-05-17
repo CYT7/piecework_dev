@@ -14,6 +14,7 @@
         "disable": "Disable",
         "recover": "recover",
         "batchDelete": "Batch Delete",
+        "batchConfirm": "Batch Confirm",
         "search": "Search",
         "loading": "loading",
         "submit": "Submit",

@@ -14,6 +14,7 @@
         "disable": "禁用",
         "recover": "恢复",
         "batchDelete": "批量删除",
+        "batchConfirm": "批量确认",
         "search": "查询",
         "loading": "拼命加载中",
         "submit": "提交",

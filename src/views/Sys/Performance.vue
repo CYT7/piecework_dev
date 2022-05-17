@@ -27,9 +27,6 @@
                 {{item.value}}
               </el-table-column>
             </el-table>
-<!--            <el-form label-position="left" inline style="font-size: 0">-->
-<!--              <el-form-item v-for="(item,i) in props.row.empList" :key="i" :label="item.coefficientName">{{item.value}}</el-form-item>-->
-<!--            </el-form>-->
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
@@ -58,7 +55,7 @@
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
-        <kt-button :label="$t('action.batchDelete')" perms="sys:performance:confirm" :size="size" type="danger" @click="handleBatchConfirm()"
+        <kt-button :label="$t('action.batchConfirm')" perms="sys:performance:confirm" :size="size" type="danger" @click="handleBatchConfirm()"
                    :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete"/>
         <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
                        :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize" style="float:right;">
