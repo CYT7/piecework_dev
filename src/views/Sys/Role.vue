@@ -110,7 +110,7 @@ export default {
 		},
 		// 批量删除
 		handleDelete: function (data) {
-			this.$api.role.batchDelete(data.params).then(data.callback)
+			this.$api.role.batchDelete({'roleId':data.params}).then(data.callback)
 		},
 		// 显示新增界面
 		handleAdd: function () {
@@ -220,7 +220,8 @@ export default {
 				let roleMenu = { roleId:roleId, menuId:checkedNodes[i].id }
 				roleMenus.push(roleMenu)
 			}
-			this.$api.role.saveRoleMenus(roleMenus).then((res) => {
+			console.log(roleMenus)
+			this.$api.role.saveRoleMenus({"roleMenuList":roleMenus}).then((res) => {
 				if(res.code === 200) {
 					this.$message({ message: '操作成功', type: 'success' })
 				} else {

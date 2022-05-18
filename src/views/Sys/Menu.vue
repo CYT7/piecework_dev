@@ -179,7 +179,8 @@ export default {
         type: "warning"
       }).then(() => {
         let params = this.getDeleteIds([], row);
-        this.$api.menu.batchDelete(params).then(() => {
+        console.log(params)
+        this.$api.menu.batchDelete({'menuId':params}).then(() => {
           this.findTreeData();
           this.$message({ message: "删除成功", type: "success" });
         });
@@ -187,7 +188,7 @@ export default {
     },
     //获取删除的包含子菜单的id列表
     getDeleteIds(ids, row) {
-      ids.push({ id: row.id });
+      ids.push(row.id);
       if (row.children != null) {
         for (let i = 0, len = row.children.length; i < len; i++) {
           this.getDeleteIds(ids, row.children[i]);

@@ -15,7 +15,8 @@
     <!--表格内容栏-->
     <kt-table perms-edit="sys:coefficient:edit" perms-delete="sys:coefficient:delete" perms-disable="sys:coefficient:disable" perms-recover="sys:coefficient:recover"
               :highlight-current-row="true" :stripe="false" :data="pageResult" :columns="columns" :show-batch-delete="true"
-              @findPage="findPage" @handleEdit="handleEdit" @handleDelte="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover"/>
+              @findPage="findPage" @handleEdit="handleEdit" @handleDelte="handleDelete" @handleDisable="handleDisable"
+              @handleRecover="handleRecover" @handleDelete="handleDelete"/>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
@@ -95,7 +96,7 @@ export default {
       }
       this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.$api.coefficient.findPage(this.pageRequest).then((res) => {
-        this.pageResult = res.data
+        this.pageResult = res
       }).then(data!=null?data.callback:'')
     },
     // 批量删除
@@ -104,11 +105,11 @@ export default {
     },
     // 批量禁用
     handleDisable: function (data) {
-      this.$api.coefficient.batchDisable(data.params).then(data.callback)
+      this.$api.coefficient.batchDisable({"coefficientId":data.params}).then(data.callback)
     },
     //批量恢复
     handleRecover: function (data) {
-      this.$api.coefficient.batchRecover(data.params).then(data.callback)
+      this.$api.coefficient.batchRecover({"coefficientId":data.params}).then(data.callback)
     },
     // 显示新增界面
     handleAdd: function () {

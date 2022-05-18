@@ -23,6 +23,8 @@
     <div class="toolbar" style="padding:10px;">
       <kt-button :label="$t('action.batchDelete')" :perms="permsDelete" :size="size" type="danger" @click="handleBatchDelete()"
         :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete & showOperation"/>
+      <kt-button :label="$t('action.batchDelete')" :perms="permsDelete" :size="size" type="danger" @click="handleBatchDelete()"
+                 :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete & showOperation"/>
       <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
         :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="data.totalSize"  style="float:right;">
       </el-pagination>
@@ -121,7 +123,8 @@ export default {
 		},
     //删除
 		handleDelete: function (index, row) {
-			this.delete(row.id)
+      let ids = [row.id]
+			this.delete(ids)
 		},
     //禁用
     handleDisable: function (index, row) {
@@ -133,7 +136,11 @@ export default {
     },
 		//批量删除
 		handleBatchDelete: function () {
-			let ids = this.selections.map(item => item.id).toString();
+      let ids = []
+      this.selections.forEach(t=>{
+        ids.push(t.id)
+      })
+			console.log(ids)
 			this.delete(ids)
 		},
 		//删除操作
@@ -141,12 +148,7 @@ export default {
 			this.$confirm('确认删除选中记录吗？', '提示', {
 				type: 'warning'
 			}).then(() => {
-				let params = [];
-				let idArray = (ids+'').split(',');
-				console.log(idArray)
-				for(let i=0; i<idArray.length; i++) {
-					params.push({'id':idArray[i]})
-        }
+				let params = ids;
         this.loading = true;
         let callback = res => {
           if(res.code === 200) {
@@ -166,11 +168,8 @@ export default {
       this.$confirm('确认禁用选中的记录吗？', '提示', {
         type: 'warning'
       }).then(() => {
-        let params = [];
-        let idArray = (ids+'').split(',');
-        for(let i=0; i<idArray.length; i++) {
-          params.push({'id':idArray[i]})
-        }
+        console.log(ids)
+        let params = [ids]
         this.loading = true;
         let callback = res => {
           if(res.code === 200) {
@@ -190,11 +189,7 @@ export default {
       this.$confirm('确认恢复选中的记录吗？', '提示', {
         type: 'warning'
       }).then(() => {
-        let params = [];
-        let idArray = (ids+'').split(',');
-        for(let i=0; i<idArray.length; i++) {
-          params.push({'id':idArray[i]})
-        }
+        let params = [ids]
         this.loading = true;
         let callback = res => {
           if(res.code === 200) {
