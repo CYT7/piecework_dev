@@ -143,6 +143,7 @@ export default {
 			}).then(() => {
 				let params = [];
 				let idArray = (ids+'').split(',');
+				console.log(idArray)
 				for(let i=0; i<idArray.length; i++) {
 					params.push({'id':idArray[i]})
         }

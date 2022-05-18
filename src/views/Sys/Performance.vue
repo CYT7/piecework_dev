@@ -137,6 +137,7 @@ export default {
           score:'',
         },
         empList: {
+          id:'',
           coefficientId:'',
           coefficientName:'',
           value:'',
@@ -227,25 +228,49 @@ export default {
     handleBatchConfirm: function () {
       let Params = []
       this.selections.forEach(t=>{
-        let params = {
-          "empNo":t.empNo,
-          "month":t.month,
-        }
-        Params.push(params)
+        let Param = []
+        t.empList.forEach(i =>{
+          let param = {
+            "id":i.id,
+            "empNo":t.empNo,
+            "month":t.month,
+            "coefficientId":i.coefficientId,
+            "value":i.value,
+          }
+          Param.push(param)
+        })
+        Params.push(Param)
       })
       this.confirm(Params)
     },
     // 确认
     handleConfirm(row){
-      let params = [{"empNo":row.empNo,"month":row.month}];
+      let params = []
+      row.empList.forEach(t=>{
+        let param = [{
+          "id":t.id,
+          "empNo":row.empNo,
+          "month":row.month,
+          "coefficientId":t.coefficientId,
+          "value":t.value,
+        }]
+        params.push(param)
+      })
       this.confirm(params)
     },
     confirm: function (params) {
       this.$confirm("确认此条信息无误吗？","提示",{
         type:"warning"
       }).then(()=>{
+        let param = []
+        params.forEach(i=>{
+          i.forEach(t=>{
+            param.push(t)
+          })
+        })
+        console.log(param)
         this.loading = true;
-        this.$api.performance.confirm(params).then((res)=>{
+        this.$api.performance.confirm({"empList":param}).then((res)=>{
           if (res.code===200){
             this.$message({ message: "确认成功", type: "success" });
           }else{
@@ -330,9 +355,9 @@ export default {
     },
     statusFormat: function (item){
       if(item===1){
-        return '加分'
+        return '月总产量分数'
       }else if (item === 2){
-        return '扣分'
+        return '月扣除产量分数'
       }
       else{
         return '其他'
