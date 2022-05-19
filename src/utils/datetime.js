@@ -1,7 +1,6 @@
 /**
  * 时间日期相关操作
  **/
-
 //时间格式化
 export function format (datetime) {
   return formatWithSeparator(datetime, "/", ":");
@@ -9,7 +8,6 @@ export function format (datetime) {
 export function formats (datetime) {
   return formatWithSeparators(datetime, "/");
 }
-
 //时间格式化
 export function formatWithSeparator (datetime, dateSeparator, timeSeparator) {
   if (datetime != null) {

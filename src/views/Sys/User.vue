@@ -190,6 +190,7 @@ export default {
 						}
 						params.userRoles = userRoles
 						this.$api.user.save(params).then((res) => {
+						  console.log(params)
 							this.editLoading = false
 							if(res.code === 200) {
 								this.$message({ message: '操作成功', type: 'success' })

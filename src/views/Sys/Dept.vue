@@ -119,7 +119,7 @@ export default {
 				type: 'warning'
       }).then(() => {
         let params = this.getDeleteIds([], row);
-        this.$api.dept.batchDelete({'deptId':params}).then(() => {
+        this.$api.dept.Delete({'deptId':params}).then(() => {
           this.findTreeData();
           this.$message({message: '删除成功', type: 'success'})
         })

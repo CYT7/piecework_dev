@@ -101,15 +101,15 @@ export default {
     },
     // 批量删除
     handleDelete: function (data) {
-      this.$api.coefficient.batchDelete(data.params).then(data.callback)
+      this.$api.coefficient.Delete(data.params).then(data.callback)
     },
     // 批量禁用
     handleDisable: function (data) {
-      this.$api.coefficient.batchDisable({"coefficientId":data.params}).then(data.callback)
+      this.$api.coefficient.disable({"coefficientId":data.params}).then(data.callback)
     },
     //批量恢复
     handleRecover: function (data) {
-      this.$api.coefficient.batchRecover({"coefficientId":data.params}).then(data.callback)
+      this.$api.coefficient.recover({"coefficientId":data.params}).then(data.callback)
     },
     // 显示新增界面
     handleAdd: function () {

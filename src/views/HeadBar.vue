@@ -74,7 +74,7 @@ export default {
     },
     //切换主题
     onThemeChange: function(themeColor) {
-      this.$store.commit('setThemeColor', themeColor)
+      this.$store.commit('onThemeChange', themeColor)
     },
     //语言切换
     changeLanguage(lang) {

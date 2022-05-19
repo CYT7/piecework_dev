@@ -180,7 +180,7 @@ export default {
       }).then(() => {
         let params = this.getDeleteIds([], row);
         console.log(params)
-        this.$api.menu.batchDelete({'menuId':params}).then(() => {
+        this.$api.menu.Delete({'menuId':params}).then(() => {
           this.findTreeData();
           this.$message({ message: "删除成功", type: "success" });
         });

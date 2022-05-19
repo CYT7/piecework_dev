@@ -1,13 +1,11 @@
-import { baseUrl } from '@/utils/global'
+import {baseUrl} from "../utils/global";
 
 export default {
   method: 'get',
   //基础url前缀
   baseUrl: baseUrl,
   //请求头信息
-  headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
-  },
+  headers: {'Content-Type': 'application/json;charset=UTF-8'},
   //参数
   data: {},
   //设置超时时间

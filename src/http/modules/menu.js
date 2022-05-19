@@ -2,7 +2,7 @@ import axios from '../axios'
 /**
  * 菜单管理模块
  **/
- //保存
+//保存
 export const save = (data) => {
     return axios({
         url: '/menu/save',
@@ -11,7 +11,7 @@ export const save = (data) => {
     })
 };
 //删除
-export const batchDelete = (data) => {
+export const Delete = (data) => {
     return axios({
         url: '/menu/delete',
         method: 'post',

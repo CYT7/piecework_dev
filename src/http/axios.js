@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from './config';
 import Cookies from "js-cookie";
-import router from '@/router'
+import router from "../router";
 
 export default function $axios(options) {
   return new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ export default function $axios(options) {
           config.headers.token = token
         } else {
           //重定向到登录页面
-          router.push('/login')
+          router.push('/login').then(() => {})
         }
         return config
       },
@@ -39,7 +39,7 @@ export default function $axios(options) {
           const errorStatus = errorInfo.status; //404 403 500 ...
           router.push({
             path: `/error/${errorStatus}`
-          })
+          }).then(() => {})
         }
         return Promise.reject(error) //调用拿到(catch)返回的错误信息
       }

@@ -14,8 +14,8 @@
 	</div>
 	<!--表格内容栏-->
 	<kt-table permsEdit="sys:role:edit" permsDelete="sys:role:delete" :highlightCurrentRow="true" :stripe="false"
-		:data="pageResult" :columns="columns" :showBatchDelete="false" @handleCurrentChange="handleRoleSelectChange"
-		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
+            :data="pageResult" :columns="columns" showBatchOperation="false" @handleCurrentChange="handleRoleSelectChange"
+            @findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">

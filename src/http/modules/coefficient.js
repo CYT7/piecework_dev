@@ -2,6 +2,22 @@ import axios from '../axios'
 /**
  * 系数管理模块
  **/
+//分页查询
+export const findPage = (data) => {
+  return axios({
+    url: '/coefficient/findPage',
+    method: 'post',
+    data
+  })
+};
+//查询系数树
+export const findCoefficientTree = (params) => {
+  return axios({
+    url: '/coefficient/findCoefficientTree',
+    method: 'post',
+    params
+  })
+};
 //保存
 export const save = (data) => {
   return axios({
@@ -11,7 +27,7 @@ export const save = (data) => {
   })
 };
 //删除
-export const batchDelete = (data) => {
+export const Delete = (data) => {
   return axios({
     url: '/coefficient/delete',
     method: 'post',
@@ -19,7 +35,7 @@ export const batchDelete = (data) => {
   })
 };
 //批量禁用
-export const batchDisable = (data) => {
+export const disable = (data) => {
   return axios({
     url: '/coefficient/disable',
     method: 'post',
@@ -27,25 +43,10 @@ export const batchDisable = (data) => {
   })
 };
 //批量恢复
-export const batchRecover = (data) => {
+export const recover = (data) => {
   return axios({
     url: '/coefficient/recover',
     method: 'post',
     data
-  })
-};
-//分页查询
-export const findPage = (data) => {
-  return axios({
-    url: '/coefficient/findPage',
-    method: 'post',
-    data
-  })
-};
-export const findCoefficientTree = (params) => {
-  return axios({
-    url: '/coefficient/findCoefficientTree',
-    method: 'post',
-    params
   })
 };

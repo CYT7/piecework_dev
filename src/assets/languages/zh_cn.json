@@ -15,6 +15,8 @@
         "recover": "恢复",
         "batchDelete": "批量删除",
         "batchConfirm": "批量确认",
+        "batchRecover": "批量恢复",
+        "batchDisable": "批量禁用",
         "search": "查询",
         "loading": "拼命加载中",
         "submit": "提交",
