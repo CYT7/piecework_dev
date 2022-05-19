@@ -54,13 +54,9 @@ export default {
     // 批量删除
     handleDelete: function (data) {this.$api.log.Delete({'logId':data.params}).then(data.callback)},
     //时间格式化
-    dateFormat: function (row, column){
-		  return format(row[column.property])
-		},
+    dateFormat: function (row, column){return format(row[column.property])},
     //耗时格式化
-    timeFormat: function (row,column){
-		  return row[column.property]/1000 + 's';
-    }
+    timeFormat: function (row,column){return row[column.property]/1000 + 's';}
 	},
 	mounted() {}
 }

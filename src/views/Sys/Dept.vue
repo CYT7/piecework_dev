@@ -2,13 +2,7 @@
   <div class="page-container">
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item>
-				<el-input v-model="filters.name" aria-placeholder="名称"></el-input>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:dept:view" type="primary" @click="findTreeData(null)"/>
-			</el-form-item>
+		<el-form :inline="true" :size="size">
 			<el-form-item>
 				<kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:dept:add" type="primary" @click="handleAdd"/>
 			</el-form-item>
@@ -18,6 +12,7 @@
     <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
       <table-tree-column prop="name" header-align="center" treeKey="id" width="150" label="名称"/>
       <el-table-column prop="parentName" header-align="center" align="center" width="120" label="上级部门"/>
+      <el-table-column prop="orderNum" header-align="center" align="center" width="120" label="排序"/>
       <el-table-column prop="createBy" header-align="center" align="center" label="创建人"/>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间" :formatter="dateFormat"/>
       <el-table-column fixed="right" header-align="center" align="center" width="185" :label="$t('action.operation')">
@@ -33,9 +28,12 @@
         <el-form-item label="部门名称" prop="name"><el-input v-model="dataForm.name" aria-placeholder="名称"/></el-form-item>
         <el-form-item label="上级机构" prop="parentName">
           <popup-tree-input
-            :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级菜单':dataForm.parentName"
+            :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级部门':dataForm.parentName"
             :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
           </popup-tree-input>
+        </el-form-item>
+        <el-form-item label="排序编号" prop="orderNum">
+          <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序编号"></el-input-number>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -62,7 +60,6 @@ export default {
 		return {
 			size: 'small',
 			loading: false,
-			filters: {name: ''},
       tableTreeData: [],
       dialogVisible: false,
       dataForm: {
@@ -70,6 +67,7 @@ export default {
         name: '',
         parentId: 0,
         parentName: '',
+        orderNum: 0
       },
       dataRule: {name: [{ required: true, message: '部门名称不能为空', trigger: 'blur' }],},
       popupTreeData: [],
@@ -106,6 +104,7 @@ export default {
         name: '',
         parentId: 0,
         parentName: '',
+        orderNum: 0
       }
 		},
 		//显示编辑界面
@@ -163,9 +162,7 @@ export default {
       })
     },
 		// 时间格式化
-    dateFormat: function (row, column){
-      return format(row[column.property])
-    }
+    dateFormat: function (row, column){return format(row[column.property])}
 	},
 	mounted() {this.findTreeData()}
 }

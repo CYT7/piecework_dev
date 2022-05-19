@@ -2,14 +2,8 @@
   <div class="page-container">
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item><el-input v-model="filters.name" aria-placeholder="名称" /></el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:menu:view" type="primary" @click="findTreeData(null)"/>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:menu:add" type="primary" @click="handleAdd"/>
-			</el-form-item>
+		<el-form :inline="true" :size="size">
+			<el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:menu:add" type="primary" @click="handleAdd"/></el-form-item>
 		</el-form>
 	</div>
 	<!--表格树内容栏-->
@@ -41,7 +35,7 @@
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" label-width="80px" :size="size" style="text-align:left;">
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="dataForm.type">
-            <el-radio v-for="(type, index) in menuTypeList" :label="index" :key="index">{{ type }}</el-radio>
+            <el-radio v-for="(type, index) in menuTypeList" :label="index" :key="index">{{type}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="menuTypeList[dataForm.type] + '名称'" prop="name">
@@ -108,7 +102,6 @@ export default {
     return {
       size: "small",
       loading: false,
-      filters: {name: ""},
       tableTreeData: [],
       dialogVisible: false,
       menuTypeList: ["目录", "菜单", "按钮"],
@@ -123,9 +116,7 @@ export default {
         orderNum: 0,
         icon: "",
       },
-      dataRule: {
-        name: [{ required: true, message: "名称不能为空", trigger: "blur" }]
-      },
+      dataRule: {name: [{ required: true, message: "名称不能为空", trigger: "blur" }]},
       popupTreeData: [],
       popupTreeProps: {
         label: "name",
@@ -179,7 +170,6 @@ export default {
         type: "warning"
       }).then(() => {
         let params = this.getDeleteIds([], row);
-        console.log(params)
         this.$api.menu.Delete({'menuId':params}).then(() => {
           this.findTreeData();
           this.$message({ message: "删除成功", type: "success" });

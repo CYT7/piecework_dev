@@ -1,52 +1,54 @@
 <template>
   <div class="page-container">
-	<!--工具栏-->
-	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item><el-input v-model="filters.name" aria-placeholder="角色名"/></el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:role:view" type="primary" @click="findPage(null)"/>
-			</el-form-item>
-			<el-form-item>
-				<kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:role:add" type="primary" @click="handleAdd" />
-			</el-form-item>
-		</el-form>
-	</div>
-	<!--表格内容栏-->
-	<kt-table permsEdit="sys:role:edit" permsDelete="sys:role:delete" :highlightCurrentRow="true" :stripe="false"
-            :data="pageResult" :columns="columns" showBatchOperation="false" @handleCurrentChange="handleRoleSelectChange"
-            @findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
-	</kt-table>
-	<!--新增编辑界面-->
-	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
-			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
-			<el-form-item label="角色名" prop="name"><el-input v-model="dataForm.name" auto-complete="off"/></el-form-item>
-			<el-form-item label="备注 " prop="remark"><el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/></el-form-item>
-		</el-form>
-		<div slot="footer" class="dialog-footer">
-			<el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-			<el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
-		</div>
-	</el-dialog>
-	<!--角色菜单，表格树内容栏-->
-	<div class="menu-container" :v-if="true">
-		<div class="menu-header">
-			<span><B>角色菜单授权</B></span>
-		</div>
-		<el-tree :data="menuData" size="mini" show-checkbox node-key="id" :props="defaultProps"
-			style="width: 100%;padding-top:20px;" ref="menuTree" :render-content="renderContent"
-			v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true"
-			@check-change="handleMenuCheckChange">
-		</el-tree>
-		<div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
-			<el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null"><b>全选</b></el-checkbox>
-		</div>
-		<div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-			<kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection" :disabled="this.selectRole.id == null"/>
-			<kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading"/>
-		</div>
-	</div>
+    <!--工具栏-->
+    <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
+      <el-form :inline="true" :size="size">
+        <el-form-item>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:role:add" type="primary" @click="handleAdd" />
+        </el-form-item>
+      </el-form>
+    </div>
+    <!--表格内容栏-->
+    <kt-table permsEdit="sys:role:edit" permsDelete="sys:role:delete" :highlightCurrentRow="true" :stripe="false"
+              :data="pageResult" :columns="columns" :showBatchOperation="false" @handleCurrentChange="handleRoleSelectChange"
+              @findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
+    </kt-table>
+    <!--新增编辑界面-->
+    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+      <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
+        <el-form-item label="ID" prop="id" v-if="false">
+          <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
+        </el-form-item>
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="dataForm.name" auto-complete="off"/>
+        </el-form-item>
+        <el-form-item label="备注 " prop="remark">
+          <el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
+    <!--角色菜单，表格树内容栏-->
+    <div class="menu-container" :v-if="true">
+      <div class="menu-header">
+        <span><B>角色菜单授权</B></span>
+      </div>
+      <el-tree :data="menuData" size="mini" show-checkbox node-key="id" :props="defaultProps"
+        style="width: 100%;padding-top:20px;" ref="menuTree" :render-content="renderContent"
+        v-loading="menuLoading" element-loading-text="拼命加载中" :check-strictly="true"
+        @check-change="handleMenuCheckChange">
+      </el-tree>
+      <div style="float:left;padding-left:24px;padding-top:12px;padding-bottom:4px;">
+        <el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null"><b>全选</b></el-checkbox>
+      </div>
+      <div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
+        <kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection" :disabled="this.selectRole.id == null"/>
+        <kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm" :disabled="this.selectRole.id == null" :loading="authLoading"/>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -63,7 +65,6 @@ export default {
 	data() {
 		return {
 			size: 'small',
-			filters: {name: ''},
 			columns: [
 				{prop:"name", label:"角色名", minWidth:'25%'},
 				{prop:"remark", label:"备注", minWidth:'25%'},
@@ -101,17 +102,13 @@ export default {
 	methods: {
 		// 获取分页数据
 		findPage: function (data) {
-			if(data !== null) {this.pageRequest = data.pageRequest}
-			this.pageRequest.params = [{name:'name', value:this.filters.name}]
 			this.$api.role.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res
 				this.findTreeData()
 			}).then(data!=null?data.callback:'')
 		},
 		// 批量删除
-		handleDelete: function (data) {
-			this.$api.role.batchDelete({'roleId':data.params}).then(data.callback)
-		},
+		handleDelete: function (data) {this.$api.role.Delete({'roleId':data.params}).then(data.callback)},
 		// 显示新增界面
 		handleAdd: function () {
 			this.dialogVisible = true
@@ -176,9 +173,7 @@ export default {
 			} else {
 				// 节点取消选中时同步取消选中子节点
 				if(data.children != null) {
-					data.children.forEach(element => {
-						this.$refs.menuTree.setChecked(element.id, false, false)
-					});
+					data.children.forEach(element => {this.$refs.menuTree.setChecked(element.id, false, false)});
 				}
 			}
 		},
@@ -193,17 +188,13 @@ export default {
 				let allMenus = []
 				this.checkAllMenu(this.menuData, allMenus)
 				this.$refs.menuTree.setCheckedNodes(allMenus)
-			} else {
-				this.$refs.menuTree.setCheckedNodes([])
-			}
+			} else {this.$refs.menuTree.setCheckedNodes([])}
 		},
 		// 递归全选
 		checkAllMenu(menuData, allMenus) {
 			menuData.forEach(menu => {
 				allMenus.push(menu)
-				if(menu.children) {
-					this.checkAllMenu(menu.children, allMenus)
-				}
+				if(menu.children) {this.checkAllMenu(menu.children, allMenus)}
 			});
 		},
 		// 角色菜单授权提交
