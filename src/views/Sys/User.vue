@@ -5,8 +5,8 @@
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
-        <el-form-item content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
+        <el-form-item content="刷新"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-form-item>
       </el-form>
     </div>
 	<!--表格内容栏-->
@@ -16,18 +16,19 @@
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
+		<el-form :model="dataForm" label-width="80px" :rules="operation?addRules:editRules" ref="dataForm" :size="size" label-position="right">
 			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
-			<el-form-item label="用户名" prop="username"><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
+			<el-form-item label="用户名" prop="username" v-if="operation" ><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
 			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
 			<el-form-item label="密码" prop="password"><el-input v-model="dataForm.password" type="password" auto-complete="off"/></el-form-item>
 			<el-form-item label="部门" prop="deptName">
-				<popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName" :nodeKey="''+dataForm.deptId"
-					:currentChangeHandle="deptTreeCurrentChangeHandle">
+				<popup-tree-input :data="deptData" :props="deptTreeProps"
+                          :prop="dataForm.deptName" :nodeKey="''+dataForm.deptId"
+                          :currentChangeHandle="deptTreeCurrentChangeHandle">
 				</popup-tree-input>
 			</el-form-item>
 			<el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
-			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off"/></el-form-item>
+			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off" /></el-form-item>
 			<el-form-item label="角色" prop="userRoles">
 				<el-select v-model="dataForm.userRoles" multiple aria-placeholder="请选择" style="width: 100%;">
           <el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
@@ -45,6 +46,25 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
+import {isEmail} from "../../utils/validate";
+const checkEmail = (rule,value,callback) =>{
+  if (!value){
+    return callback(new Error('请输入邮箱'));
+  }else{
+    if (isEmail(value)){
+      callback();
+    }else{return callback(new Error('邮箱格式不正确'))}
+  }
+}
+const checkPwd = (rule,value,callback) =>{
+  if (!value){
+    return callback(new Error('请输入密码'));
+  }else{
+    if (value.length<5){
+      return callback(new Error('密码长度不能小于5位'));
+    }else{return callback()}
+  }
+}
 export default {
 	components:{
 		PopupTreeInput,
@@ -57,9 +77,9 @@ export default {
 			filters: {name: ''},
 			columns: [
         {prop:"username", label:"用户名", minWidth:'20%'},
-        {prop:"chineseName", label:"中文名", minWidth:'20%'},
-        {prop:"deptName", label:"部门", minWidth:'20%'},
         {prop:"roleNames", label:"角色", minWidth:'20%'},
+        {prop:"deptName", label:"部门", minWidth:'20%'},
+        {prop:"chineseName", label:"中文名", minWidth:'20%'},
         {prop:"email", label:"邮箱", minWidth:'20%'},
         {prop:"phone", label:"手机", minWidth:'20%'},
         {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
@@ -69,7 +89,20 @@ export default {
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
-			dataFormRules: {username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]},
+      addRules: {//添加验证
+			  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, validator:checkPwd,min:6}],
+        chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
+        deptName:[{required: true, message: '请选择部门', trigger: 'blur'}],
+        email:[{required: true, validator:checkEmail,trigger: 'blur'}],
+      },
+      editRules:{//编辑验证
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
+        password: [{ required: true, validator:checkPwd,min:6}],
+        deptName:[{required: true, message: '请选择部门', trigger: 'blur'}],
+        email:[{required: true, validator:checkEmail,trigger: 'blur'}],
+      },
 			// 新增编辑界面数据
 			dataForm: {
 				id: 0,
@@ -80,7 +113,6 @@ export default {
 				deptName: '',
 				email: '',
 				phone: '',
-				status: 1,
 				userRoles: []
 			},
 			deptData: [],
@@ -106,9 +138,7 @@ export default {
 		// 批量删除
 		handleDelete: function (data) {this.$api.user.Delete({'userId':data.params}).then(data.callback)},
     // 批量禁用
-    handleDisable: function (data) {
-		  console.log(data.params)
-		  this.$api.user.disable({'userId':data.params}).then(data.callback)},
+    handleDisable: function (data) {this.$api.user.disable({'userId':data.params}).then(data.callback)},
     //批量恢复
     handleRecover: function (data) {this.$api.user.recover({'userId':data.params}).then(data.callback)},
 		// 显示新增界面
@@ -156,7 +186,6 @@ export default {
 						}
 						params.userRoles = userRoles
 						this.$api.user.save(params).then((res) => {
-						  console.log(params)
 							this.editLoading = false
 							if(res.code === 200) {
 								this.$message({ message: '操作成功', type: 'success' })

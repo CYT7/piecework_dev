@@ -103,18 +103,17 @@
             }
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.updatePwdLoading = true;
-              let params = {password:this.updatePwdDataForm.password, newPassword:this.updatePwdDataForm.newPassword};
-              this.$api.user.updatePassword(params).then((res) => {
-                this.updatePwdLoading = false;
-                if(res.code === 200) {
-                  this.$message({ message: '操作成功', type: 'success' });
+              let params = {username:this.user.username,password:this.updatePwdDataForm.password, newPassword:this.updatePwdDataForm.newPassword};
+              this.$api.user.updatePwd(params).then((res=>{
+                if(res.code === 200){
+                  this.$message({message:'更新密码成功,请重新登录',type:'success'});
                   this.$refs['updatePwdDataForm'].resetFields();
                   this.logoutApi()
-                } else {
-                  this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+                }else{
+                  this.$message({message:'操作失败，'+res.msg,type:'error'})
                 }
                 this.updatePwdDialogVisible = false
-              })
+              }))
             })
           }
         })

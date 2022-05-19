@@ -35,11 +35,11 @@ export const save = (data) => {
     })
 };
 //更新用户密码
-export const updatePassword = (params) => {
+export const updatePwd = (data) => {
   return axios({
     url: '/user/updatePassword',
     method: 'post',
-    params
+    data
   })
 };
 //删除
