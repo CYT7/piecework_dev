@@ -88,9 +88,9 @@ export default {
     //删除
 		handleDelete: function (index, row) {let ids = [row.id];this.delete(ids)},
     //禁用
-    handleDisable: function (index, row) {this.disable(row.id)},
+    handleDisable: function (index, row) {let ids = [row.id];this.disable(ids)},
     //恢复
-    handleRecover: function (index, row) {this.recover(row.id)},
+    handleRecover: function (index, row) {let ids = [row.id];this.recover(ids)},
 		//批量删除
 		handleBatchDelete: function () {
       let ids = []
@@ -133,8 +133,7 @@ export default {
       this.$confirm('确认禁用选中的记录吗？', '提示', {
         type: 'warning'
       }).then(() => {
-        console.log(ids)
-        let params = [ids]
+        let params = ids
         this.loading = true;
         let callback = res => {
           if(res.code === 200) {
@@ -153,7 +152,7 @@ export default {
       this.$confirm('确认恢复选中的记录吗？', '提示', {
         type: 'warning'
       }).then(() => {
-        let params = [ids]
+        let params = ids
         this.loading = true;
         let callback = res => {
           if(res.code === 200) {

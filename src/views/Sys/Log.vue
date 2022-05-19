@@ -52,7 +52,7 @@ export default {
 			}).then(data!=null?data.callback:'')
 		},
     // 批量删除
-    handleDelete: function (data) {this.$api.log.batchDelete({'logId':data.params}).then(data.callback)},
+    handleDelete: function (data) {this.$api.log.Delete({'logId':data.params}).then(data.callback)},
     //时间格式化
     dateFormat: function (row, column){
 		  return format(row[column.property])

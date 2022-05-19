@@ -4,24 +4,11 @@
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/>
-        </el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
-        </el-form-item>
+        <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
+        <el-form-item content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-form-item>
+        <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
       </el-form>
     </div>
-	<div class="toolbar" style="float:right;padding-top:10px;padding-right:15px;">
-		<el-form :inline="true" :size="size">
-			<el-form-item>
-				<el-button-group>
-				<el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-				<el-tooltip content="导出" x-placement="top"><el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"/></el-tooltip>
-				</el-button-group>
-			</el-form-item>
-		</el-form>
-	</div>
 	<!--表格内容栏-->
 	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete" permsDisable="sys:user:disable" permsRecover="sys:user:recover"
             :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
@@ -35,10 +22,7 @@
 			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
 			<el-form-item label="密码" prop="password"><el-input v-model="dataForm.password" type="password" auto-complete="off"/></el-form-item>
 			<el-form-item label="部门" prop="deptName">
-				<popup-tree-input :data="deptData"
-					:props="deptTreeProps"
-					:prop="dataForm.deptName"
-					:nodeKey="''+dataForm.deptId"
+				<popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName" :nodeKey="''+dataForm.deptId"
 					:currentChangeHandle="deptTreeCurrentChangeHandle">
 				</popup-tree-input>
 			</el-form-item>
@@ -46,7 +30,7 @@
 			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off"/></el-form-item>
 			<el-form-item label="角色" prop="userRoles">
 				<el-select v-model="dataForm.userRoles" multiple aria-placeholder="请选择" style="width: 100%;">
-					<el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
+          <el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
 				</el-select>
 			</el-form-item>
 		</el-form>
@@ -85,15 +69,13 @@ export default {
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
-			dataFormRules: {
-				username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]
-			},
+			dataFormRules: {username: [{ required: true, message: '请输入用户名', trigger: 'blur' }]},
 			// 新增编辑界面数据
 			dataForm: {
 				id: 0,
 				username: '',
         chineseName:'',
-				password: '123456',
+				password: '',
 				deptId: '',
 				deptName: '',
 				email: '',
@@ -112,39 +94,23 @@ export default {
 	methods: {
 		// 获取分页数据
 		findPage: function (data) {
-			if(data !== null) {
-				this.pageRequest = data.pageRequest
-			}
-      this.pageRequest.params = [{username:'username', value:this.filters.name}]
+			if(data !== null) {this.pageRequest = data.pageRequest}
+      this.pageRequest.params = [{name:'username', value:this.filters.name}]
 			this.$api.user.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res
 				this.findUserRoles()
 			}).then(data!=null?data.callback:'')
 		},
-		// 导出Excel用户信息
-		exportUserExcelFile: function () {
-			this.pageRequest.pageSize = 100000
-      this.pageRequest.params = [{username:'username', value:this.filters.name}]
-			this.$api.user.exportUserExcelFile(this.pageRequest).then((res) => {
-				this.$alert(res.data, '导出成功', {
-					confirmButtonText: '确定',
-					callback: () => {}
-				})
-			})
-		},
 		// 加载用户角色信息
-		findUserRoles: function () {
-			this.$api.role.findAll().then((res) => {
-				// 加载角色集合
-				this.roles = res.data
-			})
-		},
+		findUserRoles: function () {this.$api.role.findAll().then((res) => {this.roles = res.data})},
 		// 批量删除
-		handleDelete: function (data) {this.$api.user.batchDelete(data.params).then(data.callback)},
+		handleDelete: function (data) {this.$api.user.Delete({'userId':data.params}).then(data.callback)},
     // 批量禁用
-    handleDisable: function (data) {this.$api.user.batchDisable(data.params).then(data.callback)},
+    handleDisable: function (data) {
+		  console.log(data.params)
+		  this.$api.user.disable({'userId':data.params}).then(data.callback)},
     //批量恢复
-    handleRecover: function (data) {this.$api.user.batchRecover(data.params).then(data.callback)},
+    handleRecover: function (data) {this.$api.user.recover({'userId':data.params}).then(data.callback)},
 		// 显示新增界面
 		handleAdd: function () {
 			this.dialogVisible = true
@@ -196,9 +162,7 @@ export default {
 								this.$message({ message: '操作成功', type: 'success' })
 								this.dialogVisible = false
 								this.$refs['dataForm'].resetFields()
-							} else {
-								this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-							}
+							} else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
 							this.findPage(null)
 						})
 					})
@@ -214,17 +178,11 @@ export default {
 		},
     // 状态格式化
     statusFormat: function (row, column){
-      if (row[column.property]===1){
-        return '正常'
-      }
-      if (row[column.property]===0){
-        return '禁用'
-      }
+      if (row[column.property]===1){return '正常'}
+      if (row[column.property]===0){return '禁用'}
     },
 	},
-	mounted() {
-		this.findDeptTree()
-	}
+	mounted() {this.findDeptTree()}
 }
 </script>
 <style scoped>

@@ -106,7 +106,7 @@ export default {
     findPage: function (data) {
       if(data !== null) {this.pageRequest = data.pageRequest}
       this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.emp.findPage(this.pageRequest).then((res) => {this.pageResult = res.data}).then(data!=null?data.callback:'')
+      this.$api.emp.findPage(this.pageRequest).then((res) => {this.pageResult = res}).then(data!=null?data.callback:'')
     },
     // 导出Excel用户信息
     exportUserExcelFile: function () {
@@ -122,7 +122,7 @@ export default {
     // 批量删除
     handleDelete: function (data) {this.$api.emp.Delete(data.params).then(data.callback)},
     // 批量禁用
-    handleDisable: function (data) {this.$api.emp.disable(data.params).then(data.callback)},
+    handleDisable: function (data) {this.$api.emp.disable({'employeeList':data.params}).then(data.callback)},
     //批量恢复
     handleRecover: function (data) {this.$api.emp.recover(data.params).then(data.callback)},
     // 显示新增界面
