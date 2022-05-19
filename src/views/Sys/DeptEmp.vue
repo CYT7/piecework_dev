@@ -3,29 +3,21 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="职工名"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:emp:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:DeptEmp:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:DeptEmp:add" type="primary" @click="handleAdd" />
         </el-form-item>
-      </el-form>
-    </div>
-    <div class="toolbar" style="float:right;padding-top:10px;padding-right:15px;">
-      <el-form :inline="true" :size="size">
         <el-form-item>
-          <el-button-group>
-            <el-tooltip content="刷新" placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-            <el-tooltip content="导出" placement="top"><el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"/></el-tooltip>
-          </el-button-group>
+          <el-tooltip content="刷新" placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table permsEdit="sys:emp:edit" permsDelete="sys:emp:delete" permsDisable="sys:emp:disable" permsRecover="sys:emp:recover"
-              :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
-              @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
+    <kt-table permsEdit="sys:DeptEmp:edit" :data="pageResult" :columns="columns"
+              @findPage="findPage" @handleEdit="handleEdit">
     </kt-table>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
@@ -55,6 +47,7 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
+const deptIds = sessionStorage.getItem("deptId");
 export default {
   components:{
     PopupTreeInput,
@@ -105,26 +98,9 @@ export default {
     // 获取分页数据
     findPage: function (data) {
       if(data !== null) {this.pageRequest = data.pageRequest}
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.emp.findPage(this.pageRequest).then((res) => {this.pageResult = res.data}).then(data!=null?data.callback:'')
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
+      this.$api.deptEmp.findPage(this.pageRequest).then((res) => {this.pageResult = res}).then(data!=null?data.callback:'')
     },
-    // 导出Excel用户信息
-    exportUserExcelFile: function () {
-      this.pageRequest.pageSize = 100000
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.emp.exportEmpExcelFile(this.pageRequest).then((res) => {
-        this.$alert(res.data, '导出成功', {
-          confirmButtonText: '确定',
-          callback:() => {}
-        })
-      })
-    },
-    // 批量删除
-    handleDelete: function (data) {this.$api.emp.Delete(data.params).then(data.callback)},
-    // 批量禁用
-    handleDisable: function (data) {this.$api.emp.disable(data.params).then(data.callback)},
-    //批量恢复
-    handleRecover: function (data) {this.$api.emp.recover(data.params).then(data.callback)},
     // 显示新增界面
     handleAdd: function () {
       this.dialogVisible = true

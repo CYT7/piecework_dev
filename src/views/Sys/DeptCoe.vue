@@ -3,7 +3,7 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="部门名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="部门名"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
@@ -97,7 +97,7 @@ export default {
       this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.pageRequest.params = [{name:'user', value:user}]
       this.$api.coefficient.findPage(this.pageRequest).then((res) => {
-        this.pageResult = res.data
+        this.pageResult = res
       }).then(data!=null?data.callback:'')
     },
     // 批量删除

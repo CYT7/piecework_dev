@@ -25,7 +25,7 @@
     <!-- 新增修改界面 -->
     <el-dialog :title="!dataForm.id ? '新增' : '修改'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="submitForm()" label-width="80px" :size="size" style="text-align:left;">
-        <el-form-item label="部门名称" prop="name"><el-input v-model="dataForm.name" aria-placeholder="名称"/></el-form-item>
+        <el-form-item label="部门名称" prop="name"><el-input v-model="dataForm.name" placeholder="名称"/></el-form-item>
         <el-form-item label="上级机构" prop="parentName">
           <popup-tree-input
             :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级部门':dataForm.parentName"

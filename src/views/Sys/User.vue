@@ -3,10 +3,12 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
-        <el-form-item content="刷新"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-form-item>
+        <el-form-item>
+          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+        </el-form-item>
       </el-form>
     </div>
 	<!--表格内容栏-->
@@ -30,7 +32,7 @@
 			<el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
 			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off" /></el-form-item>
 			<el-form-item label="角色" prop="userRoles">
-				<el-select v-model="dataForm.userRoles" multiple aria-placeholder="请选择" style="width: 100%;">
+				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择" style="width: 100%;">
           <el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
 				</el-select>
 			</el-form-item>

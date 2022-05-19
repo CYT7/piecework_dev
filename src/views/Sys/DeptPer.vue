@@ -3,7 +3,7 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="职工名" /></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="职工名" /></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
@@ -74,7 +74,7 @@
         </el-form-item>
         <div v-if="coeData[0]!=null">
           <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName" prop="coefficientList">
-            <el-input v-model="item.value" aria-placeholder="请输入值"></el-input>
+            <el-input v-model="item.value" placeholder="请输入值"></el-input>
           </el-form-item>
         </div>
       </el-form>

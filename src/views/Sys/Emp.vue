@@ -3,22 +3,15 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:emp:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
         </el-form-item>
-      </el-form>
-    </div>
-    <div class="toolbar" style="float:right;padding-top:10px;padding-right:15px;">
-      <el-form :inline="true" :size="size">
         <el-form-item>
-          <el-button-group>
-            <el-tooltip content="刷新" placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-            <el-tooltip content="导出" placement="top"><el-button icon="fa fa-file-excel-o" @click="exportUserExcelFile"/></el-tooltip>
-          </el-button-group>
+          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -55,6 +48,14 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
+import {isEmail} from "../../utils/validate";
+const checkEmail = (rule,value,callback) =>{
+  if (!value){
+    return callback(new Error('请输入邮箱'));
+  }else{
+    if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}
+  }
+}
 export default {
   components:{
     PopupTreeInput,
@@ -82,6 +83,7 @@ export default {
         empNo: [{ required: true, message: '请输入职工号', trigger: 'blur' }],
         name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
         deptName: [{ required: true, message: '请选择部门', trigger: 'blur' }],
+        email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
       },
       // 新增编辑界面数据
       dataForm: {
@@ -108,23 +110,12 @@ export default {
       this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.$api.emp.findPage(this.pageRequest).then((res) => {this.pageResult = res}).then(data!=null?data.callback:'')
     },
-    // 导出Excel用户信息
-    exportUserExcelFile: function () {
-      this.pageRequest.pageSize = 100000
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.emp.exportEmpExcelFile(this.pageRequest).then((res) => {
-        this.$alert(res.data, '导出成功', {
-          confirmButtonText: '确定',
-          callback:() => {}
-        })
-      })
-    },
     // 批量删除
-    handleDelete: function (data) {this.$api.emp.Delete(data.params).then(data.callback)},
+    handleDelete: function (data) {this.$api.emp.Delete({'employeeList':data.params}).then(data.callback)},
     // 批量禁用
     handleDisable: function (data) {this.$api.emp.disable({'employeeList':data.params}).then(data.callback)},
     //批量恢复
-    handleRecover: function (data) {this.$api.emp.recover(data.params).then(data.callback)},
+    handleRecover: function (data) {this.$api.emp.recover({'employeeList':data.params}).then(data.callback)},
     // 显示新增界面
     handleAdd: function () {
       this.dialogVisible = true

@@ -57,9 +57,12 @@ export default {
             })
           } else {
             Cookies.set('token', res.data.token); // 放置token到Cookie
-            sessionStorage.setItem('user', userInfo.account); // 保存用户到本地会话
-            this.$store.commit('menuRouteLoaded', false); // 要求重新加载导航菜单
-            this.$router.push('/')  // 登录成功，跳转到主页
+            this.$api.user.findByName({name:userInfo.account}).then((results)=>{
+              sessionStorage.setItem('user', userInfo.account); // 保存用户到本地会话
+              sessionStorage.setItem('deptId', results.data.deptId); // 保存用户到本地会话
+              this.$store.commit('menuRouteLoaded', false); // 要求重新加载导航菜单
+              this.$router.push('/')  // 登录成功，跳转到主页
+            })
           }
           this.loading = false
         }).catch((res) => {

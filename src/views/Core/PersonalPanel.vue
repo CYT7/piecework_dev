@@ -141,6 +141,7 @@
       },
       logoutApi() {
         sessionStorage.removeItem("user");
+        sessionStorage.removeItem("deptId");
         this.$router.push("/login");
         this.$api.login.logout().then(() => {
         }).catch(function(res) {

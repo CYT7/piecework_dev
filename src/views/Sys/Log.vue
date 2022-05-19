@@ -3,10 +3,13 @@
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item><el-input v-model="filters.name" aria-placeholder="用户名"/></el-form-item>
+			<el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
 			<el-form-item>
         <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:log:view" type="primary" @click="findPage(null)"/>
 			</el-form-item>
+      <el-form-item>
+        <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+      </el-form-item>
 		</el-form>
 	</div>
 	<!--表格内容栏-->

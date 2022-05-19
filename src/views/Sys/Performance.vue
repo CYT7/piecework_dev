@@ -3,15 +3,15 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" aria-placeholder="职工名" /></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="职工名" /></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage()"/>
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:performance:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage()"/></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -40,7 +40,7 @@
           </template>
         </el-table-column>
         <el-table-column label="分数" header-align="center" align="center" min-width="60%">
-          <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i" :label="statusFormat(item.points)" header-align="center" align="center" min-width="80%">
+          <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i" :label="scoreFormat(item.points)" header-align="center" align="center" min-width="80%">
             <template slot-scope="scope">
               <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
             </template>
@@ -88,7 +88,7 @@
         </el-form-item>
         <div v-if="coeData[0]!=null">
           <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName" prop="coefficientList">
-            <el-input v-model="item.value" aria-placeholder="请输入值"></el-input>
+            <el-input v-model="item.value" placeholder="请输入值"></el-input>
           </el-form-item>
         </div>
       </el-form>
@@ -179,17 +179,35 @@ export default {
     //获取分页数据
     findPage: function () {
       this.loading = true;
+      this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.$api.performance.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
-        console.log(res.data)
         this.totalSize = res.totalSize
-        this.loading = false
       })
+      this.loading = false
+    },
+    //选择切换
+    selectionChange: function (selections) {
+      this.selections = selections;
+      this.$emit('selectionChange', {selections:selections})
+    },
+    //选择切换
+    handleCurrentChange: function (val) {
+      this.$emit('handleCurrentChange', {val:val})
     },
     //换页刷新
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
-      this.findPage()
+      this.pageRequest.pageSize = 10;
+      if (this.filters.name!=null){
+        this.pageRequest.params = [{name:'name', value:this.filters.name}]
+      }
+      this.loading = true;
+      this.$api.performance.findPage(this.pageRequest).then((res) => {
+        this.pageResult = res.data
+        this.totalSize = res.totalSize
+      })
+      this.loading = false
     },
     //显示新增界面
     handleAdd: function () {
@@ -214,15 +232,6 @@ export default {
       this.dialogVisible = true;
       this.operation = false
       this.dataForm=Object.assign({}, row);
-    },
-    //选择切换
-    selectionChange: function (selections) {
-      this.selections = selections;
-      this.$emit('selectionChange', {selections:selections})
-    },
-    //选择切换
-    handleCurrentChange: function (val) {
-      this.$emit('handleCurrentChange', {val:val})
     },
     //批量确认
     handleBatchConfirm: function () {
@@ -309,7 +318,7 @@ export default {
               } else {
                 this.$message({message: '操作失败, ' + res.msg, type: 'error'})
               }
-              this.findPage(null)
+              this.findPage()
             })
           })
         }
@@ -335,6 +344,7 @@ export default {
     // 获取绩效列表
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+        console.log(res)
         let result = res.data[0].coefficientList;
         this.coeData = res.data
         let empCoe = []
@@ -350,22 +360,15 @@ export default {
         })
     },
     // 时间格式化
-    dateFormat: function (row, column){
-      return formats(row[column.property])
-    },
-    statusFormat: function (item){
-      if(item===1){
-        return '月总产量分数'
-      }else if (item === 2){
-        return '月扣除产量分数'
-      }
-      else{
-        return '其他'
-      }
+    dateFormat: function (row, column){return formats(row[column.property])},
+    scoreFormat: function (item){
+      if(item===1){return '月总产量分数'}
+      else if (item === 2){return '月扣除产量分数'}
+      else{return '其他'}
     },
   },
   mounted() {
-    this.refreshPageRequest(1)
+    this.findPage()
     this.findDeptTree()
   },
 }

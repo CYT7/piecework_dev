@@ -39,7 +39,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="menuTypeList[dataForm.type] + '名称'" prop="name">
-          <el-input v-model="dataForm.name" :aria-placeholder="menuTypeList[dataForm.type] + '名称'"/>
+          <el-input v-model="dataForm.name" :placeholder="menuTypeList[dataForm.type] + '名称'"/>
         </el-form-item>
         <el-form-item label="上级菜单" prop="parentName">
             <popup-tree-input
@@ -47,11 +47,11 @@
               :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange"/>
         </el-form-item>
         <el-form-item v-if="dataForm.type === 2" label="授权标识" prop="perms">
-          <el-input v-model="dataForm.perms" aria-placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"/>
+          <el-input v-model="dataForm.perms" placeholder="如: sys:user:add, sys:user:edit, sys:user:delete"/>
         </el-form-item>
         <el-form-item v-if="dataForm.type === 1" label="菜单路由" prop="url">
           <el-row>
-            <el-col :span="22"><el-input v-model="dataForm.url" aria-placeholder="菜单路由"/></el-col>
+            <el-col :span="22"><el-input v-model="dataForm.url" placeholder="菜单路由"/></el-col>
             <el-col :span="2" class="icon-list__tips">
                 <el-tooltip placement="top" effect="light" style="padding: 10px;">
                   <div slot="content">
@@ -71,7 +71,7 @@
         <el-form-item v-if="dataForm.type !== 2" label="菜单图标" prop="icon">
           <el-row>
             <el-col :span="22">
-              <el-input v-model="dataForm.icon" :readonly="false" aria-placeholder="菜单图标名称（如：fa fa-home fa-lg）" class="icon-list__input"/>
+              <el-input v-model="dataForm.icon" :readonly="false" placeholder="菜单图标名称（如：fa fa-home fa-lg）" class="icon-list__input"/>
             </el-col>
             <el-col :span="2" class="icon-list__tips">
               <fa-icon-tooltip />
