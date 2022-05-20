@@ -5,17 +5,17 @@
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" placeholder="部门名"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:deptCoe:add" type="primary" @click="handleAdd"/>
         </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table perms-edit="sys:coefficient:edit" perms-delete="sys:coefficient:delete" perms-disable="sys:coefficient:disable" perms-recover="sys:coefficient:recover"
+    <kt-table perms-edit="sys:deptCoe:edit" perms-disable="sys:deptCoe:disable" perms-recover="sys:deptCoe:recover"
               :highlight-current-row="true" :stripe="false" :data="pageResult" :columns="columns" :show-batch-delete="true"
-              @findPage="findPage" @handleEdit="handleEdit" @handleDelte="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover"/>
+              @findPage="findPage" @handleEdit="handleEdit" @handleDisable="handleDisable" @handleRecover="handleRecover"/>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
@@ -44,7 +44,7 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
-const user = sessionStorage.getItem("user");
+const deptIds = sessionStorage.getItem("deptId");
 export default {
   name: "DeptCoe",
   components: {KtButton, KtTable, PopupTreeInput},
@@ -94,23 +94,18 @@ export default {
       if(data !== null) {
         this.pageRequest = data.pageRequest
       }
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.pageRequest.params = [{name:'user', value:user}]
-      this.$api.coefficient.findPage(this.pageRequest).then((res) => {
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
+      this.$api.deptCoefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res
       }).then(data!=null?data.callback:'')
     },
-    // 批量删除
-    handleDelete: function (data) {
-      this.$api.coefficient.Delete(data.params).then(data.callback)
-    },
     // 批量禁用
     handleDisable: function (data) {
-      this.$api.coefficient.disable(data.params).then(data.callback)
+      this.$api.deptCoefficient.disable(data.params).then(data.callback)
     },
     //批量恢复
     handleRecover: function (data) {
-      this.$api.coefficient.recover(data.params).then(data.callback)
+      this.$api.deptCoefficient.recover(data.params).then(data.callback)
     },
     // 显示新增界面
     handleAdd: function () {
@@ -140,7 +135,7 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            this.$api.coefficient.save(params).then((res) => {
+            this.$api.deptCoefficient.save(params).then((res) => {
               this.editLoading = false
               if(res.code === 200) {
                 this.$message({ message: '操作成功', type: 'success' })
@@ -157,9 +152,7 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {
-      this.$api.dept.findDeptTree().then((res) => {
-        this.deptData = res.data
-      })
+      this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {this.deptData = res.data})
     },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
@@ -167,13 +160,9 @@ export default {
       this.dataForm.deptName = data.name
     },
     // 状态格式化
-    statusFormat: function (row, column){
-      return row[column.property]===1?'正常':'禁用'
-    },
+    statusFormat: function (row, column){return row[column.property]===1?'正常':'禁用'},
   },
-  mounted() {
-    this.findDeptTree()
-  }
+  mounted() {this.findDeptTree()}
 }
 </script>
 <style scoped>

@@ -81,7 +81,7 @@ export default {
 		//获取数据
     findTreeData: function () {
       this.loading = true;
-			this.$api.dept.findDeptTree().then((res) => {
+			this.$api.dept.findTree().then((res) => {
         this.tableTreeData = res.data;
         this.popupTreeData = this.getParentMenuTree(res.data);
         this.loading = false

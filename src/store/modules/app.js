@@ -15,7 +15,7 @@ export default {
       onCollapse(state){//改变收缩状态
         state.collapse = !state.collapse
       },
-      onThemeChange(state, themeColor){//改变主题颜色
+      setThemeColor(state, themeColor){//改变主题颜色
         state.oldThemeColor = state.themeColor;
         state.themeColor = themeColor
       },

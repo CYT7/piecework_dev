@@ -156,7 +156,7 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {
-      this.$api.dept.findDeptTree().then((res) => {
+      this.$api.dept.findTree().then((res) => {
         this.deptData = res.data
       })
     },

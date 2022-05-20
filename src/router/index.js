@@ -65,6 +65,7 @@ function addDynamicMenuAndRoutes(userName, to) {
     let dynamicRoutes = addDynamicRoutes(res.data);
     //处理静态组件绑定路由
     router.options.routes[0].children = router.options.routes[0].children.concat(dynamicRoutes);
+    router.matcher = new Router().matcher //match
     router.addRoutes(router.options.routes);
     //保存加载状态
     store.commit('menuRouteLoaded', true);

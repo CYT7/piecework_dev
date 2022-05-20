@@ -266,7 +266,7 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {this.$api.dept.findDeptTree().then((res) => {this.deptData = res.data})},
+    findDeptTree: function () {this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {this.deptData = res.data})},
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
