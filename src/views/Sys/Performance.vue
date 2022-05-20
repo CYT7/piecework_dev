@@ -64,7 +64,7 @@
     </div>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
+      <el-form v-if="operation===true" :model="dataForm" label-width="120px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId"
@@ -86,16 +86,18 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <div v-if="coeData[0]!=null">
-          <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName" prop="coefficientList">
-            <el-input v-model="item.value" placeholder="请输入值"></el-input>
-          </el-form-item>
-        </div>
+        <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.points)" prop="coefficientList">
+          <el-card>
+            <el-form-item v-for="(i,t) in item.empCoe" :key="t" :label="i.coefficientName">
+              <el-input v-model="i.value"></el-input>
+            </el-form-item>
+          </el-card>
+        </el-form-item>
       </el-form>
       <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
         <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
-        <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="item.coefficientName">
+        <el-form-item v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
           <el-input v-model="item.value"></el-input>
         </el-form-item>
       </el-form>
@@ -154,10 +156,8 @@ export default {
         empName: '',
         month:'',
         coefficientList: {
-          coefficientId:'',
-          coefficientName:'',
-          value:'',
-        }
+        },
+        empCoeList:{}
       },
       deptData: [],
       deptTreeProps: {
@@ -165,13 +165,6 @@ export default {
         children: 'children'
       },
       empData:[],
-      coeData:{
-        coefficientList: {
-          coefficientId:'',
-          coefficientName:'',
-          value:'',
-        }
-      },
       selections: []//列表选中列
     }
   },
@@ -211,7 +204,6 @@ export default {
     },
     //显示新增界面
     handleAdd: function () {
-      this.coeData = ''
       this.dialogVisible = true
       this.operation = true
       this.dataForm = {
@@ -220,18 +212,16 @@ export default {
         empNo: '',
         empName: '',
         month:'',
-        coefficientList: {
-          coefficientId:'',
-          coefficientName:'',
-          value:'',
-        }
+        coefficientList: {}
       }
     },
     //显示编辑界面
     handleEdit: function(row) {
       this.dialogVisible = true;
       this.operation = false
+      console.log(row)
       this.dataForm=Object.assign({}, row);
+      console.log(this.dataForm)
     },
     //批量确认
     handleBatchConfirm: function () {
@@ -277,7 +267,6 @@ export default {
             param.push(t)
           })
         })
-        console.log(param)
         this.loading = true;
         this.$api.performance.confirm({"empList":param}).then((res)=>{
           if (res.code===200){
@@ -297,19 +286,33 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            let empCoe = []
-            console.log(params.coefficientList)
-            for(let i=0,len = params.coefficientList.length;i<len;i++){
-              let empPer = {
-                coefficientId : params.coefficientList[i].coefficientId,
-                coefficientName: params.coefficientList[i].coefficientName,
-                value: params.coefficientList[i].value,
-              }
-              empCoe.push(empPer)
-            }
-            params.coefficientList = empCoe
             console.log(params)
+            if (params.coefficientList!=null){
+              let empfinshList= []
+              for (let i=0,len = params.coefficientList.length;i<len;i++){
+                let empPerList = []
+                params.coefficientList[i].empCoe.forEach(t=>{
+                  let empPer = {
+                    coefficientId : t.coefficientId,
+                    coefficientName: t.coefficientName,
+                    value : t.value
+                  }
+                  empPerList.push(empPer)
+                })
+                empfinshList.push(empPerList)
+              }
+              let empCoeList = []
+              empfinshList.forEach(t=>{
+                t.forEach(i=>{
+                  empCoeList.push(i)
+                })
+              })
+              params.empCoeList = empCoeList
+            }else{
+              params.empCoeList = params.empList
+            }
             this.$api.performance.save(params).then((res)=>{
+              console.log(params)
               this.editLoading = false
               if(res.code === 200) {
                 this.$message({ message: '操作成功', type: 'success' })
@@ -344,19 +347,22 @@ export default {
     // 获取绩效列表
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
-        console.log(res)
-        let result = res.data[0].coefficientList;
-        this.coeData = res.data
-        let empCoe = []
-        for(let i = 0,len=result.length;i<len;i++){
-          let coefficient = {
-            coefficientId:result[i].id,
-            coefficientName:result[i].title,
-            value:result[i].value
-          }
-          empCoe.push(coefficient)
-        }
-        this.dataForm.coefficientList = empCoe
+        let result = res;
+        let CoeList = []
+        res.forEach(t=>{
+          let points = t.points;
+          let empCoe = []
+          t.coeDeptInfVoList.forEach(i=>{
+            let coefficient = {
+              coefficientId:i.id,
+              coefficientName:i.title,
+              value:0
+            }
+            empCoe.push(coefficient)
+          })
+          CoeList.push({points,empCoe})
+        })
+        this.dataForm.coefficientList = CoeList
         })
     },
     // 时间格式化
