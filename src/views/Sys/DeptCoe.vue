@@ -42,6 +42,7 @@
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="60%"/>
         <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="60%"/>
+        <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
             <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
@@ -96,21 +97,7 @@ export default {
       filters: {name: ""},
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
-      pageResult: {
-        deptId:'',
-        deptName:'',
-        version:'',
-        status:'',
-        coeList:{
-          id: '',
-          points: '',
-          title: '',
-          value: '',
-          version: '',
-          remark: '',
-          status: ''
-        }
-      },
+      pageResult: [],
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,

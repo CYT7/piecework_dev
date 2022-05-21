@@ -46,6 +46,7 @@
             </template>
           </el-table-column>
         </el-table-column>
+        <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
@@ -75,7 +76,7 @@
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item >
+        <el-form-item label="月份" prop="month">
           <div class="block">
             <el-date-picker
               v-model="dataForm.month"
@@ -96,6 +97,7 @@
       <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
         <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
+        <el-form-item label="月份" prop="month">{{dateFormats(dataForm.month)}}</el-form-item>
         <el-form-item v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
           <el-input v-model="item.value"></el-input>
         </el-form-item>
@@ -148,17 +150,7 @@ export default {
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,
       // 新增编辑界面数据
-      dataForm: {
-        id: 0,
-        deptId: '',
-        deptName:'',
-        empNo:'',
-        empName: '',
-        month:'',
-        coefficientList: {
-        },
-        empCoeList:{}
-      },
+      dataForm: [],
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -219,9 +211,7 @@ export default {
     handleEdit: function(row) {
       this.dialogVisible = true;
       this.operation = false
-      console.log(row)
       this.dataForm=Object.assign({}, row);
-      console.log(this.dataForm)
     },
     //批量确认
     handleBatchConfirm: function () {
@@ -286,13 +276,14 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            console.log(params)
             if (params.coefficientList!=null){
               let empfinshList= []
               for (let i=0,len = params.coefficientList.length;i<len;i++){
                 let empPerList = []
                 params.coefficientList[i].empCoe.forEach(t=>{
                   let empPer = {
+                    id: 0,
+                    points:params.coefficientList[i].points,
                     coefficientId : t.coefficientId,
                     coefficientName: t.coefficientName,
                     value : t.value
@@ -312,7 +303,6 @@ export default {
               params.empCoeList = params.empList
             }
             this.$api.performance.save(params).then((res)=>{
-              console.log(params)
               this.editLoading = false
               if(res.code === 200) {
                 this.$message({ message: '操作成功', type: 'success' })
@@ -321,8 +311,10 @@ export default {
               } else {
                 this.$message({message: '操作失败, ' + res.msg, type: 'error'})
               }
+              this.$refs['dataForm'].resetFields()
               this.findPage()
             })
+
           })
         }
       })
@@ -366,6 +358,7 @@ export default {
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
+    dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
       if(item===1){return '月总产量分数'}
       else if (item === 2){return '月扣除产量分数'}

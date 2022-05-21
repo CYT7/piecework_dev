@@ -46,6 +46,7 @@
             </template>
           </el-table-column>
         </el-table-column>
+        <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" type="primary" @click="handleEdit(scope.row)"/>
@@ -94,6 +95,7 @@
       <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
         <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
+        <el-form-item label="月份" prop="month">{{dateFormats(dataForm.month)}}</el-form-item>
         <el-form-item v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
           <el-input v-model="item.value"></el-input>
         </el-form-item>
@@ -213,9 +215,7 @@ export default {
     handleEdit: function(row) {
       this.dialogVisible = true;
       this.operation = false
-      console.log(row)
       this.dataForm=Object.assign({}, row);
-      console.log(this.dataForm)
     },
     // 编辑
     submitForm: function () {
@@ -224,7 +224,6 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            console.log(params)
             if (params.coefficientList!=null){
               let empFinishList= []
               for (let i=0,len = params.coefficientList.length;i<len;i++){
@@ -250,7 +249,6 @@ export default {
               params.empCoeList = params.empList
             }
             this.$api.deptPer.save(params).then((res)=>{
-              console.log(params)
               this.editLoading = false
               if(res.code === 200) {
                 this.$message({ message: '操作成功', type: 'success' })
@@ -304,6 +302,7 @@ export default {
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
+    dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
       if(item===1){return '月总产量分数'}
       else if (item === 2){return '月扣除产量分数'}
