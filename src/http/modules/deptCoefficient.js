@@ -10,6 +10,15 @@ export const findPage = (data) => {
     data
   })
 };
+//查询系数树
+export const findCoefficientTree = (params) => {
+  console.log(params)
+  return axios({
+    url: '/deptCoe/findCoefficientTree',
+    method: 'post',
+    params
+  })
+};
 //保存
 export const save = (data) => {
   return axios({

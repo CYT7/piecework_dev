@@ -18,7 +18,7 @@
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="operation?addRules:editRules" ref="dataForm" :size="size" label-position="right">
+		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
 			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
 			<el-form-item label="用户名" prop="username" v-if="operation" ><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
 			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
@@ -58,15 +58,6 @@ const checkEmail = (rule,value,callback) =>{
     }else{return callback(new Error('邮箱格式不正确'))}
   }
 }
-const checkPwd = (rule,value,callback) =>{
-  if (!value){
-    return callback(new Error('请输入密码'));
-  }else{
-    if (value.length<5){
-      return callback(new Error('密码长度不能小于5位'));
-    }else{return callback()}
-  }
-}
 export default {
 	components:{
 		PopupTreeInput,
@@ -91,17 +82,9 @@ export default {
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
 			editLoading: false,
-      addRules: {//添加验证
+      dataFormRules: {//添加验证
 			  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        password: [{ required: true, validator:checkPwd,min:6}],
         chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
-        deptName:[{required: true, message: '请选择部门', trigger: 'blur'}],
-        email:[{required: true, validator:checkEmail,trigger: 'blur'}],
-      },
-      editRules:{//编辑验证
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
-        password: [{ required: true, validator:checkPwd,min:6}],
         deptName:[{required: true, message: '请选择部门', trigger: 'blur'}],
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
       },

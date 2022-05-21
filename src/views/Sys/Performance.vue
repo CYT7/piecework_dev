@@ -49,13 +49,13 @@
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
-            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" @click="handleConfirm(scope.row)"/>
+            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" type="primary"  @click="handleConfirm(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
-        <kt-button :label="$t('action.batchConfirm')" perms="sys:performance:confirm" :size="size" type="danger" @click="handleBatchConfirm()"
+        <kt-button :label="$t('action.batchConfirm')" perms="sys:performance:confirm" :size="size" type="primary" @click="handleBatchConfirm()"
                    :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete"/>
         <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
                        :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize" style="float:right;">
@@ -75,14 +75,13 @@
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="月份" prop="month">
+        <el-form-item >
           <div class="block">
             <el-date-picker
               v-model="dataForm.month"
               type="month"
               placeholder="选择月"
-              value-format="yyyy-MM-dd"
-            >
+              value-format="yyyy-MM-dd">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -152,6 +151,7 @@ export default {
       dataForm: {
         id: 0,
         deptId: '',
+        deptName:'',
         empNo:'',
         empName: '',
         month:'',
@@ -347,7 +347,6 @@ export default {
     // 获取绩效列表
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
-        let result = res;
         let CoeList = []
         res.forEach(t=>{
           let points = t.points;

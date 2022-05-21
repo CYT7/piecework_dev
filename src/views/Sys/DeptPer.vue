@@ -48,7 +48,7 @@
         </el-table-column>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
+            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" type="primary" @click="handleEdit(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -284,8 +284,7 @@ export default {
     },
     // 获取绩效列表
     findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
-        let result = res;
+      this.$api.deptCoefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
         let CoeList = []
         res.forEach(t=>{
           let points = t.points;

@@ -14,8 +14,8 @@
         <template slot-scope="scope">
           <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')" :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
           <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')" :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :perms="permsDisable" :size="size" type="danger" @click="handleDisable(scope.$index, scope.row)" />
-          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :perms="permsRecover" :size="size" @click="handleRecover(scope.$index, scope.row)" />
+          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
+          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -23,9 +23,9 @@
     <div class="toolbar" style="padding:10px;">
       <kt-button :label="$t('action.batchDelete')" :perms="permsDelete" :size="size" type="danger" @click="handleBatchDelete()"
         :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
-      <kt-button :label="$t('action.batchDisable')" :perms="permsDisable" :size="size" type="danger" @click="handleBatchDisable()"
+      <kt-button :label="$t('action.batchDisable')" :perms="permsDisable" :size="size" type="waring" @click="handleBatchDisable()"
                  :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
-      <kt-button :label="$t('action.batchRecover')" :perms="permsRecover" :size="size" type="danger" @click="handleBatchRecover()"
+      <kt-button :label="$t('action.batchRecover')" :perms="permsRecover" :size="size" type="primary" @click="handleBatchRecover()"
                  :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
       <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
         :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="data.totalSize"  style="float:right;">
@@ -100,13 +100,21 @@ export default {
     //批量禁用
     handleBatchDisable: function () {
       let ids = []
-      this.selections.forEach(t=>{ids.push(t.id)})
+      this.selections.forEach(t=>{
+        if (t.status ===1){
+          ids.push(t.id)
+        }
+      })
       this.disable(ids)
     },
     //批量恢复
     handleBatchRecover: function () {
       let ids = []
-      this.selections.forEach(t=>{ids.push(t.id)})
+      this.selections.forEach(t=>{
+        if (t.status ===0){
+          ids.push(t.id)
+        }
+      })
       this.recover(ids)
     },
 		//删除操作
