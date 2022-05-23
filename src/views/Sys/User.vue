@@ -6,9 +6,7 @@
         <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
-        <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-        </el-form-item>
+        <el-form-item><el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip></el-form-item>
       </el-form>
     </div>
 	<!--表格内容栏-->
@@ -17,9 +15,9 @@
             @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
 	</kt-table>
 	<!--新增编辑界面-->
-	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+	<el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
 		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
-			<el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
+			<el-form-item label="ID" prop="id" v-if="false"><el-input style="width: 40%" v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
 			<el-form-item label="用户名" prop="username" v-if="operation" ><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
 			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
 			<el-form-item label="密码" prop="password"><el-input v-model="dataForm.password" type="password" auto-complete="off"/></el-form-item>
@@ -50,20 +48,11 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {isEmail} from "../../utils/validate";
 const checkEmail = (rule,value,callback) =>{
-  if (!value){
-    return callback(new Error('请输入邮箱'));
-  }else{
-    if (isEmail(value)){
-      callback();
-    }else{return callback(new Error('邮箱格式不正确'))}
-  }
+  if (!value){return callback(new Error('请输入邮箱'));}
+  else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
 }
 export default {
-	components:{
-		PopupTreeInput,
-		KtTable,
-		KtButton,
-	},
+	components:{PopupTreeInput, KtTable, KtButton,},
 	data() {
 		return {
 			size: 'small',
@@ -89,17 +78,7 @@ export default {
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
       },
 			// 新增编辑界面数据
-			dataForm: {
-				id: 0,
-				username: '',
-        chineseName:'',
-				password: '',
-				deptId: '',
-				deptName: '',
-				email: '',
-				phone: '',
-				userRoles: []
-			},
+			dataForm: {},
 			deptData: [],
 			deptTreeProps: {
 				label: 'name',
@@ -163,10 +142,7 @@ export default {
 						let params = Object.assign({}, this.dataForm)
 						let userRoles = []
 						for(let i=0,len=params.userRoles.length; i<len; i++) {
-							let userRole = {
-								userId: params.id,
-								roleId: params.userRoles[i]
-							}
+							let userRole = {userId: params.id, roleId: params.userRoles[i]}
 							userRoles.push(userRole)
 						}
 						params.userRoles = userRoles

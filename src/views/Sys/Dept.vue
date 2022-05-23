@@ -10,12 +10,12 @@
 	</div>
 	<!--表格树内容栏-->
     <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')">
-      <table-tree-column prop="name" header-align="center" treeKey="id" width="150" label="名称"/>
-      <el-table-column prop="parentName" header-align="center" align="center" width="120" label="上级部门"/>
-      <el-table-column prop="orderNum" header-align="center" align="center" width="120" label="排序"/>
-      <el-table-column prop="createBy" header-align="center" align="center" label="创建人"/>
+      <table-tree-column prop="name" treeKey="id" label="名称"/>
+      <el-table-column prop="parentName" header-align="center" align="center" min-width="50%" label="上级部门"/>
+      <el-table-column prop="orderNum" header-align="center" align="center" min-width="30%" label="排序"/>
+      <el-table-column prop="createBy" header-align="center" align="center" min-width="30%" label="创建人"/>
       <el-table-column prop="createTime" header-align="center" align="center" label="创建时间" :formatter="dateFormat"/>
-      <el-table-column fixed="right" header-align="center" align="center" width="185" :label="$t('action.operation')">
+      <el-table-column header-align="center" align="center" :label="$t('action.operation')">
         <template slot-scope="scope">
           <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:dept:edit" @click="handleEdit(scope.row)"/>
           <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:dept:delete" type="danger" @click="handleDelete(scope.row)"/>

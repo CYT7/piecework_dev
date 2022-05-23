@@ -20,10 +20,12 @@
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')"
                 @selection-change="selectionChange">
         <el-table-column type="selection" width="40"/>
-        <el-table-column type="expand">
+        <el-table-column type="expand" width="40">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
-              <el-table-column v-for="(item,i) in props.row.empList" :key="i" :label="item.coefficientName" aria-rowcount="1" header-align="center" align="center" min-width="50%">
+              <el-table-column v-for="(item,i) in props.row.empList"
+                               :key="i" :label="item.coefficientName"
+                               header-align="center" align="center" min-width="50%">
                 {{item.value}}
               </el-table-column>
             </el-table>
@@ -35,18 +37,20 @@
         <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="60%"/>
         <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="60%">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="small">不可编辑</el-tag>
+            <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="small">可编辑</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="分数" header-align="center" align="center" min-width="60%">
-          <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i" :label="scoreFormat(item.points)" header-align="center" align="center" min-width="80%">
+          <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
+                           :label="scoreFormat(item.points)"
+                           header-align="center" align="center" min-width="80%">
             <template slot-scope="scope">
               <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
@@ -64,8 +68,8 @@
       </div>
     </div>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" label-width="120px" ref="dataForm" :size="size" label-position="right">
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules" label-width="100px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId"
@@ -117,40 +121,27 @@ import {formats} from "../../utils/datetime";
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
-  props:{
-    showBatchDelete: {//是否显示操作组件
-      type: Boolean,
-      default: true
-    }
-  },
+  props:{showBatchDelete: {type: Boolean, default: true}},//是否显示操作组件
   data(){
     return{
       size: "small",
       loading: false,//加载标识
       filters: {name: ""},
-      //分页信息
-      pageRequest: {
-        pageNum: 1,
-        pageSize: 10
-      },
+      pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: {
-        scoreList:{
-          points:'',
-          score:'',
-        },
-        empList: {
-          id:'',
-          coefficientId:'',
-          coefficientName:'',
-          value:'',
-        },
+        scoreList:{points:'', score:'',},
+        empList: {id:'', coefficientId:'', coefficientName:'', value:'',},
       },
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,
       // 新增编辑界面数据
       dataForm: [],
+      dataFormRules: {
+        empNo: [{ required: true, message: '请选择职工', trigger: 'blur' }],
+        month: [{ required: true, message: '请选择月份', trigger: 'blur' }],
+      },
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -173,13 +164,12 @@ export default {
     },
     //选择切换
     selectionChange: function (selections) {
-      this.selections = selections;
+      console.log(selections)
+      selections.forEach(i=>{if (i.status === 1){this.selections.push(i)}})
       this.$emit('selectionChange', {selections:selections})
     },
     //选择切换
-    handleCurrentChange: function (val) {
-      this.$emit('handleCurrentChange', {val:val})
-    },
+    handleCurrentChange: function (val) {this.$emit('handleCurrentChange', {val:val})},
     //换页刷新
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;

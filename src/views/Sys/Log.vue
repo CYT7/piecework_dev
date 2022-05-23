@@ -13,8 +13,7 @@
 		</el-form>
 	</div>
 	<!--表格内容栏-->
-	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:user:delete" @findPage="findPage" @handleDelete="handleDelete">
-	</kt-table>
+	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:user:delete" @findPage="findPage" @handleDelete="handleDelete"/>
   </div>
 </template>
 <script>
@@ -50,9 +49,7 @@ export default {
 		findPage: function (data) {
 			if(data !== null) {this.pageRequest = data.pageRequest}
 			this.pageRequest.params = [{name:'userName', value:this.filters.name}];
-			this.$api.log.findPage(this.pageRequest).then((res) => {
-			  this.pageResult = res
-			}).then(data!=null?data.callback:'')
+			this.$api.log.findPage(this.pageRequest).then((res) => {this.pageResult = res}).then(data!=null?data.callback:'')
 		},
     // 批量删除
     handleDelete: function (data) {this.$api.log.Delete({'logId':data.params}).then(data.callback)},

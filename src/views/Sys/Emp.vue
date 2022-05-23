@@ -21,7 +21,7 @@
               @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
         <el-form-item label="职工号" prop="empNo"><el-input v-model="dataForm.empNo" auto-complete="off"/></el-form-item>
@@ -50,29 +50,22 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {isEmail} from "../../utils/validate";
 const checkEmail = (rule,value,callback) =>{
-  if (!value){
-    return callback(new Error('请输入邮箱'));
-  }else{
-    if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}
-  }
+  if (!value){return callback(new Error('请输入邮箱'));}
+  else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
 }
 export default {
-  components:{
-    PopupTreeInput,
-    KtTable,
-    KtButton,
-  },
+  components:{PopupTreeInput, KtTable, KtButton,},
   data() {
     return {
       size: 'small',
       filters: {name: ''},
       columns: [
-        {prop:"empNo", label:"职工号", minWidth:'20%'},
-        {prop:"name", label:"职工名", minWidth:'20%'},
-        {prop:"deptName", label:"部门", minWidth:'20%'},
-        {prop:"phone", label:"手机", minWidth:'20%'},
-        {prop:"email", label:"邮箱", minWidth:'20%'},
-        {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
+        {prop:"empNo", label:"职工号", minWidth:'25%'},
+        {prop:"name", label:"职工名", minWidth:'25%'},
+        {prop:"deptName", label:"部门", minWidth:'25%'},
+        {prop:"phone", label:"手机", minWidth:'25%'},
+        {prop:"email", label:"邮箱", minWidth:'25%'},
+        {prop:"status", label:"状态", minWidth:'25%', formatter:this.statusFormat},
       ],
       pageRequest: { pageNum: 1, pageSize: 10 },
       pageResult: {},
@@ -86,16 +79,7 @@ export default {
         email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
       },
       // 新增编辑界面数据
-      dataForm: {
-        id: 0,
-        empNo: '',
-        name:'',
-        phone: '',
-        email: '',
-        deptId: '',
-        deptName: '',
-        status: 1,
-      },
+      dataForm: {},
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -160,8 +144,7 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {
-      this.$api.dept.findTree().then((res) => {this.deptData = res.data
+    findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data
       })
     },
     // 菜单树选中

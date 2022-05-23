@@ -20,7 +20,7 @@
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')"
                 @selection-change="selectionChange">
         <el-table-column type="selection" width="40"/>
-        <el-table-column type="expand">
+        <el-table-column type="expand" width="20">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
               <el-table-column v-for="(item,i) in props.row.empList" :key="i" :label="item.coefficientName" aria-rowcount="1" header-align="center" align="center" min-width="50%">
@@ -30,10 +30,10 @@
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="60%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="60%">
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="small">不可编辑</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="small">可编辑</el-tag>
@@ -49,7 +49,7 @@
         <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" type="primary" @click="handleEdit(scope.row)"/>
+            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:DeptPer:edit" type="primary" @click="handleEdit(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -61,8 +61,8 @@
       </div>
     </div>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" label-width="120px" ref="dataForm" :size="size" label-position="right">
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules" label-width="120px" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId"
@@ -131,35 +131,20 @@ export default {
       pageRequest: {pageNum: 1, pageSize: 10},
       totalSize:0,
       pageResult: {
-        scoreList:{
-          points:'',
-          score:'',
-        },
-        empList: {
-          id:'',
-          coefficientId:'',
-          coefficientName:'',
-          value:'',
-        },
+        scoreList:{points:'', score:'',},
+        empList: {id:'', coefficientId:'', coefficientName:'', value:'',},
       },
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,
       // 新增编辑界面数据
-      dataForm: {
-        id: 0,
-        deptId: '',
-        empNo:'',
-        empName: '',
-        month:'',
-        coefficientList: {},
-        empCoeList:{}
+      dataForm: {},
+      dataFormRules: {
+        empNo: [{ required: true, message: '请选择职工', trigger: 'blur' }],
+        month: [{ required: true, message: '请选择月份', trigger: 'blur' }],
       },
       deptData: [],
-      deptTreeProps: {
-        label: 'name',
-        children: 'children'
-      },
+      deptTreeProps: {label: 'name', children: 'children'},
       empData:[],
       selections: []//列表选中列
     }
@@ -186,11 +171,7 @@ export default {
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
       this.pageRequest.pageSize = 10;
-      if (this.filters.name!=null){
-        this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
-      }else{
-        this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
-      }
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
       this.loading = true;
       this.$api.deptPer.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data

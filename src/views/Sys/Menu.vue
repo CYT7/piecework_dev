@@ -20,7 +20,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="parentName" header-align="center" align="center" width="120" label="上级菜单"/>
-      <el-table-column prop="url" header-align="center" align="center" width="150" :show-overflow-tooltip="true" label="菜单URL"/>
+      <el-table-column prop="url" header-align="center" align="center" width="170" :show-overflow-tooltip="true" label="菜单URL"/>
       <el-table-column prop="perms" header-align="center" align="center" width="150" :show-overflow-tooltip="true" label="授权标识"/>
       <el-table-column prop="orderNum" header-align="center" align="center" label="排序" />
       <el-table-column fixed="right" header-align="center" align="center" width="185" :label="$t('action.operation')">
@@ -92,12 +92,7 @@ import KtButton from "../Core/KtButton";
 import TableTreeColumn from "../Core/TableTreeColumn";
 import FaIconTooltip from "../../components/FaIconTooltip"
 export default {
-  components: {
-    PopupTreeInput,
-    KtButton,
-    TableTreeColumn,
-    FaIconTooltip
-  },
+  components: {PopupTreeInput, KtButton, TableTreeColumn, FaIconTooltip},
   data() {
     return {
       size: "small",
@@ -105,17 +100,7 @@ export default {
       tableTreeData: [],
       dialogVisible: false,
       menuTypeList: ["目录", "菜单", "按钮"],
-      dataForm: {
-        id: 0,
-        type: 1,
-        name: "",
-        parentId: 0,
-        parentName: "",
-        url: "",
-        perms: "",
-        orderNum: 0,
-        icon: "",
-      },
+      dataForm: {},
       dataRule: {name: [{ required: true, message: "名称不能为空", trigger: "blur" }]},
       popupTreeData: [],
       popupTreeProps: {
@@ -166,8 +151,7 @@ export default {
     },
     //删除
     handleDelete(row) {
-      this.$confirm("确认删除选中记录吗？", "提示", {
-        type: "warning"
+      this.$confirm("确认删除选中记录吗？", "提示", {type: "warning"
       }).then(() => {
         let params = this.getDeleteIds([], row);
         this.$api.menu.Delete({'menuId':params}).then(() => {
@@ -180,9 +164,7 @@ export default {
     getDeleteIds(ids, row) {
       ids.push(row.id);
       if (row.children != null) {
-        for (let i = 0, len = row.children.length; i < len; i++) {
-          this.getDeleteIds(ids, row.children[i]);
-        }
+        for (let i = 0, len = row.children.length; i < len; i++) {this.getDeleteIds(ids, row.children[i]);}
       }
       return ids;
     },
@@ -205,10 +187,7 @@ export default {
                 this.$refs["dataForm"].resetFields();
                 this.dialogVisible = false;
               } else {
-                this.$message({
-                  message: "操作失败, " + res.msg,
-                  type: "error"
-                });
+                this.$message({message: "操作失败, " + res.msg, type: "error"});
               }
               this.findTreeData();
             });

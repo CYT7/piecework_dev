@@ -20,7 +20,7 @@
               @findPage="findPage" @handleEdit="handleEdit">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
         <el-form-item label="职工号" prop="empNo"><el-input v-model="dataForm.empNo" auto-complete="off"/></el-form-item>
@@ -47,7 +47,12 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
+import {isEmail} from "../../utils/validate";
 const deptIds = sessionStorage.getItem("deptId");
+const checkEmail = (rule,value,callback) =>{
+  if (!value){return callback(new Error('请输入邮箱'));}
+  else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
+}
 export default {
   components:{
     PopupTreeInput,
@@ -74,19 +79,10 @@ export default {
       dataFormRules: {
         empNo: [{ required: true, message: '请输入职工号', trigger: 'blur' }],
         name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
-        deptName: [{ required: true, message: '请选择部门', trigger: 'blur' }],
+        email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
       },
       // 新增编辑界面数据
-      dataForm: {
-        id: 0,
-        empNo: '',
-        name:'',
-        phone: '',
-        email: '',
-        deptId: '',
-        deptName: '',
-        status: 1,
-      },
+      dataForm: {},
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -145,10 +141,7 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {
-      this.$api.dept.findTree().then((res) => {this.deptData = res.data
-      })
-    },
+    findDeptTree: function () {this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {this.deptData = res.data})},
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id

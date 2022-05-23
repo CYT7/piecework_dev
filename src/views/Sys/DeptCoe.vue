@@ -4,22 +4,15 @@
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" placeholder="部门名"/></el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
-        </el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
-        </el-form-item>
-        <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage()"/></el-tooltip>
-        </el-form-item>
+        <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/></el-form-item>
+        <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:deptCoe:add" type="primary" @click="handleAdd"/></el-form-item>
+        <el-form-item><el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage()"/></el-tooltip></el-form-item>
       </el-form>
     </div>
     <div>
       <!--表格内容栏-->
       <el-table :data="pageResult" v-if="pageResult[0] !== null" stripe size="mini" style="width: 100%;" v-loading="loading"
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
-        <el-table-column type="selection" width="40"/>
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
             <el-table stripe :data="props.row.coeList" v-if="props.row.coeList!=null" width="100%" border fit highlight-current-row>
@@ -30,24 +23,28 @@
               <el-table-column prop="status" label="状态" :formatter="statusFormat" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
-                  <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:coefficient:edit" @click="handleEdit(scope.row)"/>
-                  <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleDelete(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" perms="sys:coefficient:disable"  type="warning" @click="handleDisable(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" perms="sys:coefficient:recover" type="primary" @click="handleRecover(scope.row)"/>
+                  <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:deptCoe:edit" @click="handleEdit(scope.row)"/>
+                  <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:deptCoe:delete" type="danger" @click="handleDelete(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
+                             :label="$t('action.disable')" perms="sys:deptCoe:disable"  type="warning" @click="handleDisable(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock"
+                             :label="$t('action.recover')" perms="sys:deptCoe:recover" type="primary" @click="handleRecover(scope.row)"/>
                 </template>
               </el-table-column>
             </el-table>
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="60%"/>
-        <el-table-column sortable prop="updateBy" label="最后操作人员" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="50%"/>
+        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
-            <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
-            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
-            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" perms="sys:coefficient:recover" type="primary"   @click="handleBatchRecover(scope.row)"/>
+            <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:deptCoe:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
+            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
+                       :label="$t('action.disable')" perms="sys:deptCoe:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
+            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock"
+                       :label="$t('action.recover')" perms="sys:deptCoe:recover" type="primary" @click="handleBatchRecover(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -59,7 +56,7 @@
       </div>
     </div>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
         <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
         <el-form-item label="部门" prop="deptName">
@@ -104,20 +101,11 @@ export default {
       dataFormRules:{
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         value: [{ required: true, message: '值不能为空', trigger: 'blur' }],
-        remark: [{ required: true, message: '值不能为空', trigger: 'blur' }],
-        version: [{ required: true, message: '值不能为空', trigger: 'blur' }],
+        remark: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
+        version: [{ required: true, message: '版本不能为空', trigger: 'blur' }],
       },
       // 新增编辑界面数据
-      dataForm: {
-        id: 0,
-        title: '',
-        value:'',
-        deptId: '',
-        deptName: '',
-        status: 1,
-        remark: '',
-        version: '',
-      },
+      dataForm: {},
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -142,9 +130,7 @@ export default {
       this.$emit('selectionChange', {selections:selections})
     },
     //选择切换
-    handleCurrentChange: function (val) {
-      this.$emit('handleCurrentChange', {val:val})
-    },
+    handleCurrentChange: function (val) {this.$emit('handleCurrentChange', {val:val})},
     //换页刷新
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
@@ -200,9 +186,7 @@ export default {
     },
     //批量删除
     handleBatchDelete: function (params){
-      this.$confirm('确认删除选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认删除选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let coeList = params.coeList
         let ids = []
         coeList.forEach(i=>{ids.push(i.id)})
@@ -220,9 +204,7 @@ export default {
     },
     //批量禁用
     handleBatchDisable: function (params){
-      this.$confirm('确认禁用选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认禁用选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let coeList = params.coeList
         let ids = []
         coeList.forEach(i=>{ids.push(i.id)})
@@ -240,9 +222,7 @@ export default {
     },
     //批量恢复
     handleBatchRecover: function (params){
-      this.$confirm('确认恢复选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认恢复选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let coeList = params.coeList
         let ids = []
         coeList.forEach(i=>{ids.push(i.id)})
@@ -260,9 +240,7 @@ export default {
     },
     //删除
     handleDelete: function (params){
-      this.$confirm('确认删除选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认删除选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.deptCoefficient.Delete({'coefficientId':ids}).then(res=>{
@@ -278,9 +256,7 @@ export default {
     },
     //禁用
     handleDisable: function(params){
-      this.$confirm('确认禁用选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认禁用选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.deptCoefficient.disable({'coefficientId':ids}).then(res=>{
@@ -296,9 +272,7 @@ export default {
     },
     //恢复
     handleRecover: function(params){
-      this.$confirm('确认恢复选中的信息吗？','提示',{
-        type:'warning'
-      }).then(()=>{
+      this.$confirm('确认恢复选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.deptCoefficient.recover({'coefficientId':ids}).then(res=>{
@@ -313,7 +287,7 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
+    findDeptTree: function () {this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {this.deptData = res.data})},
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id

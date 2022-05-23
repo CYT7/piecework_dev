@@ -1,35 +1,15 @@
 <template>
   <div class="personal-panel">
     <div class="personal-desc" :style="{'background':this.$store.state.app.themeColor}">
-      <div class="name-role">
-        <span class="sender">{{ user.chineseName }} - {{ user.roleNames }}</span>
-      </div>
-      <div class="register-info">
-          <span class="register-info fa fa-clock-o">
-            创建时间-{{ this.dateFormat(user.createTime) }}
-          </span>
-      </div>
+      <div class="name-role"><span class="sender">{{ user.chineseName }}</span></div>
+      <div class="register-info"><span class="register-info fa fa-clock-o">创建时间-{{ this.dateFormat(user.createTime) }}</span></div>
     </div>
     <div class="main-operation">
-        <span class="main-operation-item" @click="openPersonCenter">
-          <el-button size="small" icon="fa fa-male" > 个人中心</el-button>
-        </span>
-      <span class="main-operation-item" @click="updatePasswordDialog">
-          <el-button size="small" icon="fa fa-key"> 修改密码</el-button>
-        </span>
-    </div>
-    <div class="other-operation">
-      <div class="other-operation-item" @click="clearCache">
-        <ul>
-          <li class="fa fa-eraser">清除缓存</li>
-        </ul>
-      </div>
-
+      <span class="main-operation-item" @click="openPersonCenter"><el-button size="small" icon="fa fa-male" > 个人中心</el-button></span>
+      <span class="main-operation-item" @click="updatePasswordDialog"><el-button size="small" icon="fa fa-key"> 修改密码</el-button></span>
     </div>
     <div class="personal-footer" @click="logout">
-      <ul>
-        <li class="fa fa-sign-out">{{$t("common.logout")}}</li>
-      </ul>
+      <ul><li class="fa fa-sign-out">{{$t("common.logout")}}</li></ul>
     </div>
     <!--修改密码界面-->
     <el-dialog title="修改密码" width="40%" :visible.sync="updatePwdDialogVisible" :close-on-click-modal="false" :modal="false">
@@ -56,11 +36,7 @@
   export default {
     name: 'PersonalPanel',
     components:{},
-    props: {
-      user: {
-        type: Object,
-      }
-    },
+    props: {user: {type: Object,}},
     data() {
       return {
         size: 'small',
@@ -72,27 +48,17 @@
           confirmPassword: ''
         },
         updatePwdDataFormRules: {
-          password: [
-            { required: true, message: '请输入原密码', trigger: 'blur' }
-          ],
-          newPassword: [
-            { required: true, message: '请输入新密码', trigger: 'blur' }
-          ],
-          confirmPassword: [
-            { required: true, message: '请确认密码', trigger: 'blur' }
-          ]
+          password: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
+          newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+          confirmPassword: [{ required: true, message: '请确认密码', trigger: 'blur' }]
         },
       }
     },
     methods: {
       //打开个人中心
-      openPersonCenter: function () {
-        alert('待开发')
-      },
+      openPersonCenter: function () {alert('待开发')},
       //打开修改密码对话框
-      updatePasswordDialog: function () {
-        this.updatePwdDialogVisible = true
-      },
+      updatePasswordDialog: function () {this.updatePwdDialogVisible = true},
       //修改密码
       updatePassword: function () {
         this.$refs.updatePwdDataForm.validate((valid) => {
@@ -109,9 +75,7 @@
                   this.$message({message:'更新密码成功,请重新登录',type:'success'});
                   this.$refs['updatePwdDataForm'].resetFields();
                   this.logoutApi()
-                }else{
-                  this.$message({message:'操作失败，'+res.msg,type:'error'})
-                }
+                }else{this.$message({message:'操作失败，'+res.msg,type:'error'})}
                 this.updatePwdDialogVisible = false
               }))
             })
@@ -120,43 +84,26 @@
       },
       //退出登录
       logout() {
-        this.$confirm("确认退出吗?", "提示", {
-          type: "warning"
-        })
-          .then(() => {
-            this.logoutApi()
-          })
-          .catch(() => {})
-      },
-      //清除缓存并退出登录
-      clearCache() {
-        this.$confirm("确认清除缓存并退出登录吗?", "提示", {
-          type: "warning"
-        })
+        this.$confirm("确认退出吗?", "提示", {type: "warning"})
           .then(() => {
             this.deleteCookie('token');// 清空Cookie里的token
             this.logoutApi()
-          })
-          .catch(() => {})
+          }).catch(() => {})
       },
       logoutApi() {
         sessionStorage.removeItem("user");
         sessionStorage.removeItem("deptId");
         this.$router.push("/login");
-        this.$api.login.logout().then(() => {
-        }).catch(function(res) {
-        })
+        this.$api.login.logout().then(() => {}).catch(function(res) {})
       },
       //清除Cookie
       deleteCookie(name){
         let myDate = new Date();
         myDate.setTime(-1000); // 设置过期时间
-        document.cookie = name+"=''; expires="+myDate.toGMTString();
+        document.cookie = name+"=''; expires="+myDate.toUTCString();
       },
       //时间格式化
-      dateFormat(date){
-        return format(date)
-      }
+      dateFormat(date){return format(date)}
     },
   }
 </script>
@@ -189,22 +136,6 @@
   }
   .main-operation-item {
     margin: 15px;
-  }
-  .other-operation {
-    padding: 15px;
-    margin-right: 1px;
-    text-align: left;
-    border-color: rgba(180, 190, 190, 0.2);
-    border-top-width: 1px;
-    border-top-style: solid;
-  }
-  .other-operation-item {
-    padding: 12px;
-  }
-  .other-operation-item:hover {
-    cursor: pointer;
-    background: #9e94941e;
-    color: rgb(19, 138, 156);
   }
   .personal-footer {
     margin-right: 1px;

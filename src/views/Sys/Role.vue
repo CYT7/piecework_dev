@@ -14,17 +14,11 @@
               @findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
-        <el-form-item label="ID" prop="id" v-if="false">
-          <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
-        </el-form-item>
-        <el-form-item label="角色名" prop="name">
-          <el-input v-model="dataForm.name" auto-complete="off"/>
-        </el-form-item>
-        <el-form-item label="备注 " prop="remark">
-          <el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/>
-        </el-form-item>
+    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+      <el-form :model="dataForm" label-width="auto" :rules="dataFormRules" ref="dataForm" :size="size">
+        <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
+        <el-form-item label="角色名" prop="name"><el-input v-model="dataForm.name" auto-complete="off"/></el-form-item>
+        <el-form-item label="备注 " prop="remark"><el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/></el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -57,11 +51,7 @@ import KtButton from "../Core/KtButton";
 import {format} from "../../utils/datetime";
 import TableTreeColumn from "../Core/TableTreeColumn";
 export default {
-	components:{
-		KtTable,
-		KtButton,
-		TableTreeColumn
-	},
+	components:{KtTable, KtButton, TableTreeColumn},
 	data() {
 		return {
 			size: 'small',
@@ -81,11 +71,7 @@ export default {
         remark: [{ required: true, message: '请输入备注', trigger: 'blur' }],
 			},
 			// 新增编辑界面数据
-			dataForm: {
-				id: 0,
-				name: '',
-				remark: ''
-			},
+			dataForm: {},
 			selectRole: {},
 			menuData: [],
 			menuSelections: [],
@@ -213,11 +199,8 @@ export default {
 			}
 			console.log(roleMenus)
 			this.$api.role.saveRoleMenus({"roleMenuList":roleMenus}).then((res) => {
-				if(res.code === 200) {
-					this.$message({ message: '操作成功', type: 'success' })
-				} else {
-					this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-				}
+				if(res.code === 200) {this.$message({ message: '操作成功', type: 'success' })}
+				else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
 				this.authLoading = false
 			})
 		},
@@ -236,9 +219,7 @@ export default {
         </div>);
     },
 		// 时间格式化
-    dateFormat: function (row, column){
-		  return format(row[column.property])
-		}
+    dateFormat: function (row, column){return format(row[column.property])}
 	},
 	mounted() {}
 }
