@@ -50,6 +50,7 @@
             </template>
           </el-table-column>
         </el-table-column>
+        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="60%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
@@ -267,44 +268,48 @@ export default {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
             if (params.coefficientList!=null){
-              let empFinshList= []
+              let empFinishList= []
               for (let i=0,len = params.coefficientList.length;i<len;i++){
                 let empPerList = []
                 params.coefficientList[i].empCoe.forEach(t=>{
                   let empPer = {
-                    id: 0,
                     points:params.coefficientList[i].points,
                     coefficientId : t.coefficientId,
                     coefficientName: t.coefficientName,
-                    value : t.value
-                  }
+                    value : t.value}
                   empPerList.push(empPer)
                 })
-                empFinshList.push(empPerList)
+                empFinishList.push(empPerList)
               }
               let empCoeList = []
-              empfinshList.forEach(t=>{
-                t.forEach(i=>{
-                  empCoeList.push(i)
-                })
-              })
+              empFinishList.forEach(t=>{t.forEach(i=>{empCoeList.push(i)})})
               params.empCoeList = empCoeList
+            }else{params.empCoeList = params.empList}
+            if (this.operation){
+              this.$api.performance.save(params).then((res)=>{
+                this.editLoading = false
+                if(res.code === 200) {
+                  this.$message({ message: '操作成功', type: 'success' })
+                  this.dialogVisible = false
+                  this.$refs['dataForm'].resetFields()
+                } else {
+                  this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+                }
+                this.findPage()
+              })
             }else{
-              params.empCoeList = params.empList
+              this.$api.performance.update(params).then((res)=>{
+                this.editLoading = false
+                if(res.code === 200) {
+                  this.$message({ message: '操作成功', type: 'success' })
+                  this.dialogVisible = false
+                  this.$refs['dataForm'].resetFields()
+                } else {
+                  this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+                }
+                this.findPage()
+              })
             }
-            this.$api.performance.save(params).then((res)=>{
-              this.editLoading = false
-              if(res.code === 200) {
-                this.$message({ message: '操作成功', type: 'success' })
-                this.dialogVisible = false
-                this.$refs['dataForm'].resetFields()
-              } else {
-                this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-              }
-              this.$refs['dataForm'].resetFields()
-              this.findPage()
-            })
-
           })
         }
       })
@@ -350,9 +355,9 @@ export default {
     dateFormat: function (row, column){return formats(row[column.property])},
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
-      if(item===1){return '月总产量分数'}
-      else if (item === 2){return '月扣除产量分数'}
-      else{return '其他'}
+      if(item===0){return '加分分数'}
+      else if (item === 1){return '减分分数'}
+      else{return '考勤分数'}
     },
   },
   mounted() {

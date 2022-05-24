@@ -11,7 +11,15 @@
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
         </el-form-item>
         <el-form-item>
+          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                     :before-upload="beforeUpload" :http-request="UploadFile"
+                     accept=".xls,.xlsx">
+            <el-button type="primary">上传</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip content="导出" placement="top"><el-button icon="fa fa-file-excel-o" @click="exportExcelFile"></el-button></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -153,7 +161,22 @@ export default {
       this.dataForm.deptName = data.name
     },
     // 状态格式化
-    statusFormat: function (row, column){return row[column.property]===1 ?'正常':'禁用'}
+    statusFormat: function (row, column){return row[column.property]===1 ?'正常':'禁用'},
+    //上传鉴定
+    beforeUpload(file){
+      let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
+      const extension = (testMsg === 'xls' ||testMsg ==='xlsx')
+      const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
+      if(!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
+      if(!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
+      return extension && isLt2M
+    },
+    UploadFile(param){
+      // this.$refs['upload'].clearFiles();
+    },
+    exportExcelFile: function () {
+      console.log("hi")
+    },
   },
   mounted() {this.findDeptTree()}
 }

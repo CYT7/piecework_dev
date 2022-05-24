@@ -10,10 +10,18 @@ export const findPage = (data) => {
     data
   })
 };
-//保存
+//新增
 export const save = (data) => {
   return axios({
-    url: '/performance/save',
+    url: '/performance/add',
+    method: 'post',
+    data
+  })
+};
+//更新
+export const update = (data) => {
+  return axios({
+    url: '/performance/update',
     method: 'post',
     data
   })

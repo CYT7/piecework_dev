@@ -67,6 +67,11 @@
             :node-key="''+dataForm.deptId"
             :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
+        <el-form-item label="系数类型" prop="points">
+          <el-radio-group v-model="dataForm.points">
+            <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="标题" prop="title"><el-input v-model="dataForm.title" auto-complete="off"/></el-form-item>
         <el-form-item label="值" prop="value"><el-input v-model="dataForm.value" auto-complete="off"/></el-form-item>
         <el-form-item label="备注" prop="remark"><el-input v-model="dataForm.remark" auto-complete="off"/></el-form-item>
@@ -106,6 +111,7 @@ export default {
       },
       // 新增编辑界面数据
       dataForm: {},
+      pointsList: ["减分系数", "加分系数", "考勤系数"],
       deptData: [],
       deptTreeProps: {
         label: 'name',
