@@ -267,7 +267,7 @@ export default {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
             if (params.coefficientList!=null){
-              let empfinshList= []
+              let empFinshList= []
               for (let i=0,len = params.coefficientList.length;i<len;i++){
                 let empPerList = []
                 params.coefficientList[i].empCoe.forEach(t=>{
@@ -280,7 +280,7 @@ export default {
                   }
                   empPerList.push(empPer)
                 })
-                empfinshList.push(empPerList)
+                empFinshList.push(empPerList)
               }
               let empCoeList = []
               empfinshList.forEach(t=>{
