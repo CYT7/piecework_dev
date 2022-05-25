@@ -3,6 +3,15 @@ import axios from '../axios'
  * 职工管理模块
  **/
 //分页查询
+export const upload = (data) => {
+  return axios({
+    url: '/emp/upload',
+    method: 'post',
+    headers:{'Content-Type':'multipart/form-data'},
+    data,
+  })
+};
+//分页查询
 export const findPage = (data) => {
   return axios({
     url: '/emp/findPage',

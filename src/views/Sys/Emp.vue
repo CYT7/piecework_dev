@@ -57,6 +57,7 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {isEmail} from "../../utils/validate";
+import axios from "axios";
 const checkEmail = (rule,value,callback) =>{
   if (!value){return callback(new Error('请输入邮箱'));}
   else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
@@ -172,9 +173,21 @@ export default {
       return extension && isLt2M
     },
     UploadFile(param){
-      // this.$refs['upload'].clearFiles();
+      const formData = new FormData()
+      formData.append('file', param.file) // 要提交给后台的文件
+      this.$api.emp.upload(formData).then(res=>{
+        if(res.code === 200) {
+          this.$message({ message: '操作成功', type: 'success' })
+          this.$refs['upload'].clearFiles();
+        } else {
+          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+        }
+        this.$refs['upload'].clearFiles();
+      })
+
     },
     exportExcelFile: function () {
+
       console.log("hi")
     },
   },

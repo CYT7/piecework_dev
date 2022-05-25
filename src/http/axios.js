@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import router from "../router";
 
 export default function $axios(options) {
+  console.log(options)
   return new Promise((resolve, reject) => {
     const instance = axios.create({
       baseURL: config.baseUrl,
