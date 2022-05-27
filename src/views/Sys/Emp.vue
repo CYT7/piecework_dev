@@ -57,7 +57,9 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {isEmail} from "../../utils/validate";
+import {baseUrl} from "../../utils/global";
 import axios from "axios";
+import Cookies from "js-cookie";
 const checkEmail = (rule,value,callback) =>{
   if (!value){return callback(new Error('请输入邮箱'));}
   else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
@@ -89,6 +91,7 @@ export default {
       },
       // 新增编辑界面数据
       dataForm: {},
+      downloadForm:{},
       deptData: [],
       deptTreeProps: {
         label: 'name',
@@ -182,13 +185,43 @@ export default {
         } else {
           this.$message({message: '操作失败, ' + res.msg, type: 'error'})
         }
-        this.$refs['upload'].clearFiles();
       })
-
     },
     exportExcelFile: function () {
-
-      console.log("hi")
+      this.downloadForm.name=this.filters.name;
+      axios.post(baseUrl+'/emp/download',this.downloadForm,{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        }
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
+      // this.$api.emp.download(this.downloadForm).then(response=>{
+      //   console.log(response.headers)
+      //   //通过header中获取返回的文件名称
+      //   let fileName = response.headers['content-disposition'].split('filename=').pop();
+      //   let blob = new Blob([response.data], { type: "application/vnd.ms-excel" })
+      //   let downloadElement = document.createElement("a")
+      //   var href = window.URL.createObjectURL(blob)
+      //   downloadElement.href = href
+      //   //指定下载的文件的名称，切记进行decode
+      //   downloadElement.download = decodeURI(fileName)
+      //   document.body.appendChild(downloadElement)
+      //   downloadElement.click()
+      //   //移除临时创建对象，释放资源
+      //   document.body.removeChild(downloadElement)
+      //   window.URL.revokeObjectURL(href)
+      // })
     },
   },
   mounted() {this.findDeptTree()}

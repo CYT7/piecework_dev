@@ -2,13 +2,21 @@ import axios from '../axios'
 /**
  * 职工管理模块
  **/
-//分页查询
+//上传
 export const upload = (data) => {
   return axios({
     url: '/emp/upload',
     method: 'post',
     headers:{'Content-Type':'multipart/form-data'},
     data,
+  })
+};
+//下载
+export const download = (data) => {
+  return axios({
+    url: '/emp/download',
+    method: 'post',
+    data
   })
 };
 //分页查询
