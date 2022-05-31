@@ -11,7 +11,8 @@
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:performance:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage()"/></el-tooltip>
+          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip content="导出" placement="top"><el-button icon="fa fa-file-excel-o" @click="exportExcelFile"></el-button></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -119,6 +120,9 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
 import {formats} from "../../utils/datetime";
+import axios from "axios";
+import {baseUrl} from "../../utils/global";
+import Cookies from "js-cookie";
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -162,6 +166,26 @@ export default {
         this.totalSize = res.totalSize
       })
       this.loading = false
+    },
+    exportExcelFile: function () {
+      axios.get(baseUrl+'/performance/download',{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        responseType: 'blob'
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
     },
     //选择切换
     selectionChange: function (selections) {

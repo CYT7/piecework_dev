@@ -193,7 +193,8 @@ export default {
         headers:{
           'token':Cookies.get('token'),
           'Content-Type': 'application/json;charset=UTF-8'
-        }
+        },
+        responseType: 'blob'
       }).then(response=>{
         let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
         let blob = new Blob([response.data], { type: "application/ms-excel" })

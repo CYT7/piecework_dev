@@ -11,7 +11,7 @@ export default {
   props: {
     label: {//按钮显示文本
       type: String,
-      default: 'Button'
+      default: ''
     },
     icon: {//按钮显示图标
       type: String,

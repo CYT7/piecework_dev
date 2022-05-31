@@ -6,7 +6,16 @@
         <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
-        <el-form-item><el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip></el-form-item>
+        <el-form-item>
+          <el-tooltip content="刷新" placement="top">
+            <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
+          </el-tooltip>
+        </el-form-item>
+        <el-form-item>
+          <el-tooltip content="导出" placement="top">
+            <kt-button perms="sys:user:download" icon="fa fa-file-excel-o" @click="exportUserExcelFile"></kt-button>
+          </el-tooltip>
+        </el-form-item>
       </el-form>
     </div>
 	<!--表格内容栏-->
@@ -28,7 +37,7 @@
 				</popup-tree-input>
 			</el-form-item>
 			<el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
-			<el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off" /></el-form-item>
+			<el-form-item label="手机" prop="phone"><el-input v-model="dataForm.phone" auto-complete="off" /></el-form-item>
 			<el-form-item label="角色" prop="userRoles">
 				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择" style="width: 100%;">
           <el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
@@ -47,6 +56,9 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {isEmail} from "../../utils/validate";
+import axios from "axios";
+import {baseUrl} from "../../utils/global";
+import Cookies from "js-cookie";
 const checkEmail = (rule,value,callback) =>{
   if (!value){return callback(new Error('请输入邮箱'));}
   else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
@@ -97,6 +109,27 @@ export default {
 				this.findUserRoles()
 			}).then(data!=null?data.callback:'')
 		},
+    //导出用户信息
+    exportUserExcelFile:function (){
+      axios.post(baseUrl+'/user/download',{names:this.filters.name},{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        responseType: 'blob'
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
+    },
 		// 加载用户角色信息
 		findUserRoles: function () {this.$api.role.findAll().then((res) => {this.roles = res.data})},
 		// 批量删除
@@ -117,7 +150,7 @@ export default {
 				deptId: '',
 				deptName: '',
 				email: '',
-				phone: '',
+        phone: '',
 				status: 1,
 				userRoles: []
 			}
