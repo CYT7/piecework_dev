@@ -2,6 +2,15 @@ import axios from '../axios'
 /**
  * 绩效管理模块
  **/
+//上传
+export const upload = (data) => {
+  return axios({
+    url: '/performance/upload',
+    method: 'post',
+    headers:{'Content-Type':'multipart/form-data'},
+    data,
+  })
+};
 //分页查询
 export const findPage = (data) => {
   return axios({

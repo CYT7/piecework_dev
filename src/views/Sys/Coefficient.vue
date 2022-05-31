@@ -6,7 +6,17 @@
         <el-form-item><el-input v-model="filters.name" placeholder="部门名"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/></el-form-item>
         <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/></el-form-item>
-        <el-form-item><el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage()"/></el-tooltip></el-form-item>
+        <el-form-item>
+          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                     :before-upload="beforeUpload" :http-request="UploadFile"
+                     accept=".xls,.xlsx">
+            <kt-button icon="fa fa-upload" type="primary" perms="sys:coefficient:upload" :label="$t('action.upload')"/>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:coefficient:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip content="导出" placement="top"><kt-button perms="sys:coefficient:download" icon="fa fa-file-excel-o" @click="exportExcelFile"></kt-button></el-tooltip>
+        </el-form-item>
       </el-form>
     </div>
     <div>
@@ -84,6 +94,9 @@
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import PopupTreeInput from "../../components/PopupTreeInput";
+import axios from "axios";
+import {baseUrl} from "../../utils/global";
+import Cookies from "js-cookie";
 export default {
   name: "Coefficient",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -313,6 +326,47 @@ export default {
       if(row[column.property]===1){return '加分系数'}
       else if (row[column.property] === 0){return '扣分系数'}
       else{return '考勤系数'}
+    },
+    //上传鉴定
+    beforeUpload(file){
+      let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
+      const extension = (testMsg === 'xls' ||testMsg ==='xlsx')
+      const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
+      if(!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
+      if(!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
+      return extension && isLt2M
+    },
+    UploadFile(param){
+      const formData = new FormData()
+      formData.append('file', param.file) // 要提交给后台的文件
+      this.$api.coefficient.upload(formData).then(res=>{
+        if(res.code === 200) {
+          this.$message({ message: '操作成功', type: 'success' })
+          this.$refs['upload'].clearFiles();
+        } else {
+          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+        }
+      })
+    },
+    exportExcelFile: function () {
+      axios.get(baseUrl+'/coefficient/download',{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        responseType: 'blob'
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
     },
   },
   mounted() {

@@ -14,12 +14,12 @@
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
                      :before-upload="beforeUpload" :http-request="UploadFile"
                      accept=".xls,.xlsx">
-            <el-button type="primary">上传</el-button>
+            <kt-button icon="fa fa-upload" type="primary" perms="sys:emp:upload" :label="$t('action.upload')"/>
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-          <el-tooltip content="导出" placement="top"><el-button icon="fa fa-file-excel-o" @click="exportExcelFile"></el-button></el-tooltip>
+          <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:emp:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip content="导出" placement="top"><kt-button perms="sys:emp:download" icon="fa fa-file-excel-o" @click="exportExcelFile"></kt-button></el-tooltip>
         </el-form-item>
       </el-form>
     </div>

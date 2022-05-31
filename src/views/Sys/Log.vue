@@ -13,7 +13,7 @@
 		</el-form>
 	</div>
 	<!--表格内容栏-->
-	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:user:delete" @findPage="findPage" @handleDelete="handleDelete"/>
+	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:log:delete" @findPage="findPage" @handleDelete="handleDelete"/>
   </div>
 </template>
 <script>
