@@ -407,8 +407,8 @@ export default {
     dateFormat: function (row, column){return formats(row[column.property])},
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
-      if(item===0){return '加分分数'}
-      else if (item === 1){return '减分分数'}
+      if(item===1){return '加分分数'}
+      else if (item === 0){return '扣分分数'}
       else{return '考勤分数'}
     },
   },

@@ -70,6 +70,7 @@ export default {
           message: res.message,
           type: 'error'
           })
+        this.loading = false
         });
     },
     reset() {

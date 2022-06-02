@@ -3,7 +3,7 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="职工名"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:emp:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
@@ -86,7 +86,6 @@ export default {
       dataFormRules: {
         empNo: [{ required: true, message: '请输入职工号', trigger: 'blur' }],
         name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
-        deptName: [{ required: true, message: '请选择部门', trigger: 'blur' }],
         email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
       },
       // 新增编辑界面数据
