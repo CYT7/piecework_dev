@@ -57,9 +57,7 @@ export default {
 			size: 'small',
 			columns: [
 				{prop:"name", label:"角色名", minWidth:'25%'},
-				{prop:"remark", label:"备注", minWidth:'25%'},
-				{prop:"createBy", label:"创建人", minWidth:'25%'},
-				{prop:"createTime", label:"创建时间", minWidth:'25%', formatter:this.dateFormat}
+				{prop:"remark", label:"备注", minWidth:'25%'}
       ],
 			pageRequest: { pageNum: 1, pageSize: 10 },
 			pageResult: {},

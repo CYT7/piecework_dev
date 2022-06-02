@@ -44,6 +44,7 @@
         </el-form-item>
         <el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
         <el-form-item label="手机" prop="mobile"><el-input v-model="dataForm.phone" auto-complete="off"/></el-form-item>
+        <el-form-item label="绩效单价" prop="unitPrice"><el-input v-model="dataForm.unitPrice" auto-complete="off"/></el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -71,12 +72,13 @@ export default {
       size: 'small',
       filters: {name: ''},
       columns: [
-        {prop:"empNo", label:"职工号", minWidth:'25%'},
-        {prop:"name", label:"职工名", minWidth:'25%'},
-        {prop:"deptName", label:"部门", minWidth:'25%'},
-        {prop:"phone", label:"手机", minWidth:'25%'},
-        {prop:"email", label:"邮箱", minWidth:'25%'},
-        {prop:"status", label:"状态", minWidth:'25%', formatter:this.statusFormat},
+        {prop:"empNo", label:"职工号", minWidth:'20%'},
+        {prop:"name", label:"职工名", minWidth:'20%'},
+        {prop:"deptName", label:"部门", minWidth:'20%'},
+        {prop:"phone", label:"手机", minWidth:'20%'},
+        {prop:"email", label:"邮箱", minWidth:'20%'},
+        {prop:"unitPrice", label:"绩效单价", minWidth:'20%'},
+        {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
       ],
       pageRequest: { pageNum: 1, pageSize: 10 },
       pageResult: {},
@@ -123,6 +125,7 @@ export default {
         email: '',
         deptId: '',
         deptName: '',
+        unitPrice:'',
         status: 1,
       }
     },
@@ -183,6 +186,7 @@ export default {
           this.$refs['upload'].clearFiles();
         } else {
           this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          this.$refs['upload'].clearFiles();
         }
       })
     },
