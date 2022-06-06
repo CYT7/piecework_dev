@@ -25,7 +25,7 @@
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
-            <el-table stripe :data="props.row.coeList" v-if="props.row.coeList!=null" width="100%" border fit highlight-current-row>
+            <el-table stripe :data="props.row.children" v-if="props.row.children!=null" width="100%" border fit highlight-current-row>
               <el-table-column prop="points" label="类型" :formatter="typeFormat" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
@@ -43,11 +43,15 @@
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
+            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:coefficient:edit" @click="handleEdits(scope.row)"/>
             <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
             <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
             <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" perms="sys:coefficient:recover" type="primary"   @click="handleBatchRecover(scope.row)"/>
@@ -63,9 +67,13 @@
     </div>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
-        <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
-        <el-form-item label="部门" prop="deptName">
+      <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()" label-width="100px" :size="size" style="text-align:left;">
+        <el-form-item label="选项" prop="type" v-if="operation">
+          <el-radio-group v-model="dataForm.type">
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change="ChangeHandle(index)">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 0" label="部门" prop="deptName">
           <popup-tree-input
             :data="deptData"
             :props="deptTreeProps"
@@ -73,15 +81,32 @@
             :node-key="''+dataForm.deptId"
             :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item label="系数类型" prop="points">
+        <el-form-item :label="TypeList[dataForm.type] + '名'" prop="title">
+          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.type] + '名'"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 0" label="版本" prop="version">
+          <el-input v-model="dataForm.version" placeholder="请填写版本"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 0" label="绩效单价" prop="unitPrice">
+          <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 0" label="绩效单价倍数" prop="multiple">
+          <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="系数方案" prop="coefficientSid">
+          <el-input v-model="dataForm.coefficientSid"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="类型" prop="points">
           <el-radio-group v-model="dataForm.points">
             <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="标题" prop="title"><el-input v-model="dataForm.title" auto-complete="off"/></el-form-item>
-        <el-form-item label="值" prop="value"><el-input v-model="dataForm.value" auto-complete="off"/></el-form-item>
-        <el-form-item label="备注" prop="remark"><el-input v-model="dataForm.remark" auto-complete="off"/></el-form-item>
-        <el-form-item label="版本" prop="version"><el-input v-model="dataForm.version" auto-complete="off"/></el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="系数值" prop="value">
+          <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="备注" prop="remark">
+          <el-input v-model="dataForm.remark" placeholder="请输入备注"/>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible=false">{{$t('action.cancel')}}</el-button>
@@ -118,6 +143,7 @@ export default {
         version: [{ required: true, message: '版本不能为空', trigger: 'blur' }],
       },
       // 新增编辑界面数据
+      TypeList:["方案", "系数"],
       dataForm: {},
       pointsList: ["减分系数", "加分系数", "考勤系数"],
       deptData: [],
@@ -162,23 +188,21 @@ export default {
     handleAdd: function () {
       this.dialogVisible = true
       this.operation = true
-      this.dataForm = {
-        id: 0,
-        points:'',
-        title: '',
-        value:'',
-        deptId: '',
-        deptName: '',
-        status: 1,
-        remark: '',
-        version: '',
-      }
+      this.ChangeHandle(0)
     },
     // 显示编辑界面
     handleEdit: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
+      this.dataForm.type = 1
+    },
+    // 显示编辑界面
+    handleEdits: function (params) {
+      this.dialogVisible = true
+      this.operation = false
+      this.dataForm = Object.assign({}, params)
+      this.dataForm.type = 0
     },
     // 编辑
     submitForm: function () {
@@ -187,27 +211,39 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            this.$api.coefficient.save(params).then((res) => {
-              this.editLoading = false
-              if(res.code === 200) {
-                this.$message({ message: '操作成功', type: 'success' })
-                this.dialogVisible = false
-                this.$refs['dataForm'].resetFields()
-              } else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
-              this.findPage(null)
-            })
+            console.log(params.id)
+            if (params.type===0){
+              this.$api.coefficient.saveScheme(params).then((res) => {
+                this.editLoading = false
+                if(res.code === 200) {
+                  this.$message({ message: '操作成功', type: 'success' })
+                  this.dialogVisible = false
+                  this.$refs['dataForm'].resetFields()
+                } else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
+                this.findPage(null)
+              })
+            }else{
+              this.$api.coefficient.save(params).then((res) => {
+                this.editLoading = false
+                if(res.code === 200) {
+                  this.$message({ message: '操作成功', type: 'success' })
+                  this.dialogVisible = false
+                  this.$refs['dataForm'].resetFields()
+                } else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
+                this.findPage(null)
+              })
+            }
           })
         }
       })
     },
     //批量删除
     handleBatchDelete: function (params){
+      console.log(params)
       this.$confirm('确认删除选中的信息吗？','提示',{type:'warning'}).then(()=>{
-        let coeList = params.coeList
-        let ids = []
-        coeList.forEach(i=>{ids.push(i.id)})
+        let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.Delete({'coefficientId':ids}).then(res=>{
+        this.$api.coefficient.DeleteScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'删除成功',type:'success'})
             this.findPage();
@@ -223,11 +259,9 @@ export default {
       this.$confirm('确认禁用选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
-        let coeList = params.coeList
-        let ids = []
-        coeList.forEach(i=>{ids.push(i.id)})
+        let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.disable({'coefficientId':ids}).then(res=>{
+        this.$api.coefficient.disableScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'禁用成功',type:'success'})
             this.findPage();
@@ -243,11 +277,9 @@ export default {
       this.$confirm('确认恢复选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
-        let coeList = params.coeList
-        let ids = []
-        coeList.forEach(i=>{ids.push(i.id)})
+        let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.recover({'coefficientId':ids}).then(res=>{
+        this.$api.coefficient.recoverScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'恢复成功',type:'success'})
             this.findPage();
@@ -274,6 +306,7 @@ export default {
           }
           this.loading = false
         })
+        this.loading = false
       })
     },
     //禁用
@@ -314,6 +347,31 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
+    ChangeHandle(data){
+      let type = data
+      if (data===0){
+        this.dataForm = {
+          type:type,
+          id: 0,
+          deptId:'',
+          title:'',
+          version:'',
+          unitPrice:'',
+          multiple:'',
+        }
+      }else{
+        this.dataForm = {
+          type:type,
+          id: 0,
+          coefficientSid:'',
+          points:'',
+          title:'',
+          value:'',
+          remark:'',
+        }
+      }
+      console.log(this.dataForm)
+    },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
@@ -368,10 +426,14 @@ export default {
         window.URL.revokeObjectURL(href)
       })
     },
+    next() {
+      if (this.active++ > 2) this.active = 0;
+    }
   },
   mounted() {
     this.findPage()
     this.findDeptTree()
+
   },
 }
 </script>

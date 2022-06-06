@@ -35,6 +35,14 @@ export const save = (data) => {
     data
   })
 };
+//保存
+export const saveScheme = (data) => {
+  return axios({
+    url: '/coefficient/saveScheme',
+    method: 'post',
+    data
+  })
+};
 //删除
 export const Delete = (data) => {
   return axios({
@@ -55,6 +63,30 @@ export const disable = (data) => {
 export const recover = (data) => {
   return axios({
     url: '/coefficient/recover',
+    method: 'post',
+    data
+  })
+};
+//删除
+export const DeleteScheme = (data) => {
+  return axios({
+    url: '/coefficient/deleteScheme',
+    method: 'post',
+    data
+  })
+};
+//批量禁用
+export const disableScheme = (data) => {
+  return axios({
+    url: '/coefficient/disableScheme',
+    method: 'post',
+    data
+  })
+};
+//批量恢复
+export const recoverScheme = (data) => {
+  return axios({
+    url: '/coefficient/recoverScheme',
     method: 'post',
     data
   })

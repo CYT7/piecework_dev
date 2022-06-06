@@ -50,7 +50,6 @@ export default function $axios(options) {
         return response.data
       },
       err => {
-        console.log(err)
         if (err && err.response) {
           switch (err.response.status) {
             case 400:
