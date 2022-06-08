@@ -31,10 +31,12 @@
         <el-table-column type="expand" width="40">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
-              <el-table-column v-for="(item,i) in props.row.empList"
-                               :key="i" :label="item.coefficientName"
-                               header-align="center" align="center" min-width="50%">
-                {{item.value}}
+              <el-table-column label="工作绩效产量" header-align="center" align="center">
+                <el-table-column v-for="(item,i) in props.row.empList"
+                                 :key="i" :label="item.coefficientName"
+                                 header-align="center" align="center" min-width="50%">
+                  {{item.value}}
+                </el-table-column>
               </el-table-column>
             </el-table>
           </template>
@@ -78,7 +80,8 @@
     </div>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules" label-width="100px" ref="dataForm" :size="size" label-position="right">
+      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules"
+               label-width="100px" ref="dataForm" :size="size" label-position="right" style="text-align:left;">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId"
@@ -87,6 +90,11 @@
         <el-form-item label="职工" prop="empNo">
           <el-select style="width: 100%" placeholder="选择职工" value-key="id" v-model="dataForm.empNo">
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="coefficientSid">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="月份" prop="month">
@@ -138,9 +146,10 @@ export default {
     return{
       size: "small",
       loading: false,//加载标识
-      filters: {name: ""},
+      filters: {name: ""},//查询
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
-      totalSize:0,
+      totalSize:0,//总共数量
+      selections: [],//列表选中列
       pageResult: {
         scoreList:{points:'', score:'',},
         empList: {id:'', coefficientId:'', coefficientName:'', value:'',},
@@ -155,12 +164,12 @@ export default {
         month: [{ required: true, message: '请选择月份', trigger: 'blur' }],
       },
       deptData: [],
+      coeSchemeData:[],
       deptTreeProps: {
         label: 'name',
         children: 'children'
       },
       empData:[],
-      selections: []//列表选中列
     }
   },
   methods:{
@@ -174,50 +183,8 @@ export default {
       })
       this.loading = false
     },
-    //上传鉴定
-    beforeUpload(file){
-      let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
-      const extension = (testMsg === 'xls' ||testMsg ==='xlsx')
-      const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
-      if(!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
-      if(!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
-      return extension && isLt2M
-    },
-    UploadFile(param){
-      const formData = new FormData()
-      formData.append('file', param.file) // 要提交给后台的文件
-      this.$api.performance.upload(formData).then(res=>{
-        if(res.code === 200) {
-          this.$message({ message: '操作成功', type: 'success' })
-          this.$refs['upload'].clearFiles();
-        } else {
-          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-        }
-      })
-    },
-    exportExcelFile: function () {
-      axios.get(baseUrl+'/performance/download',{
-        headers:{
-          'token':Cookies.get('token'),
-          'Content-Type': 'application/json;charset=UTF-8'
-        },
-        responseType: 'blob'
-      }).then(response=>{
-        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
-        let blob = new Blob([response.data], { type: "application/ms-excel" })
-        let downloadElement = document.createElement("a")
-        let href = window.URL.createObjectURL(blob)
-        downloadElement.href = href
-        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
-        document.body.appendChild(downloadElement)
-        downloadElement.click()
-        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
-        window.URL.revokeObjectURL(href)
-      })
-    },
     //选择切换
     selectionChange: function (selections) {
-      console.log(selections)
       selections.forEach(i=>{if (i.status === 1){this.selections.push(i)}})
       this.$emit('selectionChange', {selections:selections})
     },
@@ -227,9 +194,7 @@ export default {
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
       this.pageRequest.pageSize = 10;
-      if (this.filters.name!=null){
-        this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      }
+      this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.loading = true;
       this.$api.performance.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
@@ -245,7 +210,6 @@ export default {
         id: 0,
         deptId: '',
         empNo: '',
-        empName: '',
         month:'',
         coefficientList: {}
       }
@@ -328,7 +292,8 @@ export default {
                     points:params.coefficientList[i].points,
                     coefficientId : t.coefficientId,
                     coefficientName: t.coefficientName,
-                    value : t.value}
+                    value : t.value
+                  }
                   empPerList.push(empPer)
                 })
                 empFinishList.push(empPerList)
@@ -368,6 +333,33 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
+    // 获取职工列表
+    findEmpTree: function (deptId){
+      this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
+    },
+    //获取方案树
+    findCoefficientTree:function (deptId){
+      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+        this.coeSchemeData = res
+      })
+    },
+    findCoeList: function (sid) {this.$api.coefficient.findCoeList({'sid':sid}).then((res)=>{
+      let CoeList = []
+      res.forEach(i=>{
+        let points = i.points;
+        let empCoe = []
+        i.children.forEach(j=>{
+          let coefficient = {
+            coefficientId:j.id,
+            coefficientName:j.title,
+            value:''
+          }
+          empCoe.push(coefficient)
+        })
+        CoeList.push({points,empCoe})
+      })
+      this.dataForm.coefficientList = CoeList
+    })},
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
@@ -375,33 +367,55 @@ export default {
       this.findCoefficientTree(data.id)
       this.findEmpTree(data.id)
     },
-    // 获取职工列表
-    findEmpTree: function (deptId){
-      this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
-    },
     empCurrentChangeHandle: function (data){
       this.dataForm.empNo = data.empNo
-      this.dataForm.empName = data.name
     },
-    // 获取绩效列表
-    findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
-        let CoeList = []
-        res.forEach(t=>{
-          let points = t.points;
-          let empCoe = []
-          t.coeDeptInfVoList.forEach(i=>{
-            let coefficient = {
-              coefficientId:i.id,
-              coefficientName:i.title,
-              value:0
-            }
-            empCoe.push(coefficient)
-          })
-          CoeList.push({points,empCoe})
-        })
-        this.dataForm.coefficientList = CoeList
-        })
+    CoeSchemeCurrentChange:function (data){
+      this.dataForm.coefficientSid = data.id
+      this.findCoeList(data.id)
+    },
+    //上传鉴定
+    beforeUpload(file){
+      let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
+      const extension = (testMsg === 'xls' ||testMsg ==='xlsx')
+      const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
+      if(!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
+      if(!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
+      return extension && isLt2M
+    },
+    //上传文件
+    UploadFile(param){
+      const formData = new FormData()
+      formData.append('file', param.file) // 要提交给后台的文件
+      this.$api.performance.upload(formData).then(res=>{
+        if(res.code === 200) {
+          this.$message({ message: '操作成功', type: 'success' })
+          this.$refs['upload'].clearFiles();
+        } else {
+          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+        }
+      })
+    },
+    //下载文件
+    exportExcelFile: function () {
+      axios.get(baseUrl+'/performance/download',{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        responseType: 'blob'
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
