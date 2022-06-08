@@ -4,8 +4,12 @@
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
-        <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/></el-form-item>
-        <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" /></el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
+        </el-form-item>
         <el-form-item>
           <el-tooltip content="刷新" placement="top">
             <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
@@ -19,25 +23,37 @@
       </el-form>
     </div>
 	<!--表格内容栏-->
-	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete" permsDisable="sys:user:disable" permsRecover="sys:user:recover"
+	<kt-table permsEdit="sys:user:edit" permsDelete="sys:user:delete"
+            permsDisable="sys:user:disable" permsRecover="sys:user:recover"
             :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
             @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
-			<el-form-item label="ID" prop="id" v-if="false"><el-input style="width: 40%" v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
-			<el-form-item label="用户名" prop="username" v-if="operation" ><el-input v-model="dataForm.username" auto-complete="off"/></el-form-item>
-			<el-form-item label="中文名" prop="chineseName"><el-input v-model="dataForm.chineseName" auto-complete="off"/></el-form-item>
-			<el-form-item label="密码" prop="password"><el-input v-model="dataForm.password" type="password" auto-complete="off"/></el-form-item>
+		<el-form :model="dataForm" label-width="80px"  :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
+			<el-form-item label="ID" prop="id" v-if="false">
+        <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
+      </el-form-item>
+			<el-form-item label="用户名" prop="username" v-if="operation">
+        <el-input v-model="dataForm.username" auto-complete="off"/>
+      </el-form-item>
+			<el-form-item label="中文名" prop="chineseName">
+        <el-input v-model="dataForm.chineseName" auto-complete="off"/>
+      </el-form-item>
+			<el-form-item label="密码" prop="password">
+        <el-input v-model="dataForm.password" type="password" auto-complete="off"/>
+      </el-form-item>
 			<el-form-item label="部门" prop="deptName">
 				<popup-tree-input :data="deptData" :props="deptTreeProps"
                           :prop="dataForm.deptName" :nodeKey="''+dataForm.deptId"
-                          :currentChangeHandle="deptTreeCurrentChangeHandle">
-				</popup-tree-input>
+                          :currentChangeHandle="deptTreeCurrentChangeHandle"/>
 			</el-form-item>
-			<el-form-item label="邮箱" prop="email"><el-input v-model="dataForm.email" type="email" auto-complete="off"/></el-form-item>
-			<el-form-item label="手机" prop="phone"><el-input v-model="dataForm.phone" auto-complete="off" /></el-form-item>
+			<el-form-item label="邮箱" prop="email">
+        <el-input v-model="dataForm.email" type="email" auto-complete="off"/>
+      </el-form-item>
+			<el-form-item label="手机" prop="phone">
+        <el-input v-model="dataForm.phone" auto-complete="off" />
+      </el-form-item>
 			<el-form-item label="角色" prop="userRoles">
 				<el-select v-model="dataForm.userRoles" multiple placeholder="请选择" style="width: 100%;">
           <el-option v-for="item in roles" :key="item.id" :label="item.remark" :value="item.id"/>
@@ -86,11 +102,9 @@ export default {
       dataFormRules: {//添加验证
 			  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
-        deptName:[{required: true, message: '请选择部门', trigger: 'blur'}],
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
       },
-			// 新增编辑界面数据
-			dataForm: {},
+			dataForm: {},// 新增编辑界面数据
 			deptData: [],
 			deptTreeProps: {
 				label: 'name',
@@ -151,7 +165,6 @@ export default {
 				deptName: '',
 				email: '',
         phone: '',
-				status: 1,
 				userRoles: []
 			}
 		},

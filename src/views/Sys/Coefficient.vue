@@ -3,9 +3,13 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="部门名"/></el-form-item>
-        <el-form-item><kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/></el-form-item>
-        <el-form-item><kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="方案名"/></el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
+        </el-form-item>
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
                      :before-upload="beforeUpload" :http-request="UploadFile"
@@ -14,8 +18,12 @@
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:coefficient:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-          <el-tooltip content="导出" placement="top"><kt-button perms="sys:coefficient:download" icon="fa fa-file-excel-o" @click="exportExcelFile"></kt-button></el-tooltip>
+          <el-tooltip content="刷新" x-placement="top">
+            <kt-button perms="sys:coefficient:view" icon="fa fa-refresh" @click="findPage(null)"/>
+          </el-tooltip>
+          <el-tooltip content="导出" placement="top">
+            <kt-button perms="sys:coefficient:download" icon="fa fa-file-excel-o" @click="exportExcelFile"/>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -31,6 +39,7 @@
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="status" label="状态" :formatter="statusFormat" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
                   <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:coefficient:edit" @click="handleEdit(scope.row)"/>
@@ -61,8 +70,8 @@
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
         <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
-                       :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize"
-                       style="float:right;"/>
+                       :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize"
+                       :total="totalSize" style="float:right;"/>
       </div>
     </div>
     <!--新增编辑界面-->
@@ -70,16 +79,26 @@
       <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()" label-width="100px" :size="size" style="text-align:left;">
         <el-form-item label="选项" prop="type" v-if="operation">
           <el-radio-group v-model="dataForm.type">
-            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change="ChangeHandle(index)">{{type}}</el-radio>
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{type}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 0" label="部门" prop="deptName">
+        <el-form-item label="部门" prop="deptName" v-if="operation">
           <popup-tree-input
             :data="deptData"
             :props="deptTreeProps"
             :prop="dataForm.deptName"
             :node-key="''+dataForm.deptId"
             :current-change-handle="deptTreeCurrentChangeHandle"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="系数方案" prop="coefficientSid">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="dataForm.type === 1" label="类型" prop="points">
+          <el-radio-group v-model="dataForm.points">
+            <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item :label="TypeList[dataForm.type] + '名'" prop="title">
           <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.type] + '名'"/>
@@ -92,14 +111,6 @@
         </el-form-item>
         <el-form-item v-if="dataForm.type === 0" label="绩效单价倍数" prop="multiple">
           <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="系数方案" prop="coefficientSid">
-          <el-input v-model="dataForm.coefficientSid"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="类型" prop="points">
-          <el-radio-group v-model="dataForm.points">
-            <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
-          </el-radio-group>
         </el-form-item>
         <el-form-item v-if="dataForm.type === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
@@ -147,6 +158,7 @@ export default {
       dataForm: {},
       pointsList: ["减分系数", "加分系数", "考勤系数"],
       deptData: [],
+      coeSchemeData:[],
       deptTreeProps: {
         label: 'name',
         children: 'children'
@@ -160,7 +172,6 @@ export default {
       this.pageRequest.params = [{name:'name', value:this.filters.name}]
       this.$api.coefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
-        this.pageResult.coeList = res.data.coeList
         this.totalSize = res.totalSize
       })
       this.loading = false
@@ -211,7 +222,6 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            console.log(params.id)
             if (params.type===0){
               this.$api.coefficient.saveScheme(params).then((res) => {
                 this.editLoading = false
@@ -239,7 +249,6 @@ export default {
     },
     //批量删除
     handleBatchDelete: function (params){
-      console.log(params)
       this.$confirm('确认删除选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
@@ -347,7 +356,7 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
-    ChangeHandle(data){
+    ChangeHandle: function(data){
       let type = data
       if (data===0){
         this.dataForm = {
@@ -363,6 +372,7 @@ export default {
         this.dataForm = {
           type:type,
           id: 0,
+          deptId:'',
           coefficientSid:'',
           points:'',
           title:'',
@@ -370,12 +380,20 @@ export default {
           remark:'',
         }
       }
-      console.log(this.dataForm)
     },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
       this.dataForm.deptName = data.name
+      this.findCoefficientTree(data.id)
+    },
+    CoeSchemeCurrentChange:function (data){
+      this.dataForm.coefficientSid = data.id
+    },
+    findCoefficientTree:function (deptId){
+      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+        this.coeSchemeData = res
+      })
     },
     // 状态格式化
     statusFormat: function (row, column){return row[column.property]===1?'正常':'禁用'},
@@ -426,9 +444,6 @@ export default {
         window.URL.revokeObjectURL(href)
       })
     },
-    next() {
-      if (this.active++ > 2) this.active = 0;
-    }
   },
   mounted() {
     this.findPage()

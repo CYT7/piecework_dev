@@ -27,6 +27,14 @@ export const save = (data) => {
     data
   })
 };
+//保存
+export const saveScheme = (data) => {
+  return axios({
+    url: '/deptCoe/saveScheme',
+    method: 'post',
+    data
+  })
+};
 //批量禁用
 export const disable = (data) => {
   return axios({
@@ -39,6 +47,22 @@ export const disable = (data) => {
 export const recover = (data) => {
   return axios({
     url: '/deptCoe/recover',
+    method: 'post',
+    data
+  })
+};
+//批量禁用
+export const disableScheme = (data) => {
+  return axios({
+    url: '/deptCoe/disableScheme',
+    method: 'post',
+    data
+  })
+};
+//批量恢复
+export const recoverScheme = (data) => {
+  return axios({
+    url: '/deptCoe/recoverScheme',
     method: 'post',
     data
   })
