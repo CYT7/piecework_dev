@@ -316,7 +316,7 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {
+    findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {
       this.deptData = res.data
       console.log(res.data)
     })},
@@ -411,7 +411,7 @@ export default {
   },
   mounted() {
     this.findPage()
-    this.findDeptTree()
+    this.findDeptTree(deptIds)
   },
 }
 </script>

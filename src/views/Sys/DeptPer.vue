@@ -327,7 +327,9 @@ export default {
       })
     },
     // 获取部门列表
-    findDeptTree: function () {this.$api.dept.findDeptTree({deptId:deptIds}).then((res) => {this.deptData = res.data})},
+    findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {this.deptData = res.data
+      console.log(this.deptData)
+    })},
     // 获取职工列表
     findEmpTree: function (deptId){
       this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
@@ -423,7 +425,7 @@ export default {
   },
   mounted() {
     this.findPage()
-    this.findDeptTree()
+    this.findDeptTree(deptIds)
   },
 }
 </script>
