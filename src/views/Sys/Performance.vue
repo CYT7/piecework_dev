@@ -8,16 +8,6 @@
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage()"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:performance:add" type="primary" @click="handleAdd"/>
-        </el-form-item>
-        <el-form-item>
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
-                     :before-upload="beforeUpload" :http-request="UploadFile"
-                     accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:performance:upload" :label="$t('action.upload')"/>
-          </el-upload>
-        </el-form-item>
-        <el-form-item>
           <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:performance:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
           <el-tooltip content="导出" placement="top"><kt-button perms="sys:performance:download" icon="fa fa-file-excel-o" @click="exportExcelFile"></kt-button></el-tooltip>
         </el-form-item>
@@ -62,12 +52,12 @@
         </el-table-column>
         <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="60%"/>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
-          <template slot-scope="scope" v-if="scope.row.status === 1">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>
-            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" type="primary"  @click="handleConfirm(scope.row)"/>
-          </template>
-        </el-table-column>
+<!--        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">-->
+<!--          <template slot-scope="scope" v-if="scope.row.status === 1">-->
+<!--            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>-->
+<!--            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" type="primary"  @click="handleConfirm(scope.row)"/>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
@@ -78,56 +68,6 @@
         </el-pagination>
       </div>
     </div>
-    <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules"
-               label-width="100px" ref="dataForm" :size="size" label-position="right" style="text-align:left;">
-        <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
-                            :nodeKey="''+dataForm.deptId"
-                            :currentChangeHandle="deptTreeCurrentChangeHandle"/>
-        </el-form-item>
-        <el-form-item label="职工" prop="empNo">
-          <el-select style="width: 100%" placeholder="选择职工" value-key="id" v-model="dataForm.empNo">
-            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="系数方案" prop="coefficientSid">
-          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
-            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="月份" prop="month">
-          <div class="block">
-            <el-date-picker
-              v-model="dataForm.month"
-              type="month"
-              placeholder="选择月"
-              value-format="yyyy-MM-dd">
-            </el-date-picker>
-          </div>
-        </el-form-item>
-        <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.points)" prop="coefficientList">
-          <el-card>
-            <el-form-item v-for="(i,t) in item.empCoe" :key="t" :label="i.coefficientName">
-              <el-input v-model="i.value"></el-input>
-            </el-form-item>
-          </el-card>
-        </el-form-item>
-      </el-form>
-      <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
-        <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
-        <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
-        <el-form-item label="月份" prop="month">{{dateFormats(dataForm.month)}}</el-form-item>
-        <el-form-item v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
-          <el-input v-model="item.value"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -154,22 +94,6 @@ export default {
         scoreList:{points:'', score:'',},
         empList: {id:'', coefficientId:'', coefficientName:'', value:'',},
       },
-      operation: false, // true:新增, false:编辑
-      dialogVisible: false, // 新增编辑界面是否显示
-      editLoading: false,
-      // 新增编辑界面数据
-      dataForm: [],
-      dataFormRules: {
-        empNo: [{ required: true, message: '请选择职工', trigger: 'blur' }],
-        month: [{ required: true, message: '请选择月份', trigger: 'blur' }],
-      },
-      deptData: [],
-      coeSchemeData:[],
-      deptTreeProps: {
-        label: 'name',
-        children: 'children'
-      },
-      empData:[],
     }
   },
   methods:{
@@ -201,200 +125,6 @@ export default {
         this.totalSize = res.totalSize
       })
       this.loading = false
-    },
-    //显示新增界面
-    handleAdd: function () {
-      this.dialogVisible = true
-      this.operation = true
-      this.dataForm = {
-        id: 0,
-        deptId: '',
-        empNo: '',
-        month:'',
-        coefficientList: {}
-      }
-    },
-    //显示编辑界面
-    handleEdit: function(row) {
-      this.dialogVisible = true;
-      this.operation = false
-      this.dataForm=Object.assign({}, row);
-    },
-    //批量确认
-    handleBatchConfirm: function () {
-      let Params = []
-      this.selections.forEach(t=>{
-        let Param = []
-        t.empList.forEach(i =>{
-          let param = {
-            "id":i.id,
-            "empNo":t.empNo,
-            "month":t.month,
-            "coefficientId":i.coefficientId,
-            "value":i.value,
-          }
-          Param.push(param)
-        })
-        Params.push(Param)
-      })
-      this.confirm(Params)
-    },
-    // 确认
-    handleConfirm(row){
-      let params = []
-      row.empList.forEach(t=>{
-        let param = [{
-          "id":t.id,
-          "empNo":row.empNo,
-          "month":row.month,
-          "coefficientId":t.coefficientId,
-          "value":t.value,
-        }]
-        params.push(param)
-      })
-      this.confirm(params)
-    },
-    confirm: function (params) {
-      this.$confirm("确认此条信息无误吗？","提示",{
-        type:"warning"
-      }).then(()=>{
-        let param = []
-        params.forEach(i=>{
-          i.forEach(t=>{
-            param.push(t)
-          })
-        })
-        this.loading = true;
-        this.$api.performance.confirm({"empList":param}).then((res)=>{
-          if (res.code===200){
-            this.$message({ message: "确认成功", type: "success" });
-          }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-          }
-          this.findPage();
-          this.loading = false
-        })
-      })
-    },
-    // 编辑
-    submitForm: function () {
-      this.$refs.dataForm.validate((valid) => {
-        if (valid) {
-          this.$confirm('确认提交吗？', '提示', {}).then(() => {
-            this.editLoading = true
-            let params = Object.assign({}, this.dataForm)
-            if (params.coefficientList!=null){
-              let empFinishList= []
-              for (let i=0,len = params.coefficientList.length;i<len;i++){
-                let empPerList = []
-                params.coefficientList[i].empCoe.forEach(t=>{
-                  let empPer = {
-                    points:params.coefficientList[i].points,
-                    coefficientId : t.coefficientId,
-                    coefficientName: t.coefficientName,
-                    value : t.value
-                  }
-                  empPerList.push(empPer)
-                })
-                empFinishList.push(empPerList)
-              }
-              let empCoeList = []
-              empFinishList.forEach(t=>{t.forEach(i=>{empCoeList.push(i)})})
-              params.empCoeList = empCoeList
-            }else{params.empCoeList = params.empList}
-            if (this.operation){
-              this.$api.performance.save(params).then((res)=>{
-                this.editLoading = false
-                if(res.code === 200) {
-                  this.$message({ message: '操作成功', type: 'success' })
-                  this.dialogVisible = false
-                  this.$refs['dataForm'].resetFields()
-                } else {
-                  this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-                }
-                this.findPage()
-              })
-            }else{
-              this.$api.performance.update(params).then((res)=>{
-                this.editLoading = false
-                if(res.code === 200) {
-                  this.$message({ message: '操作成功', type: 'success' })
-                  this.dialogVisible = false
-                  this.$refs['dataForm'].resetFields()
-                } else {
-                  this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-                }
-                this.findPage()
-              })
-            }
-          })
-        }
-      })
-    },
-    // 获取部门列表
-    findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
-    // 获取职工列表
-    findEmpTree: function (deptId){
-      this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
-    },
-    //获取方案树
-    findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
-        this.coeSchemeData = res
-      })
-    },
-    findCoeList: function (sid) {this.$api.coefficient.findCoeList({'sid':sid}).then((res)=>{
-      let CoeList = []
-      res.forEach(i=>{
-        let points = i.points;
-        let empCoe = []
-        i.children.forEach(j=>{
-          let coefficient = {
-            coefficientId:j.id,
-            coefficientName:j.title,
-            value:''
-          }
-          empCoe.push(coefficient)
-        })
-        CoeList.push({points,empCoe})
-      })
-      this.dataForm.coefficientList = CoeList
-    })},
-    // 菜单树选中
-    deptTreeCurrentChangeHandle (data) {
-      this.dataForm.deptId = data.id
-      this.dataForm.deptName = data.name
-      this.findCoefficientTree(data.id)
-      this.findEmpTree(data.id)
-    },
-    empCurrentChangeHandle: function (data){
-      this.dataForm.empNo = data.empNo
-    },
-    CoeSchemeCurrentChange:function (data){
-      this.dataForm.coefficientSid = data.id
-      this.findCoeList(data.id)
-    },
-    //上传鉴定
-    beforeUpload(file){
-      let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
-      const extension = (testMsg === 'xls' ||testMsg ==='xlsx')
-      const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
-      if(!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
-      if(!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
-      return extension && isLt2M
-    },
-    //上传文件
-    UploadFile(param){
-      const formData = new FormData()
-      formData.append('file', param.file) // 要提交给后台的文件
-      this.$api.performance.upload(formData).then(res=>{
-        if(res.code === 200) {
-          this.$message({ message: '操作成功', type: 'success' })
-          this.$refs['upload'].clearFiles();
-        } else {
-          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-        }
-      })
     },
     //下载文件
     exportExcelFile: function () {

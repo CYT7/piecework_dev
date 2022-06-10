@@ -10,12 +10,36 @@ export const findPage = (data) => {
     data
   })
 };
-//保存
+//新增
 export const save = (data) => {
   return axios({
-    url: '/DeptPer/save',
+    url: '/DeptPer/add',
     method: 'post',
     data
+  })
+};
+//更新
+export const update = (data) => {
+  return axios({
+    url: '/DeptPer/update',
+    method: 'post',
+    data
+  })
+};
+export const confirm = (data) => {
+  return axios({
+    url: '/DeptPer/confirm',
+    method: 'post',
+    data
+  })
+};
+//上传
+export const upload = (data) => {
+  return axios({
+    url: '/DeptPer/upload',
+    method: 'post',
+    headers:{'Content-Type':'multipart/form-data'},
+    data,
   })
 };
 
