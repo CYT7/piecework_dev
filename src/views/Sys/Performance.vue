@@ -20,7 +20,7 @@
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')"
                 @selection-change="selectionChange">
         <el-table-column type="selection" width="40"/>
-        <el-table-column type="expand" width="40">
+        <el-table-column type="expand" width="20">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
               <el-table-column label="工作绩效产量" header-align="center" align="center">
@@ -34,15 +34,10 @@
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="60%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="60%">
-          <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="small">可编辑</el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"/>
+        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%"/>
         <el-table-column label="分数" header-align="center" align="center" min-width="60%">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.points)"
@@ -53,7 +48,13 @@
           </el-table-column>
         </el-table-column>
         <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
 <!--        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">-->
 <!--          <template slot-scope="scope" v-if="scope.row.status === 1">-->
 <!--            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>-->
