@@ -34,7 +34,7 @@
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
             <el-table stripe :data="props.row.children" v-if="props.row.children!=null" width="100%" border fit highlight-current-row>
-              <el-table-column prop="points" label="类型" :formatter="typeFormat" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
@@ -78,8 +78,8 @@
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()" label-width="100px" :size="size" style="text-align:left;">
         <el-form-item label="选项" prop="type" v-if="operation">
-          <el-radio-group v-model="dataForm.type">
-            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{type}}</el-radio>
+          <el-radio-group v-model="dataForm.types">
+            <el-radio v-for="(types, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{types}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="部门" prop="deptName" v-if="operation">
@@ -90,32 +90,32 @@
             :node-key="''+dataForm.deptId"
             :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="系数方案" prop="coefficientSid">
+        <el-form-item v-if="dataForm.types === 1" label="系数方案" prop="coefficientSid">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
             <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="类型" prop="points">
-          <el-radio-group v-model="dataForm.points">
+        <el-form-item v-if="dataForm.types === 1" label="类型" prop="type">
+          <el-radio-group v-model="dataForm.type">
             <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="TypeList[dataForm.type] + '名'" prop="title">
-          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.type] + '名'"/>
+        <el-form-item :label="TypeList[dataForm.types] + '名'" prop="title">
+          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.types] + '名'"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 0" label="版本" prop="version">
+        <el-form-item v-if="dataForm.types === 0" label="版本" prop="version">
           <el-input v-model="dataForm.version" placeholder="请填写版本"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 0" label="绩效单价" prop="unitPrice">
+        <el-form-item v-if="dataForm.types === 0" label="绩效单价" prop="unitPrice">
           <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 0" label="绩效单价倍数" prop="multiple">
+        <el-form-item v-if="dataForm.types === 0" label="绩效单价倍数" prop="multiple">
           <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="系数值" prop="value">
+        <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.type === 1" label="备注" prop="remark">
+        <el-form-item v-if="dataForm.types === 1" label="备注" prop="remark">
           <el-input v-model="dataForm.remark" placeholder="请输入备注"/>
         </el-form-item>
       </el-form>
@@ -206,14 +206,14 @@ export default {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
-      this.dataForm.type = 1
+      this.dataForm.types = 1
     },
     // 显示编辑界面
     handleEdits: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
-      this.dataForm.type = 0
+      this.dataForm.types = 0
     },
     // 编辑
     submitForm: function () {
@@ -222,7 +222,7 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
-            if (params.type===0){
+            if (params.types===0){
               this.$api.coefficient.saveScheme(params).then((res) => {
                 this.editLoading = false
                 if(res.code === 200) {
@@ -360,7 +360,7 @@ export default {
       let type = data
       if (data===0){
         this.dataForm = {
-          type:type,
+          types:type,
           id: 0,
           deptId:'',
           title:'',
@@ -370,11 +370,11 @@ export default {
         }
       }else{
         this.dataForm = {
-          type:type,
+          types:type,
           id: 0,
           deptId:'',
           coefficientSid:'',
-          points:'',
+          type:'',
           title:'',
           value:'',
           remark:'',

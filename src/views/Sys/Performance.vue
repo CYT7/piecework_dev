@@ -8,8 +8,10 @@
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage()"/>
         </el-form-item>
         <el-form-item>
+          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:performance:download" type="primary" @click="handleDownLoad"/>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:performance:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
-          <el-tooltip content="导出" placement="top"><kt-button perms="sys:performance:download" icon="fa fa-file-excel-o" @click="exportExcelFile"></kt-button></el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -68,6 +70,35 @@
         </el-pagination>
       </div>
     </div>
+    <el-dialog title="导出绩效" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
+                            :nodeKey="''+downForm.deptId"
+                            :currentChangeHandle="deptTreeCurrentChange"/>
+        </el-form-item>
+        <el-form-item label="月份" prop="month">
+          <div class="block">
+            <el-date-picker
+              v-model="downForm.month"
+              type="monthrange"
+              unlink-panels
+              range-separator="至"
+              start-placeholder="开始月份"
+              end-placeholder="结束月份"
+              :picker-options="pickerOptions">
+            </el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item label="职工" prop="name">
+          <el-input v-model="downForm.name" placeholder="查询某职工"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -93,6 +124,37 @@ export default {
       pageResult: {
         scoreList:{points:'', score:'',},
         empList: {id:'', coefficientId:'', coefficientName:'', value:'',},
+      },
+      downloadVisible:false,// 下载页面是否显示
+      downForm:[],
+      deptData: [],
+      deptTreeProps: {
+        label: 'name',
+        children: 'children'
+      },
+      pickerOptions: {
+        shortcuts: [{
+          text: '本月',
+          onClick(picker) {
+            const end = new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0);
+            const start = new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '今年至今',
+          onClick(picker) {
+            const end = new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0);
+            const start = new Date(new Date().getFullYear(), 0,1,0,0,0);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近六个月',
+          onClick(picker) {
+            const end = new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0);
+            const start = new Date(new Date().getFullYear(), new Date().getMonth()-6,1,0,0,0);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
       },
     }
   },
@@ -126,9 +188,27 @@ export default {
       })
       this.loading = false
     },
+    handleDownLoad: function (){
+      this.downloadVisible = true
+      this.downForm = {
+        month:[],
+        name:'',
+        deptId: '',
+      }
+    },
+    submitDown:function (){
+      this.$refs.downForm.validate((valid)=>{
+        if (valid){
+          let params = Object.assign({},this.downForm)
+          this.exportExcelFile(params);
+          this.downloadVisible = false;
+          this.$refs['downForm'].resetFields()
+        }
+      })
+    },
     //下载文件
-    exportExcelFile: function () {
-      axios.get(baseUrl+'/performance/download',{
+    exportExcelFile: function (params) {
+      axios.post(baseUrl+'/performance/download',params,{
         headers:{
           'token':Cookies.get('token'),
           'Content-Type': 'application/json;charset=UTF-8'
@@ -146,6 +226,12 @@ export default {
         document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
         window.URL.revokeObjectURL(href)
       })
+    },
+    // 获取部门列表
+    findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
+    deptTreeCurrentChange (data) {
+      this.downForm.deptId = data.id
+      this.downForm.deptName = data.name
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
