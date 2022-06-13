@@ -45,12 +45,12 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"/>
-        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%"/>
-        <el-table-column label="分数" header-align="center" align="center" min-width="60%">
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column label="分数" header-align="center" align="center" min-width="50%" width="100%">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
                            header-align="center" align="center" min-width="80%">
@@ -59,15 +59,15 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%">
+        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%" width="100%">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="small">确认</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="small">未编辑</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%" width="100%">
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%" width="200%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:DeptPer:edit" @click="handleEdit(scope.row)"/>
             <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:DeptPer:confirm" type="primary"  @click="handleConfirm(scope.row)"/>
@@ -478,6 +478,7 @@ export default {
         }
       })
     },
+
     //下载文件
     exportExcelFile: function (params) {
       axios.post(baseUrl+'/DeptPer/download',params,{

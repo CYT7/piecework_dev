@@ -33,28 +33,28 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"/>
-        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%"/>
-        <el-table-column label="分数" header-align="center" align="center" min-width="60%">
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column label="分数" header-align="center" align="center" min-width="60%" width="100%">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
-                           :label="scoreFormat(item.points)"
+                           :label="scoreFormat(item.type)"
                            header-align="center" align="center" min-width="80%">
             <template slot-scope="scope">
               <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%">
+        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%" width="100%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%" width="100%">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%" width="100%"/>
 <!--        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">-->
 <!--          <template slot-scope="scope" v-if="scope.row.status === 1">-->
 <!--            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>-->
@@ -238,9 +238,9 @@ export default {
     dateFormat: function (row, column){return formats(row[column.property])},
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
-      if(item===1){return '加分分数'}
-      else if (item === 0){return '扣分分数'}
-      else{return '考勤分数'}
+      if(item===1){return '加分'}
+      else if (item === 0){return '扣分'}
+      else{return '考勤'}
     },
   },
   mounted() {

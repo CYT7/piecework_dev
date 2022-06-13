@@ -18,11 +18,11 @@
           </el-upload>
         </el-form-item>
         <el-form-item>
+          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:coefficient:download" type="primary" @click="handleDownLoad"/>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip content="刷新" x-placement="top">
             <kt-button perms="sys:coefficient:view" icon="fa fa-refresh" @click="findPage(null)"/>
-          </el-tooltip>
-          <el-tooltip content="导出" placement="top">
-            <kt-button perms="sys:coefficient:download" icon="fa fa-file-excel-o" @click="exportExcelFile"/>
           </el-tooltip>
         </el-form-item>
       </el-form>
@@ -124,6 +124,19 @@
         <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="导出系数" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
+                            :nodeKey="''+downForm.deptId"
+                            :currentChangeHandle="deptTreeCurrentChange"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -155,6 +168,8 @@ export default {
       },
       // 新增编辑界面数据
       TypeList:["方案", "系数"],
+      downloadVisible:false,// 下载页面是否显示
+      downForm:[],
       dataForm: {},
       pointsList: ["减分系数", "加分系数", "考勤系数"],
       deptData: [],
@@ -387,6 +402,10 @@ export default {
       this.dataForm.deptName = data.name
       this.findCoefficientTree(data.id)
     },
+    deptTreeCurrentChange (data) {
+      this.downForm.deptId = data.id
+      this.downForm.deptName = data.name
+    },
     CoeSchemeCurrentChange:function (data){
       this.dataForm.coefficientSid = data.id
     },
@@ -424,8 +443,24 @@ export default {
         }
       })
     },
-    exportExcelFile: function () {
-      axios.get(baseUrl+'/coefficient/download',{
+    handleDownLoad: function (){
+      this.downloadVisible = true
+      this.downForm = {
+        deptId: '',
+      }
+    },
+    submitDown:function (){
+      this.$refs.downForm.validate((valid)=>{
+        if (valid){
+          let params = Object.assign({},this.downForm)
+          this.exportExcelFile(params);
+          this.downloadVisible = false;
+          this.$refs['downForm'].resetFields()
+        }
+      })
+    },
+    exportExcelFile: function (params) {
+      axios.post(baseUrl+'/coefficient/download',params,{
         headers:{
           'token':Cookies.get('token'),
           'Content-Type': 'application/json;charset=UTF-8'
