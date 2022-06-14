@@ -20,7 +20,7 @@
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:DeptPer:download" type="primary" @click="handleDownLoad"/>
+          <kt-button icon="fa fa-file-excel-o" label="下载" perms="sys:DeptPer:download" type="primary" @click="handleDownLoad"/>
         </el-form-item>
         <el-form-item>
           <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:DeptPer:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
@@ -83,14 +83,19 @@
         </el-pagination>
       </div>
     </div>
-    <el-dialog title="导出绩效" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+    <el-dialog title="下载" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+        <el-form-item label="下载" prop="type">
+          <el-radio-group v-model="downForm.type">
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
                             :currentChangeHandle="deptTreeCurrentChange"/>
         </el-form-item>
-        <el-form-item label="月份" prop="month">
+        <el-form-item label="月份" prop="month" v-if="downForm.type===0">
           <div class="block">
             <el-date-picker
               v-model="downForm.month"
@@ -103,8 +108,19 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="职工" prop="name">
-          <el-input v-model="downForm.name" placeholder="查询某职工"/>
+        <el-form-item label="月" prop="month" v-if="downForm.type===1">
+          <div class="block" style="width: 100%">
+            <el-date-picker
+              v-model="downForm.months"
+              type="month"
+              placeholder="选择月">
+            </el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="coefficientSid" v-if="downForm.type===1">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.coefficientSid">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeChange(item)"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -134,7 +150,7 @@
         <el-form-item label="月份" prop="month">
           <div class="block">
             <el-date-picker
-              v-model="dataForm.month"
+              v-model="dataForm.months"
               type="month"
               placeholder="选择月"
               value-format="yyyy-MM-dd">
@@ -192,6 +208,7 @@ export default {
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       downloadVisible:false,// 下载页面是否显示
+      TypeList:['导出绩效','导出填写模板'],
       editLoading: false,
       // 新增编辑界面数据
       dataForm: [],
@@ -284,10 +301,26 @@ export default {
     },
     handleDownLoad: function (){
       this.downloadVisible = true
-      this.downForm = {
-        month:[],
-        name:'',
-        deptId: '',
+      this.ChangeHandle(0)
+    },
+    ChangeHandle: function(data){
+      let type = data
+      if (data===0){
+        this.downForm = {
+          month:[],
+          deptId: '',
+          deptName:'',
+          type:type
+        }
+      }else{
+        this.downForm = {
+          months:'',
+          deptId: '',
+          deptName:'',
+          type:type,
+          coefficientSid:'',
+          schemeName:"",
+        }
       }
     },
     //显示编辑界面
@@ -330,7 +363,7 @@ export default {
           })
         })
         this.loading = true;
-        this.$api.deptPer.confirm({"empList":param}).then((res)=>{
+        this.$api.deptPer.confirm({"empListDTO":param}).then((res)=>{
           if (res.code===200){
             this.$message({ message: "确认成功", type: "success" });
           }else{
@@ -440,6 +473,9 @@ export default {
     deptTreeCurrentChange (data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
+      if (this.downForm.type === 1){
+        this.findCoefficientTree(data.id)
+      }
     },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
@@ -455,6 +491,10 @@ export default {
     CoeSchemeCurrentChange:function (data){
       this.dataForm.coefficientScheme = data.id
       this.findCoeList(data.id)
+    },
+    CoeSchemeChange:function (data){
+      this.downForm.coefficientSid = data.id
+      this.downForm.schemeName = data.title
     },
     //上传鉴定
     beforeUpload(file){
