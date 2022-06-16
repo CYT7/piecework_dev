@@ -6,14 +6,15 @@
       <el-menu class="el-menu-demo" :background-color="themeColor" text-color="#fff"
         :active-text-color="themeColor" mode="horizontal">
         <el-menu-item index="1" @click="onCollapse">
-          <hamburger :isActive="collapse"></hamburger>
+          <hamburger :isActive="collapse"/>
         </el-menu-item>
       </el-menu>
     </span>
     <!-- 导航菜单 -->
     <span class="navbar">
       <el-menu :default-active="activeIndex" class="el-menu-demo"
-          :background-color="themeColor" text-color="#fff" active-text-color="#ffd04b" mode="horizontal" @select="selectNavBar()">
+          :background-color="themeColor" text-color="#fff"
+               active-text-color="#ffd04b" mode="horizontal">
         <el-menu-item index="1" @click="$router.push('/')">{{$t("common.home")}}</el-menu-item>
       </el-menu>
     </span>
@@ -23,9 +24,7 @@
         :active-text-color="themeColor" mode="horizontal">
         <el-menu-item index="1">
           <!-- 主题切换 -->
-          <theme-picker class="theme-picker" :default="themeColor"
-            @onThemeChange="onThemeChange">
-          </theme-picker>
+          <theme-picker class="theme-picker" :default="themeColor" @onThemeChange="onThemeChange"/>
         </el-menu-item>
         <el-menu-item index="2" v-popover:popover-lang>
           <!-- 语言切换 -->
@@ -65,17 +64,10 @@ export default {
     }
   },
   methods: {
-    selectNavBar(key, keyPath) {
-      console.log(key, keyPath)
-    },
     //折叠导航栏
-    onCollapse: function() {
-      this.$store.commit('onCollapse')
-    },
+    onCollapse: function() {this.$store.commit('onCollapse')},
     //切换主题
-    onThemeChange: function(themeColor) {
-      this.$store.commit('setThemeColor', themeColor)
-    },
+    onThemeChange: function(themeColor) {this.$store.commit('setThemeColor', themeColor)},
     //语言切换
     changeLanguage(lang) {
       this.$i18n.locale = lang === '' ? 'zh_cn' : lang;
@@ -87,9 +79,7 @@ export default {
     if (user) {
       const params = {name:user};
       this.$api.user.findByName(params).then((res) => {
-				if(res.code === 200) {
-          this.user = res.data;
-        }
+				if(res.code === 200) {this.user = res.data;}
       })
     }
   },

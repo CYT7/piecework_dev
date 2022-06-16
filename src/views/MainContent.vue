@@ -32,9 +32,7 @@
 </template>
 <script>
 export default {
-  data () {
-    return {}
-  },
+  data () {return {}},
   computed: {
     mainTabs: {
       get () { return this.$store.state.tab.mainTabs },
@@ -49,9 +47,7 @@ export default {
     //tabs, 选中tab
     selectedTabHandle (tab) {
       tab = this.mainTabs.filter(item => item.name === tab.name);
-      if (tab.length >= 1) {
-        this.$router.push({ name: tab[0].name })
-      }
+      if (tab.length >= 1) {this.$router.push({ name: tab[0].name })}
     },
     //tabs, 删除tab
     removeTabHandle (tabName) {
@@ -142,10 +138,6 @@ export default {
     padding: 5px;
   }
 }
-.position-left {
-  left: 200px;
-}
-.position-collapse-left {
-  left: 65px;
-}
+.position-left {left: 200px;}
+.position-collapse-left {left: 65px;}
 </style>

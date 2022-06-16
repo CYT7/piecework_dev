@@ -6,6 +6,9 @@
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:role:add" type="primary" @click="handleAdd" />
         </el-form-item>
+        <el-form-item>
+          <kt-button perms="sys:role:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
+        </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
@@ -198,7 +201,7 @@ export default {
 			console.log(roleMenus)
 			this.$api.role.saveRoleMenus({"roleMenuList":roleMenus}).then((res) => {
 				if(res.code === 200) {this.$message({ message: '操作成功', type: 'success' })}
-				else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
+				else {this.$message({message: res.msg, type: 'error'})}
 				this.authLoading = false
 			})
 		},

@@ -55,16 +55,10 @@
           </template>
         </el-table-column>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%" width="100%"/>
-<!--        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">-->
-<!--          <template slot-scope="scope" v-if="scope.row.status === 1">-->
-<!--            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:performance:edit" @click="handleEdit(scope.row)"/>-->
-<!--            <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:performance:confirm" type="primary"  @click="handleConfirm(scope.row)"/>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
-        <kt-button :label="$t('action.batchConfirm')" perms="sys:performance:confirm" :size="size" type="primary" @click="handleBatchConfirm()"
+        <kt-button :label="$t('action.batchConfirm')" perms="sys:performance:confirm" :size="size" type="primary"
                    :disabled="this.selections.length===0" style="float:left;" v-if="showBatchDelete"/>
         <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
                        :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="totalSize" style="float:right;">

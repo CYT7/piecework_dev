@@ -14,9 +14,9 @@ import NavBar from "./NavBar"
 import MainContent from "./MainContent"
 export default {
   components:{
-        HeadBar,
-        NavBar,
-        MainContent
+    HeadBar,
+    NavBar,
+    MainContent
   }
 };
 </script>

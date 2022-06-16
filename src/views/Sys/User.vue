@@ -11,14 +11,10 @@
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" placement="top">
-            <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
-          </el-tooltip>
+          <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="导出" placement="top">
-            <kt-button perms="sys:user:download" icon="fa fa-file-excel-o" @click="exportUserExcelFile"></kt-button>
-          </el-tooltip>
+          <kt-button perms="sys:user:download" icon="fa fa-file-excel-o" @click="exportUserExcelFile"></kt-button>
         </el-form-item>
       </el-form>
     </div>
@@ -71,13 +67,17 @@
 import PopupTreeInput from "../../components/PopupTreeInput";
 import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
-import {isEmail} from "../../utils/validate";
+import {isEmail, isPhone} from "../../utils/validate";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
 const checkEmail = (rule,value,callback) =>{
   if (!value){return callback(new Error('请输入邮箱'));}
   else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
+}
+const checkPhone = (rule,value,callback) =>{
+  if (!value){callback();}
+  else{if (isPhone(value)){callback();}else{return callback(new Error('手机格式不正确'))}}
 }
 export default {
 	components:{PopupTreeInput, KtTable, KtButton,},
@@ -98,19 +98,20 @@ export default {
 			pageResult: {},
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
-			editLoading: false,
+			editLoading: false, //新增编辑加载
       dataFormRules: {//添加验证
 			  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
+        phone:[{validator:checkPhone,trigger:'blur'}]
       },
 			dataForm: {},// 新增编辑界面数据
-			deptData: [],
-			deptTreeProps: {
+			deptData: [],//部门数据
+			deptTreeProps: { //部门树
 				label: 'name',
 				children: 'children'
 			},
-			roles: []
+			roles: [] //角色
 		}
 	},
 	methods: {

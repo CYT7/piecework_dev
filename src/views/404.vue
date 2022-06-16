@@ -11,9 +11,7 @@
   </div>
 </template>
 <script>
-  export default {
-    name: '404'
-  }
+  export default {name: '404'}
 </script>
 <style lang="scss">
   .site-wrapper.site-page--not-found {
@@ -53,8 +51,6 @@
         color: #ee8145;
       }
     }
-    .not-found-btn-go-home {
-      margin-left: 30px;
-    }
+    .not-found-btn-go-home {margin-left: 30px;}
   }
 </style>
