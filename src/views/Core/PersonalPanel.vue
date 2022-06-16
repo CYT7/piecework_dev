@@ -5,7 +5,7 @@
       <div class="register-info"><span class="register-info fa fa-clock-o">创建时间-{{ this.dateFormat(user.createTime) }}</span></div>
     </div>
     <div class="main-operation">
-      <span class="main-operation-item" @click="openPersonCenter"><el-button size="small" icon="fa fa-male" > 个人中心</el-button></span>
+      <span class="main-operation-item" @click="$router.push('/')"><el-button size="small" icon="fa fa-male" > 个人中心</el-button></span>
       <span class="main-operation-item" @click="updatePasswordDialog"><el-button size="small" icon="fa fa-key"> 修改密码</el-button></span>
     </div>
     <div class="personal-footer" @click="logout">
@@ -86,6 +86,8 @@
       logout() {
         this.$confirm("确认退出吗?", "提示", {type: "warning"})
           .then(() => {
+            sessionStorage.removeItem("user");
+            sessionStorage.removeItem("deptId");
             this.deleteCookie('token');// 清空Cookie里的token
             this.logoutApi()
           }).catch(() => {})

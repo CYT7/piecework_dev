@@ -6,6 +6,7 @@ import Home from '../views/Home'
 import api from '../http/api'
 import store from '../store'
 import { getIFramePath, getIFrameUrl } from '../utils/iframe'
+import Personal from "../views/Personal";
 
 Vue.use(Router);
 const originalPush = Router.prototype.push
@@ -16,9 +17,19 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: '',
+      name: '首页',
       component: Home,
-      children: []
+      children: [
+        {
+          path: '',
+          name: '个人中心',
+          component: Personal,
+          meta: {
+            icon: 'fa fa-home fa-lg',
+            index: 0
+          }
+        }
+      ]
     },
     {
       path: '/login',

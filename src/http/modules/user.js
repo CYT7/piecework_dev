@@ -66,3 +66,10 @@ export const recover = (data) => {
     data
   })
 };
+//根据用户名查找
+export const personalCenter = () => {
+  return axios({
+    url: '/user/personalCenter',
+    method: 'post',
+  })
+};
