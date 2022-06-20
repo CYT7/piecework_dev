@@ -12,8 +12,8 @@
       <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
     </el-form-item>
     <el-form-item style="width:100%;">
-      <el-button type="primary" style="width:50%;" @click.native.prevent="reset">重 置</el-button>
-      <el-button type="primary" style="width:50%;" @click.native.prevent="login" :loading="loading">登 录</el-button>
+      <el-button type="primary" style="width:40%;" @click.native.prevent="reset">重 置</el-button>
+      <el-button type="primary" style="width:40%;" @click.native.prevent="login" :loading="loading">登 录</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -67,13 +67,10 @@ export default {
         });
     },
     reset() {this.$refs.loginForm.resetFields()},
-    //切换主题
-    onThemeChange: function(themeColor) {this.$store.commit('setThemeColor', themeColor)}
+    onThemeChange: function(themeColor) {this.$store.commit('setThemeColor', themeColor)} //切换主题
   },
   computed:{
-    ...mapState({
-      themeColor: state=>state.app.themeColor
-    })
+    ...mapState({themeColor: state=>state.app.themeColor})
   }
 }
 </script>

@@ -1,7 +1,6 @@
 <template>
   <div class="iframe-container">
-    <iframe :src="src" :scrolling="auto" :frameborder="0"  class="frame" :onload="onload()">
-    </iframe>
+    <iframe :src="src" :scrolling="auto" :frameborder="0"  class="frame" :onload="onload()"/>
   </div>
 </template>
 <script>
@@ -29,19 +28,14 @@
         })
       },
       onload: function() {
-        if(this.loading) {
-          this.loading.close()
-        }
+        if(this.loading) {this.loading.close()}
       }
     },
-    mounted() {
-      this.resetSrc(this.$store.state.iframe.iframeUrl);
-    },
+    mounted() {this.resetSrc(this.$store.state.iframe.iframeUrl);},
     watch: {
       $route: {
         handler: function() {
-          //如果是跳转到嵌套页面，切换iframe的url
-          this.resetSrc(this.$store.state.iframe.iframeUrl);
+          this.resetSrc(this.$store.state.iframe.iframeUrl);//如果是跳转到嵌套页面，切换iframe的url
         }
       }
     }

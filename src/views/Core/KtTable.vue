@@ -2,8 +2,10 @@
   <div>
     <!--表格栏-->
     <el-table :data="data.data" :highlight-current-row="highlightCurrentRow" @selection-change="selectionChange"
-          @current-change="handleCurrentChange" v-loading="loading" :element-loading-text="$t('action.loading')" :border="border" :stripe="stripe"
-          :show-overflow-tooltip="showOverflowTooltip" :max-height="maxHeight" :size="size" :align="align" style="width:100%;" >
+              @current-change="handleCurrentChange" v-loading="loading"
+              :element-loading-text="$t('action.loading')" :border="border" :stripe="stripe"
+              :show-overflow-tooltip="showOverflowTooltip" :max-height="maxHeight"
+              :size="size" :align="align" style="width:100%;" >
       <el-table-column type="selection" width="40" v-if="showBatchOperation & showOperation"></el-table-column>
       <el-table-column v-for="column in columns" header-align="center" align="center"
         :prop="column.prop" :label="column.label" :width="column.width" :min-width="column.minWidth"
@@ -12,23 +14,31 @@
       </el-table-column>
       <el-table-column :label="$t('action.operation')" min-width="40%" v-if="showOperation" header-align="center" align="center">
         <template slot-scope="scope">
-          <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')" :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
-          <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')" :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
-          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
+          <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')"
+                     :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
+          <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')"
+                     :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
+          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
+                     :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
+          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
+                     :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
         </template>
       </el-table-column>
     </el-table>
     <!--分页栏-->
     <div class="toolbar" style="padding:10px;">
-      <kt-button :label="$t('action.batchDelete')" :perms="permsDelete" :size="size" type="danger" @click="handleBatchDelete()"
-        :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
-      <kt-button :label="$t('action.batchDisable')" :perms="permsDisable" :size="size" type="waring" @click="handleBatchDisable()"
-                 :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
-      <kt-button :label="$t('action.batchRecover')" :perms="permsRecover" :size="size" type="primary" @click="handleBatchRecover()"
-                 :disabled="this.selections.length===0" style="float:left;" v-if="showBatchOperation & showOperation"/>
+      <kt-button :label="$t('action.batchDelete')" :perms="permsDelete" :size="size"
+                 type="danger" @click="handleBatchDelete()" :disabled="this.selections.length===0"
+                 style="float:left;" v-if="showBatchOperation & showOperation"/>
+      <kt-button :label="$t('action.batchDisable')" :perms="permsDisable" :size="size"
+                 type="waring" @click="handleBatchDisable()" :disabled="this.selections.length===0"
+                 style="float:left;" v-if="showBatchOperation & showOperation"/>
+      <kt-button :label="$t('action.batchRecover')" :perms="permsRecover" :size="size"
+                 type="primary" @click="handleBatchRecover()" :disabled="this.selections.length===0"
+                 style="float:left;" v-if="showBatchOperation & showOperation"/>
       <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
-        :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize" :total="data.totalSize"  style="float:right;">
+                     :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize"
+                     :total="data.totalSize" style="float:right;">
       </el-pagination>
     </div>
   </div>
@@ -37,9 +47,7 @@
 import KtButton from "./KtButton";
 export default {
   name: 'KtTable',
-  components:{
-    KtButton
-	},
+  components:{KtButton},
   props: {
     columns: Array, //表格列配置
     data: Object, //表格分页数据
@@ -49,7 +57,7 @@ export default {
     permsRecover: String,  //恢复权限标识
     size: {type: String, default: 'mini'},//尺寸样式
     align: {type: String, default: 'left'},//文本对齐方式
-    maxHeight: {type: Number, default: 800},//表格最大高度
+    maxHeight: {type: Number, default: '100%'},//表格最大高度
     showOperation: {type: Boolean, default: true},//是否显示操作组件
     border: {type: Boolean, default: false},//是否显示边框
     stripe: {type: Boolean, default: true},//是否显示斑马线
@@ -100,27 +108,18 @@ export default {
     //批量禁用
     handleBatchDisable: function () {
       let ids = []
-      this.selections.forEach(t=>{
-        if (t.status ===1){
-          ids.push(t.id)
-        }
-      })
+      this.selections.forEach(t=>{if (t.status ===1){ids.push(t.id)}})
       this.disable(ids)
     },
     //批量恢复
     handleBatchRecover: function () {
       let ids = []
-      this.selections.forEach(t=>{
-        if (t.status ===0){
-          ids.push(t.id)
-        }
-      })
+      this.selections.forEach(t=>{if (t.status ===0){ids.push(t.id)}})
       this.recover(ids)
     },
 		//删除操作
 		delete: function (ids) {
-			this.$confirm('确认删除选中记录吗？', '提示', {
-				type: 'warning'
+			this.$confirm('确认删除选中记录吗？', '提示', {type: 'warning'
 			}).then(() => {
 				let params = ids;
         this.loading = true;
@@ -138,8 +137,7 @@ export default {
 		},
 		//禁用操作
     disable: function (ids) {
-      this.$confirm('确认禁用选中的记录吗？', '提示', {
-        type: 'warning'
+      this.$confirm('确认禁用选中的记录吗？', '提示', {type: 'warning'
       }).then(() => {
         let params = ids
         this.loading = true;
@@ -157,8 +155,7 @@ export default {
     },
     //恢复操作
     recover: function (ids) {
-      this.$confirm('确认恢复选中的记录吗？', '提示', {
-        type: 'warning'
+      this.$confirm('确认恢复选中的记录吗？', '提示', {type: 'warning'
       }).then(() => {
         let params = ids
         this.loading = true;

@@ -2,7 +2,7 @@
   <div class="personal-panel">
     <div class="personal-desc" :style="{'background':this.$store.state.app.themeColor}">
       <div class="name-role"><span class="sender">{{ user.chineseName }}</span></div>
-      <div class="register-info"><span class="register-info fa fa-clock-o">创建时间-{{ this.dateFormat(user.createTime) }}</span></div>
+      <div class="register-info"><span class="register-info fa fa-clock-o">创建时间:{{ this.dateFormat(user.createTime) }}</span></div>
     </div>
     <div class="main-operation">
       <span class="main-operation-item" @click="$router.push('/')"><el-button size="small" icon="fa fa-male" > 个人中心</el-button></span>
@@ -55,8 +55,6 @@
       }
     },
     methods: {
-      //打开个人中心
-      openPersonCenter: function () {alert('待开发')},
       //打开修改密码对话框
       updatePasswordDialog: function () {this.updatePwdDialogVisible = true},
       //修改密码
@@ -136,9 +134,7 @@
     border-top-width: 1px;
     border-top-style: solid;
   }
-  .main-operation-item {
-    margin: 15px;
-  }
+  .main-operation-item {margin: 15px;}
   .personal-footer {
     margin-right: 1px;
     font-size: 14px;

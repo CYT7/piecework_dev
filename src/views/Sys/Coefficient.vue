@@ -3,12 +3,16 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="方案名"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
+          <el-input v-model="filters.name" placeholder="方案名查询"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')"
+                     perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')"
+                     perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
@@ -18,7 +22,8 @@
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:coefficient:download" type="primary" @click="handleDownLoad"/>
+          <kt-button icon="fa fa-file-excel-o" label="导出"
+                     perms="sys:coefficient:download" type="primary" @click="handleDownLoad"/>
         </el-form-item>
         <el-form-item>
           <el-tooltip content="刷新" x-placement="top">
@@ -33,19 +38,27 @@
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
-            <el-table stripe :data="props.row.children" v-if="props.row.children!=null" width="100%" border fit highlight-current-row>
-              <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable header-align="center" align="center" min-width="50%"/>
+            <el-table stripe :data="props.row.children" v-if="props.row.children!=null"
+                      width="100%" border fit highlight-current-row>
+              <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable
+                               header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="status" label="状态" :formatter="statusFormat" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="status" label="状态" :formatter="statusFormat"
+                               sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
-                  <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:coefficient:edit" @click="handleEdit(scope.row)"/>
-                  <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleDelete(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" perms="sys:coefficient:disable"  type="warning" @click="handleDisable(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" perms="sys:coefficient:recover" type="primary" @click="handleRecover(scope.row)"/>
+                  <kt-button icon="fa fa-edit" :label="$t('action.edit')"
+                             perms="sys:coefficient:edit" @click="editsCoefficient(scope.row)"/>
+                  <kt-button icon="fa fa-trash" :label="$t('action.delete')"
+                             perms="sys:coefficient:delete" type="danger" @click="handleDelete(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
+                             :label="$t('action.disable')" perms="sys:coefficient:disable"
+                             type="warning" @click="handleDisable(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
+                             perms="sys:coefficient:recover" type="primary" @click="handleRecover(scope.row)"/>
                 </template>
               </el-table-column>
             </el-table>
@@ -56,14 +69,19 @@
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="50%"/>
         <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="50%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center"
+                         align="center" :formatter="statusFormat" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:coefficient:edit" @click="handleEdits(scope.row)"/>
-            <kt-button icon="fa fa-trash" :label="$t('action.delete')" perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
-            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
-            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" perms="sys:coefficient:recover" type="primary"   @click="handleBatchRecover(scope.row)"/>
+            <kt-button icon="fa fa-edit" :label="$t('action.edit')"
+                       perms="sys:coefficient:edit" @click="editScheme(scope.row)"/>
+            <kt-button icon="fa fa-trash" :label="$t('action.delete')"
+                       perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
+            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
+                       perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
+            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
+                       perms="sys:coefficient:recover" type="primary"   @click="handleBatchRecover(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -76,10 +94,14 @@
     </div>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()" label-width="100px" :size="size" style="text-align:left;">
+      <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()"
+               label-width="100px" :size="size" style="text-align:left;">
         <el-form-item label="选项" prop="type" v-if="operation">
           <el-radio-group v-model="dataForm.types">
-            <el-radio v-for="(types, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{types}}</el-radio>
+            <el-radio v-for="(types, index) in TypeList" :label="index"
+                      :key="index" @change.native="ChangeHandle(index)">
+              {{types}}
+            </el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="部门" prop="deptName" v-if="operation">
@@ -92,7 +114,9 @@
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="系数方案" prop="coefficientSid">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
-            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+            <el-option v-for="item in coeSchemeData" :key="item.id"
+                       :label="item.title" :value="item.id"
+                       @click.native="CoeSchemeCurrentChange(item)"/>
           </el-select>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="类型" prop="type">
@@ -109,8 +133,8 @@
         <el-form-item v-if="dataForm.types === 0" label="绩效单价" prop="unitPrice">
           <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="绩效单价倍数" prop="multiple">
-          <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
+        <el-form-item v-if="dataForm.types === 0" label="单价倍数" prop="multiple">
+          <el-input v-model="dataForm.multiple" placeholder="请输入单价倍数"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
@@ -125,7 +149,8 @@
       </div>
     </el-dialog>
     <el-dialog title="导出系数" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px"
+               label-position="right" style="text-align:left;">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
@@ -217,14 +242,14 @@ export default {
       this.ChangeHandle(0)
     },
     // 显示编辑界面
-    handleEdit: function (params) {
+    editsCoefficient: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
       this.dataForm.types = 1
     },
     // 显示编辑界面
-    handleEdits: function (params) {
+    editScheme: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
@@ -483,7 +508,6 @@ export default {
   mounted() {
     this.findPage()
     this.findDeptTree()
-
   },
 }
 </script>

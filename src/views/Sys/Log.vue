@@ -3,17 +3,21 @@
 	<!--工具栏-->
 	<div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
 		<el-form :inline="true" :model="filters" :size="size">
-			<el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
+			<el-form-item><el-input v-model="filters.name" placeholder="用户名查询"/></el-form-item>
 			<el-form-item>
-        <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:log:view" type="primary" @click="findPage(null)"/>
+        <kt-button icon="fa fa-search" :label="$t('action.search')"
+                   perms="sys:log:view" type="primary" @click="findPage(null)"/>
 			</el-form-item>
       <el-form-item>
-        <el-tooltip content="刷新" x-placement="top"><el-button icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+        <el-tooltip content="刷新" x-placement="top">
+          <kt-button perms="sys:log:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
+        </el-tooltip>
       </el-form-item>
 		</el-form>
 	</div>
 	<!--表格内容栏-->
-	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:log:delete" @findPage="findPage" @handleDelete="handleDelete"/>
+	<kt-table :data="pageResult" :columns="columns" permsDelete="sys:log:delete"
+            @findPage="findPage" @handleDelete="handleDelete"/>
   </div>
 </template>
 <script>
@@ -21,10 +25,7 @@ import KtTable from "../Core/KtTable";
 import KtButton from "../Core/KtButton";
 import {format} from "../../utils/datetime";
 export default {
-	components: {
-		KtTable,
-		KtButton
-	},
+	components: {KtTable, KtButton},
 	data() {
 		return {
 			size: 'small',
@@ -49,7 +50,9 @@ export default {
 		findPage: function (data) {
 			if(data !== null) {this.pageRequest = data.pageRequest}
 			this.pageRequest.params = [{name:'userName', value:this.filters.name}];
-			this.$api.log.findPage(this.pageRequest).then((res) => {this.pageResult = res}).then(data!=null?data.callback:'')
+			this.$api.log.findPage(this.pageRequest).then((res) => {
+			  this.pageResult = res
+			}).then(data!=null?data.callback:'')
 		},
     // 批量删除
     handleDelete: function (data) {this.$api.log.Delete({'logId':data.params}).then(data.callback)},

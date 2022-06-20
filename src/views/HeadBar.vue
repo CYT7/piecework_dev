@@ -103,15 +103,9 @@ export default {
   border-left-width: 1px;
   border-left-style: solid;
 }
-.hamburg {
-  float: left;
-}
-.navbar {
-  float: left;
-}
-.toolbar {
-  float: right;
-}
+.hamburg {float: left;}
+.navbar {float: left;}
+.toolbar {float: right;}
 .lang-item {
   font-size: 16px;
   padding-left: 8px;
@@ -135,13 +129,7 @@ export default {
     float: right;
   }
 }
-.badge {
-  line-height: 18px;
-}
-.position-left {
-  left: 200px;
-}
-.position-collapse-left {
-  left: 65px;
-}
+.badge {line-height: 18px;}
+.position-left {left: 200px;}
+.position-collapse-left {left: 65px;}
 </style>

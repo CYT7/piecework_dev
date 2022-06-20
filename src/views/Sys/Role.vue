@@ -219,8 +219,7 @@ export default {
           <span style="text-align:center;margin-right:80px;">{data.url?data.url:'\t'}</span>
         </div>);
     },
-		// 时间格式化
-    dateFormat: function (row, column){return format(row[column.property])}
+    dateFormat: function (row, column){return format(row[column.property])}// 时间格式化
 	},
 	mounted() {}
 }

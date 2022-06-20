@@ -14,8 +14,7 @@
             <el-dropdown-item @click.native="tabsRefreshCurrentHandle">刷新当前标签</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-tab-pane v-for="item in mainTabs"
-          :key="item.name" :label="item.title" :name="item.name">
+        <el-tab-pane v-for="item in mainTabs" :key="item.name" :label="item.title" :name="item.name">
           <span slot="label"><i :class="item.icon"></i> {{item.title}} </span>
         </el-tab-pane>
       </el-tabs>
@@ -64,13 +63,9 @@ export default {
       }
     },
     //tabs, 关闭当前
-    tabsCloseCurrentHandle () {
-      this.removeTabHandle(this.mainTabsActiveName)
-    },
+    tabsCloseCurrentHandle () {this.removeTabHandle(this.mainTabsActiveName)},
     //tabs, 关闭其它
-    tabsCloseOtherHandle () {
-      this.mainTabs = this.mainTabs.filter(item => item.name === this.mainTabsActiveName)
-    },
+    tabsCloseOtherHandle () {this.mainTabs = this.mainTabs.filter(item => item.name === this.mainTabsActiveName)},
     //tabs, 关闭全部
     tabsCloseAllHandle () {
       this.mainTabs = [];
@@ -80,9 +75,7 @@ export default {
     tabsRefreshCurrentHandle () {
       let tempTabName = this.mainTabsActiveName;
       this.removeTabHandle(tempTabName);
-      this.$nextTick(() => {
-        this.$router.push({ name: tempTabName })
-      })
+      this.$nextTick(() => {this.$router.push({ name: tempTabName })})
     }
   }
 }
@@ -126,9 +119,7 @@ export default {
     border-bottom-style: solid;
     background: rgba(255, 255, 255, 1);
   }
-  .tabs-tools:hover {
-    background: rgba(200, 206, 206, 1);
-  }
+  .tabs-tools:hover {background: rgba(200, 206, 206, 1);}
   .main-content {
     position: absolute;
     top: 45px;

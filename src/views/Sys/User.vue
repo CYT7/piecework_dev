@@ -3,18 +3,24 @@
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="用户名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="用户名查询"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')"
+                     perms="sys:user:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add" type="primary" @click="handleAdd" />
+          <kt-button icon="fa fa-plus" :label="$t('action.add')"
+                     perms="sys:user:add" type="primary" @click="handleAdd" />
         </el-form-item>
         <el-form-item>
-          <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
+          <el-tooltip content="刷新" x-placement="top">
+            <kt-button perms="sys:user:view" icon="fa fa-refresh" @click="findPage(null)"></kt-button>
+          </el-tooltip>
         </el-form-item>
         <el-form-item>
-          <kt-button perms="sys:user:download" icon="fa fa-file-excel-o" @click="exportUserExcelFile"></kt-button>
+          <el-tooltip content="下载" x-placement="top">
+            <kt-button perms="sys:user:download" icon="fa fa-file-excel-o" @click="exportUserExcelFile"></kt-button>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -26,7 +32,7 @@
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px"  :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
+		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
 			<el-form-item label="ID" prop="id" v-if="false">
         <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
       </el-form-item>
@@ -87,9 +93,9 @@ export default {
 			filters: {name: ''},
 			columns: [
         {prop:"username", label:"用户名", minWidth:'20%'},
-        {prop:"roleNames", label:"角色", minWidth:'20%'},
         {prop:"deptName", label:"部门", minWidth:'20%'},
-        {prop:"chineseName", label:"中文名", minWidth:'20%'},
+        {prop:"chineseName", label:"名字", minWidth:'20%'},
+        {prop:"roleNames", label:"角色", minWidth:'20%'},
         {prop:"email", label:"邮箱", minWidth:'20%'},
         {prop:"phone", label:"手机", minWidth:'20%'},
         {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
@@ -124,27 +130,6 @@ export default {
 				this.findUserRoles()
 			}).then(data!=null?data.callback:'')
 		},
-    //导出用户信息
-    exportUserExcelFile:function (){
-      axios.post(baseUrl+'/user/download',{names:this.filters.name},{
-        headers:{
-          'token':Cookies.get('token'),
-          'Content-Type': 'application/json;charset=UTF-8'
-        },
-        responseType: 'blob'
-      }).then(response=>{
-        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
-        let blob = new Blob([response.data], { type: "application/ms-excel" })
-        let downloadElement = document.createElement("a")
-        let href = window.URL.createObjectURL(blob)
-        downloadElement.href = href
-        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
-        document.body.appendChild(downloadElement)
-        downloadElement.click()
-        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
-        window.URL.revokeObjectURL(href)
-      })
-    },
 		// 加载用户角色信息
 		findUserRoles: function () {this.$api.role.findAll().then((res) => {this.roles = res.data})},
 		// 批量删除
@@ -175,9 +160,7 @@ export default {
 			this.operation = false
 			this.dataForm = Object.assign({}, params.row)
 			let userRoles = []
-			for(let i=0,len=params.row.userRoles.length; i<len; i++) {
-				userRoles.push(params.row.userRoles[i].roleId)
-			}
+			for(let i=0,len=params.row.userRoles.length; i<len; i++) {userRoles.push(params.row.userRoles[i].roleId)}
 			this.dataForm.userRoles = userRoles
 		},
 		// 编辑
@@ -217,6 +200,27 @@ export default {
     statusFormat: function (row, column){
       if (row[column.property]===1){return '正常'}
       if (row[column.property]===0){return '禁用'}
+    },
+    //导出用户信息
+    exportUserExcelFile:function (){
+      axios.post(baseUrl+'/user/download',{names:this.filters.name},{
+        headers:{
+          'token':Cookies.get('token'),
+          'Content-Type': 'application/json;charset=UTF-8'
+        },
+        responseType: 'blob'
+      }).then(response=>{
+        let fileName = response.headers['content-disposition'].split('filename=').pop();//通过header中获取返回的文件名称
+        let blob = new Blob([response.data], { type: "application/ms-excel" })
+        let downloadElement = document.createElement("a")
+        let href = window.URL.createObjectURL(blob)
+        downloadElement.href = href
+        downloadElement.download = decodeURI(fileName)//指定下载的文件的名称，切记进行decode
+        document.body.appendChild(downloadElement)
+        downloadElement.click()
+        document.body.removeChild(downloadElement)//移除临时创建对象，释放资源
+        window.URL.revokeObjectURL(href)
+      })
     },
 	},
 	mounted() {this.findDeptTree()}

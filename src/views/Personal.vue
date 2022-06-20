@@ -115,7 +115,6 @@ export default {
       else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
     }
     const checkPhone = (rule,value,callback) =>{
-      console.log(value);
       if (!value){callback();}
       else{if (isPhone(value)){callback();}else{return callback(new Error('手机格式不正确'))}}
     }

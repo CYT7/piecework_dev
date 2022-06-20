@@ -40,14 +40,8 @@ export default {
   },
   data() {return {}},
   methods: {
-    handleClick: function () {
-      //按钮操作处理函数
-      this.$emit('click', {})
-    },
-    hasPerms: function (perms) {
-      //根据权限标识和外部指示状态进行权限判断
-      return hasPermission(perms) & !this.disabled
-    }
+    handleClick: function () {this.$emit('click', {})},//按钮操作处理函数
+    hasPerms: function (perms) {return hasPermission(perms) & !this.disabled}//根据权限标识和外部指示状态进行权限判断
   },
   mounted() {}
 }

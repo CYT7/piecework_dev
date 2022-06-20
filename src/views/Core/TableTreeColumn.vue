@@ -13,9 +13,7 @@
   export default {
     name: 'table-tree-column',
     props: {
-      prop: {
-        type: String
-      },
+      prop: {type: String},
       treeKey: {
         type: String,
         default: 'id'
