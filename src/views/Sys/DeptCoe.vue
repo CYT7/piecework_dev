@@ -62,13 +62,15 @@
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
-        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
-        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
-        <el-table-column sortable prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center"
-                         align="center" :formatter="statusFormat" min-width="50%"/>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
+        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
+        <el-table-column prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
+        <el-table-column prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="58%"/>
+        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="58%"/>
+        <el-table-column prop="status" label="状态" header-align="center"
+                         align="center" :formatter="statusFormat" min-width="20%"/>
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="30%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:deptCoe:edit" @click="handleEdits(scope.row)"/>

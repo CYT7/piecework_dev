@@ -18,6 +18,14 @@ export const save = (data) => {
     data
   })
 };
+//新增
+export const findEmp = (data) => {
+  return axios({
+    url: '/DeptPer/findEmp',
+    method: 'post',
+    data
+  })
+};
 //更新
 export const update = (data) => {
   return axios({

@@ -97,7 +97,7 @@ export default {
       padding-left: 20px;
     }
   }
-  .menu-bar-width {width: 200px;}
-  .menu-bar-collapse-width {width: 65px;}
+  .menu-bar-width {width: 110px;}
+  .menu-bar-collapse-width {width: 55px;}
 }
 </style>

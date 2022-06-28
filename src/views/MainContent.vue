@@ -129,6 +129,6 @@ export default {
     padding: 5px;
   }
 }
-.position-left {left: 200px;}
-.position-collapse-left {left: 65px;}
+.position-left {left: 110px;}
+.position-collapse-left {left: 55px;}
 </style>

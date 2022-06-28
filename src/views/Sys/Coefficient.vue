@@ -71,6 +71,8 @@
         <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
         <el-table-column sortable prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
+        <el-table-column sortable prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="58%"/>
+        <el-table-column sortable prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="58%"/>
         <el-table-column sortable prop="status" label="状态" header-align="center"
                          align="center" :formatter="statusFormat" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>

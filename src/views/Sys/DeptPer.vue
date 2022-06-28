@@ -29,10 +29,11 @@
     </div>
     <div>
       <!--表格内容栏-->
-      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%; font-size: 10px;"
+      <el-table :data="pageResult" v-if="pageResult[0]!= null"
+                stripe size="mini" class="el-table"
                 v-loading="loading" element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="selection" width="30px"/>
-        <el-table-column type="expand" width="20px">
+        <el-table-column type="expand" width="25px">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
               <el-table-column label="工作绩效产量" header-align="center" align="center">
@@ -45,14 +46,16 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" width="70%" />
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" width="85%"/>
-        <el-table-column prop="empName" label="姓名" header-align="center" align="center" width="60%" />
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" width="70%" />
-        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" width="100%" />
-        <el-table-column prop="nonPieceTime" label="非计件" header-align="center" align="center" width="60%" />
-        <el-table-column prop="attendance" label="出勤" header-align="center" align="center" width="50%" />
-        <el-table-column prop="absence" label="缺勤" header-align="center" align="center" width="50%" />
+        <el-table-column prop="deptName" label="部门" header-align="center" align="center" width="50%" />
+        <el-table-column prop="empNo" label="工号" header-align="center" align="center" width="65%"/>
+        <el-table-column prop="empName" label="姓名" header-align="center" align="center" width="58%" />
+        <el-table-column prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" width="58%" />
+        <el-table-column prop="schemeName" label="方案" header-align="center" align="center" width="95%" />
+        <el-table-column prop="nonPieceTime" label="非计件" header-align="center" align="center" width="58%" />
+        <el-table-column prop="attendance" label="出勤" header-align="center" align="center" width="48%" />
+        <el-table-column prop="absence" label="缺勤" header-align="center" align="center" width="48%" />
+        <el-table-column prop="tutoringName" label="被辅导员" header-align="center" align="center" width="70%" />
+        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center" width="70%" />
         <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
@@ -62,17 +65,17 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="score" label="绩效分" header-align="center" align="center" width="60%" />
+        <el-table-column prop="score" label="绩效分" header-align="center" align="center" width="58%" />
         <el-table-column prop="bonus" label="绩效工资" header-align="center" align="center" width="70%" />
-        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" width="60%" />
-        <el-table-column prop="status" label="状态" header-align="center" align="center" width="65%" >
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" width="58%" />
+        <el-table-column prop="status" label="状态" header-align="center" align="center" width="60%" >
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="mini">确认</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="mini">未确认</el-tag>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
-          <template slot-scope="scope" v-if="scope.row.status === 1">
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')">
+          <template slot-scope="scope" v-if="scope.row.status === 1" style="float: left;padding-left: 5px">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:DeptPer:edit" @click="handleEdit(scope.row)"/>
             <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:DeptPer:confirm" type="primary"  @click="handleConfirm(scope.row)"/>
           </template>
@@ -156,7 +159,7 @@
               v-model="dataForm.month"
               type="month"
               placeholder="选择月"
-              value-format="yyyy-MM-dd">
+              value-format="yyyy-MM-dd" @change="findEmpPerformance(dataForm)">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -173,6 +176,14 @@
         </el-form-item>
         <el-form-item label="缺勤天数" prop="absence">
           <el-input v-model="dataForm.absence" placeholder="请填写缺勤天数"/>
+        </el-form-item>
+        <el-form-item label="辅导员工" prop="tutoringEmp">
+          <el-select style="width: 100%" placeholder="选择辅导职工" value-key="id" v-model="dataForm.tutoringEmp">
+            <el-option v-for="item in empPerData" :key="item.empNo" :label="item.empName" :value="item.empNo"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="辅导月数" prop="tutoringMonth">
+          <el-input v-model="dataForm.tutoringMonth" placeholder="请填写非计件时间"/>
         </el-form-item>
         <el-form-item v-if="operation" v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.type)" prop="coefficientList">
           <el-card>
@@ -235,6 +246,7 @@ export default {
         children: 'children'
       },
       empData:[],
+      empPerData:[],
       pickerOptions: {
         shortcuts: [{
           text: '本月',
@@ -311,6 +323,8 @@ export default {
         nonPieceTime:'',
         attendance:'',
         absence: '',
+        tutoringEmp:'',
+        tutoringMonth:'',
         coefficientList: {}
       }
     },
@@ -485,6 +499,11 @@ export default {
       this.dataForm.empNo = data.empNo
       this.dataForm.empName = data.name
     },
+    findEmpPerformance:function (item){
+      this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
+        this.empPerData = res.data
+      })
+    },
     CoeSchemeCurrentChange:function (data){
       this.dataForm.coefficientScheme = data.id
       this.findCoeList(data.id)
@@ -542,12 +561,14 @@ export default {
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
       switch (item) {
-        case 1:
-          return '加分';
         case 0:
           return '扣分';
+        case 1:
+          return '加分';
         case 2:
           return '非计件';
+        case 3:
+          return '辅导';
         default:
           return '标准产量';
       }
@@ -560,4 +581,7 @@ export default {
 }
 </script>
 <style scoped>
+.el-table{
+  font-size: 12px;
+}
 </style>
