@@ -3,12 +3,14 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="方案名"/></el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="方案名查询"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')"
+                     perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:deptCoe:add" type="primary" @click="handleAdd"/>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')"
+                     perms="sys:deptCoe:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
@@ -18,7 +20,8 @@
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:deptCoe:download" type="primary" @click="handleDownLoad"/>
+          <kt-button icon="fa fa-file-excel-o" label="导出"
+                     perms="sys:deptCoe:download" type="primary" @click="handleDownLoad"/>
         </el-form-item>
         <el-form-item>
           <el-tooltip content="刷新" x-placement="top">
@@ -33,31 +36,38 @@
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
-            <el-table stripe :data="props.row.children" v-if="props.row.children!=null" width="100%" border fit highlight-current-row>
-              <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable header-align="center" align="center" min-width="50%"/>
+            <el-table stripe :data="props.row.children" v-if="props.row.children!=null"
+                      width="100%" border fit highlight-current-row>
+              <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable
+                               header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="status" label="状态" :formatter="statusFormat" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="status" label="状态" :formatter="statusFormat"
+                               sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
-                  <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:deptCoe:edit" @click="handleEdit(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
-                             :label="$t('action.disable')" perms="sys:deptCoe:disable"  type="warning" @click="handleDisable(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock"
-                             :label="$t('action.recover')" perms="sys:deptCoe:recover" type="primary" @click="handleRecover(scope.row)"/>
+                  <kt-button icon="fa fa-edit" :label="$t('action.edit')"
+                             perms="sys:deptCoe:edit" @click="handleEdit(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
+                             perms="sys:deptCoe:disable"  type="warning" @click="handleDisable(scope.row)"/>
+                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
+                             perms="sys:deptCoe:recover" type="primary" @click="handleRecover(scope.row)"/>
                 </template>
               </el-table-column>
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" :formatter="statusFormat" min-width="50%"/>
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
+        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
+        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
+        <el-table-column sortable prop="status" label="状态" header-align="center"
+                         align="center" :formatter="statusFormat" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
@@ -114,6 +124,12 @@
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="绩效单价倍数" prop="multiple">
           <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="multiple">
+          <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="multiple">
+          <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
@@ -346,6 +362,8 @@ export default {
           version:'',
           unitPrice:'',
           multiple:'',
+          hourTargetOutput:'',
+          dayTargetOutput:'',
         }
       }else{
         this.dataForm = {
@@ -383,8 +401,7 @@ export default {
     // 类型格式化
     typeFormat: function (row, column){
       if(row[column.property]===1){return '加分系数'}
-      else if (row[column.property] === 2){return '扣分系数'}
-      else{return '考勤系数'}
+      else{return '扣分系数'}
     },
     //上传鉴定
     beforeUpload(file){

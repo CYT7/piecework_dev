@@ -64,11 +64,13 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="50%"/>
-        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="50%"/>
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
+        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
+        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
+        <el-table-column sortable prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
         <el-table-column sortable prop="status" label="状态" header-align="center"
                          align="center" :formatter="statusFormat" min-width="50%"/>
         <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
@@ -93,9 +95,9 @@
       </div>
     </div>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()"
-               label-width="100px" :size="size" style="text-align:left;">
+               label-width="140px" :size="size" style="text-align:left;">
         <el-form-item label="选项" prop="type" v-if="operation">
           <el-radio-group v-model="dataForm.types">
             <el-radio v-for="(types, index) in TypeList" :label="index"
@@ -135,6 +137,12 @@
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="单价倍数" prop="multiple">
           <el-input v-model="dataForm.multiple" placeholder="请输入单价倍数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="multiple">
+          <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="multiple">
+          <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
@@ -185,12 +193,6 @@ export default {
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,
-      dataFormRules:{
-        title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        value: [{ required: true, message: '值不能为空', trigger: 'blur' }],
-        remark: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
-        version: [{ required: true, message: '版本不能为空', trigger: 'blur' }],
-      },
       // 新增编辑界面数据
       TypeList:["方案", "系数"],
       downloadVisible:false,// 下载页面是否显示
@@ -284,6 +286,8 @@ export default {
               })
             }
           })
+        }else{
+          this.$message({message: '请完善表单信息', type: 'error'})
         }
       })
     },
@@ -407,6 +411,8 @@ export default {
           version:'',
           unitPrice:'',
           multiple:'',
+          hourTargetOutput:'',
+          dayTargetOutput:'',
         }
       }else{
         this.dataForm = {

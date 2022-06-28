@@ -29,10 +29,10 @@
     </div>
     <div>
       <!--表格内容栏-->
-      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;"
+      <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%; font-size: 10px;"
                 v-loading="loading" element-loading-text="$t('action.loading')" @selection-change="selectionChange">
-        <el-table-column type="selection" width="40"/>
-        <el-table-column type="expand" width="20">
+        <el-table-column type="selection" width="30px"/>
+        <el-table-column type="expand" width="20px">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
               <el-table-column label="工作绩效产量" header-align="center" align="center">
@@ -45,29 +45,33 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column label="分数" header-align="center" align="center" min-width="50%" width="100%">
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" width="70%" />
+        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" width="85%"/>
+        <el-table-column prop="empName" label="姓名" header-align="center" align="center" width="60%" />
+        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" width="70%" />
+        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" width="100%" />
+        <el-table-column prop="nonPieceTime" label="非计件" header-align="center" align="center" width="60%" />
+        <el-table-column prop="attendance" label="出勤" header-align="center" align="center" width="50%" />
+        <el-table-column prop="absence" label="缺勤" header-align="center" align="center" width="50%" />
+        <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
-                           header-align="center" align="center" min-width="80%">
+                           header-align="center" align="center" width="70%">
             <template slot-scope="scope">
               <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%" width="100%">
+        <el-table-column prop="score" label="绩效分" header-align="center" align="center" width="60%" />
+        <el-table-column prop="bonus" label="绩效工资" header-align="center" align="center" width="70%" />
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" width="60%" />
+        <el-table-column prop="status" label="状态" header-align="center" align="center" width="65%" >
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="small">确认</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
+            <el-tag v-if="scope.row.status === 0" size="mini">确认</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="mini">未确认</el-tag>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%" width="200%">
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope" v-if="scope.row.status === 1">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:DeptPer:edit" @click="handleEdit(scope.row)"/>
             <kt-button icon="fa fa-check-circle" :label="$t('action.agree')" perms="sys:DeptPer:confirm" type="primary"  @click="handleConfirm(scope.row)"/>
@@ -83,6 +87,7 @@
         </el-pagination>
       </div>
     </div>
+    <!--下载界面-->
     <el-dialog title="下载" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
         <el-form-item label="下载" prop="type">
@@ -130,8 +135,11 @@
     </el-dialog>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form v-if="operation===true" :model="dataForm" :rules="dataFormRules"
+      <el-form :model="dataForm" :rules="dataFormRules"
                label-width="100px" ref="dataForm" :size="size" label-position="right" style="text-align:left;">
+        <el-form-item label="ID" prop="id" v-if="false">
+          <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId"
@@ -142,34 +150,38 @@
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="系数方案" prop="coefficientSid">
-          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientScheme">
-            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="月份" prop="month">
           <div class="block">
             <el-date-picker
-              v-model="dataForm.months"
+              v-model="dataForm.month"
               type="month"
               placeholder="选择月"
               value-format="yyyy-MM-dd">
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.points)" prop="coefficientList">
+        <el-form-item v-if="operation" label="系数方案" prop="coefficientSid">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientScheme">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="非计件时间" prop="nonPieceTime">
+          <el-input v-model="dataForm.nonPieceTime" placeholder="请填写非计件时间"/>
+        </el-form-item>
+        <el-form-item label="出勤天数" prop="attendance">
+          <el-input v-model="dataForm.attendance" placeholder="请填写出勤天数"/>
+        </el-form-item>
+        <el-form-item label="缺勤天数" prop="absence">
+          <el-input v-model="dataForm.absence" placeholder="请填写缺勤天数"/>
+        </el-form-item>
+        <el-form-item v-if="operation" v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.type)" prop="coefficientList">
           <el-card>
             <el-form-item v-for="(i,t) in item.empCoe" :key="t" :label="i.coefficientName">
               <el-input v-model="i.value"></el-input>
             </el-form-item>
           </el-card>
         </el-form-item>
-      </el-form>
-      <el-form v-if="operation===false" :model="dataForm" label-width="80px" ref="dataForm" :size="size" label-position="right">
-        <el-form-item label="部门" prop="deptName">{{dataForm.deptName}}</el-form-item>
-        <el-form-item label="职工" prop="empName">{{dataForm.empName}}</el-form-item>
-        <el-form-item label="月份" prop="month">{{dateFormats(dataForm.month)}}</el-form-item>
-        <el-form-item v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
+        <el-form-item v-if="!operation" v-for="(item,index) in dataForm.empList" :key="index" :label="item.coefficientName">
           <el-input v-model="item.value"></el-input>
         </el-form-item>
       </el-form>
@@ -214,7 +226,6 @@ export default {
       dataForm: [],
       dataFormRules: {
         empNo: [{ required: true, message: '请选择职工', trigger: 'blur' }],
-        month: [{ required: true, message: '请选择月份', trigger: 'blur' }],
       },
       downForm:[],
       deptData: [],
@@ -257,6 +268,7 @@ export default {
       this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
       this.$api.deptPer.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
+        console.log(res.data)
         this.totalSize = res.totalSize
       })
       this.loading = false
@@ -296,6 +308,9 @@ export default {
         empName:'',
         month:'',
         coefficientScheme:'',
+        nonPieceTime:'',
+        attendance:'',
+        absence: '',
         coefficientList: {}
       }
     },
@@ -331,39 +346,21 @@ export default {
     },
     //批量确认
     handleBatchConfirm: function () {
-      let Params = []
-      this.selections.forEach(t=>{
-        console.log(t)
-        let param = [{
-          "empNo":t.empNo,
-          "month":t.month,
-        }]
-        Params.push(param)
-      })
-      this.confirm(Params)
+      let ids = []
+      this.selections.forEach(t=>{ids.push(t.id)})
+      this.confirm(ids)
     },
     // 确认
     handleConfirm(row){
-      let params = []
-      let param = [{
-        "empNo":row.empNo,
-        "month":row.month,
-      }]
-      params.push(param)
-      this.confirm(params)
+      let ids = [row.id];
+      this.confirm(ids)
     },
     confirm: function (params) {
       this.$confirm("确认此条信息无误吗？","提示",{
         type:"warning"
       }).then(()=>{
-        let param = []
-        params.forEach(i=>{
-          i.forEach(t=>{
-            param.push(t)
-          })
-        })
         this.loading = true;
-        this.$api.deptPer.confirm({"empListDTO":param}).then((res)=>{
+        this.$api.deptPer.confirm({"performanceId":params}).then((res)=>{
           if (res.code===200){
             this.$message({ message: "确认成功", type: "success" });
           }else{
@@ -544,9 +541,16 @@ export default {
     dateFormat: function (row, column){return formats(row[column.property])},
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
-      if(item===1){return '加分'}
-      else if (item === 0){return '扣分'}
-      else{return '考勤'}
+      switch (item) {
+        case 1:
+          return '加分';
+        case 0:
+          return '扣分';
+        case 2:
+          return '非计件';
+        default:
+          return '标准产量';
+      }
     },
   },
   mounted() {
