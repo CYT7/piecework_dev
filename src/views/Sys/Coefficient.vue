@@ -11,10 +11,6 @@
                      perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')"
-                     perms="sys:coefficient:add" type="primary" @click="handleAdd"/>
-        </el-form-item>
-        <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
                      :before-upload="beforeUpload" :http-request="UploadFile"
                      accept=".xls,.xlsx">
@@ -34,7 +30,7 @@
     </div>
     <div>
       <!--表格内容栏-->
-      <el-table :data="pageResult" stripe size="mini" style="width: 100%;" v-loading="loading"
+      <el-table :data="pageResult" stripe size="mini" style="width: 100%;" v-loading="loading" class="el-table"
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
@@ -50,11 +46,9 @@
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
-                  <kt-button icon="fa fa-edit" :label="$t('action.edit')"
-                             perms="sys:coefficient:edit" @click="editsCoefficient(scope.row)"/>
                   <kt-button icon="fa fa-trash" :label="$t('action.delete')"
                              perms="sys:coefficient:delete" type="danger" @click="handleDelete(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
+                  <kt-button v-if="scope.row.status === 0" icon="fa fa-lock"
                              :label="$t('action.disable')" perms="sys:coefficient:disable"
                              type="warning" @click="handleDisable(scope.row)"/>
                   <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
@@ -64,28 +58,50 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
-        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="28%"/>
+        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="35%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
-        <el-table-column sortable prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
-        <el-table-column sortable prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
-        <el-table-column sortable prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
-        <el-table-column sortable prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
-        <el-table-column sortable prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="58%"/>
-        <el-table-column sortable prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="58%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center"
-                         align="center" :formatter="statusFormat" min-width="50%"/>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="hourTargetOutput" label="每小时指标产量" header-align="center" align="center" min-width="43%"/>
+        <el-table-column prop="dayTargetOutput" label="8小时指标产量" header-align="center" align="center" min-width="43%"/>
+        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="45%"/>
+        <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="30%"/>
+        <el-table-column label="变更" header-align="center" align="center" min-width="23%">
+          <template slot-scope="scope">
+            <el-popover
+              width="10px"
+              v-if="scope.row.remark!==null"
+              placement="top-start"
+              title="变化记录"
+              trigger="click"
+              :content= scope.row.remark>
+              <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="25%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
           <template slot-scope="scope">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')"
-                       perms="sys:coefficient:edit" @click="editScheme(scope.row)"/>
             <kt-button icon="fa fa-trash" :label="$t('action.delete')"
                        perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
-            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
-                       perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
-            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
-                       perms="sys:coefficient:recover" type="primary"   @click="handleBatchRecover(scope.row)"/>
+            <el-tooltip content="不通过" x-placement="top">
+              <kt-button v-if="scope.row.status === 0" icon="el-icon-error" circle="true"
+                         perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.recover')" x-placement="top">
+              <kt-button v-if="scope.row.status === 0" icon="el-icon-success" circle="true"
+                         perms="sys:coefficient:recover" type="primary" @click="handleBatchRecover(scope.row)"/>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -300,7 +316,7 @@ export default {
         this.loading = true;
         this.$api.coefficient.DeleteScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'删除成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
             this.$message({message: '操作失败, ' + res.msg, type: 'error'})
@@ -311,17 +327,17 @@ export default {
     },
     //批量禁用
     handleBatchDisable: function (params){
-      this.$confirm('确认禁用选中的信息吗？','提示',{
+      this.$confirm('确认不通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.coefficient.disableScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'禁用成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$message({message: '操作失败', type: 'error'})
           }
           this.loading = false
         })
@@ -329,17 +345,17 @@ export default {
     },
     //批量恢复
     handleBatchRecover: function (params){
-      this.$confirm('确认恢复选中的信息吗？','提示',{
+      this.$confirm('确认通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.coefficient.recoverScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'恢复成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$message({message: '操作失败', type: 'error'})
           }
           this.loading = false
         })
@@ -354,10 +370,10 @@ export default {
         this.loading = true;
         this.$api.coefficient.Delete({'coefficientId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'删除成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$message({message: res.msg, type: 'error'})
           }
           this.loading = false
         })
@@ -366,17 +382,17 @@ export default {
     },
     //禁用
     handleDisable: function(params){
-      this.$confirm('确认禁用选中的信息吗？','提示',{
+      this.$confirm('确认不通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.coefficient.disable({'coefficientId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'禁用成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$message({message: res.msg, type: 'error'})
           }
           this.loading = false
         })
@@ -384,17 +400,17 @@ export default {
     },
     //恢复
     handleRecover: function(params){
-      this.$confirm('确认恢复选中的信息吗？','提示',{
+      this.$confirm('确认通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.coefficient.recover({'coefficientId':ids}).then(res=>{
           if (res.code===200){
-            this.$message({message:'恢复成功',type:'success'})
+            this.$message({message:'操作成功',type:'success'})
             this.findPage();
           }else{
-            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$message({message: res.msg, type: 'error'})
           }
           this.loading = false
         })
@@ -520,4 +536,7 @@ export default {
 }
 </script>
 <style scoped>
+.el-table{
+  font-size: 12px;
+}
 </style>

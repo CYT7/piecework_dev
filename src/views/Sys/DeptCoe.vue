@@ -32,7 +32,7 @@
     </div>
     <div>
       <!--表格内容栏-->
-      <el-table :data="pageResult" stripe size="mini" style="width: 100%;" v-loading="loading"
+      <el-table :data="pageResult" stripe size="mini" style="width: 100%;" v-loading="loading" class="el-table"
                 element-loading-text="$t('action.loading')" @selection-change="selectionChange">
         <el-table-column type="expand" width="20">
           <template slot-scope="props">
@@ -42,7 +42,6 @@
                                header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="status" label="状态" :formatter="statusFormat"
                                sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
@@ -61,23 +60,26 @@
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
-        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="40%"/>
-        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="40%"/>
-        <el-table-column prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="60%"/>
-        <el-table-column prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="58%"/>
-        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="58%"/>
-        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="58%"/>
-        <el-table-column prop="status" label="状态" header-align="center"
-                         align="center" :formatter="statusFormat" min-width="20%"/>
-        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="30%"/>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
+        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
+        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="55%"/>
+        <el-table-column prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="55%"/>
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="25%"/>
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="40%">
           <template slot-scope="scope">
             <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:deptCoe:edit" @click="handleEdits(scope.row)"/>
-            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock"
-                       :label="$t('action.disable')" perms="sys:deptCoe:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
-            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock"
-                       :label="$t('action.recover')" perms="sys:deptCoe:recover" type="primary" @click="handleBatchRecover(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -127,17 +129,26 @@
         <el-form-item v-if="dataForm.types === 0" label="绩效单价倍数" prop="multiple">
           <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="multiple">
+        <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="hourTargetOutput">
           <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="multiple">
+        <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="dayTargetOutput">
           <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="辅导月数" prop="tutoringMonth">
+          <el-input v-model="dataForm.tutoringMonth" placeholder="请输入辅导月数，多个请用;分开"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="辅导比例" prop="tutoringProportion">
+          <el-input v-model="dataForm.tutoringProportion" placeholder="请输入辅导比例，多个请用;分开"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="开始月份" prop="startMonth">
+          <el-input v-model="dataForm.startMonth" placeholder="请输入方案开始月份"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="结束月份" prop="endMonth">
+          <el-input v-model="dataForm.endMonth" placeholder="请输入方案结束月份"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
           <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="备注" prop="remark">
-          <el-input v-model="dataForm.remark" placeholder="请输入备注"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -366,6 +377,10 @@ export default {
           multiple:'',
           hourTargetOutput:'',
           dayTargetOutput:'',
+          tutoringMonth: '',
+          tutoringProportion: '',
+          startMonth:'',
+          endMonth: '',
         }
       }else{
         this.dataForm = {
@@ -376,7 +391,6 @@ export default {
           type:'',
           title:'',
           value:'',
-          remark:'',
         }
       }
     },
@@ -394,7 +408,7 @@ export default {
       this.dataForm.coefficientSid = data.id
     },
     findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+      this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
         this.coeSchemeData = res
       })
     },
@@ -470,4 +484,7 @@ export default {
 }
 </script>
 <style scoped>
+.el-table{
+  font-size: 12px;
+}
 </style>

@@ -70,8 +70,9 @@
         <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" width="58%" />
         <el-table-column prop="status" label="状态" header-align="center" align="center" width="60%" >
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="mini">确认</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="mini">未确认</el-tag>
+            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')">

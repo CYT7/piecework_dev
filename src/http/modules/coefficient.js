@@ -20,11 +20,11 @@ export const findPage = (data) => {
   })
 };
 //查询方案树
-export const findCoefficientTree = (params) => {
+export const findCoefficientTree = (data) => {
   return axios({
     url: '/coefficient/findCoefficientTree',
     method: 'post',
-    params
+    data
   })
 };
 //查询方案下系数树

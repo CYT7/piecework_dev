@@ -12,18 +12,18 @@
         "edit": "Edit",
         "delete": "Delete",
         "disable": "Disable",
-        "recover": "recover",
+        "recover": "Recover",
         "batchDelete": "Batch Delete",
         "batchConfirm": "Batch Confirm",
         "batchRecover": "Batch Recover",
         "batchDisable": "Batch Disable",
         "search": "Search",
-        "loading": "loading",
+        "loading": "Loading",
         "submit": "Submit",
-        "confirms": "confirm",
+        "confirms": "Confirm",
         "cancel": "Cancel",
         "reset": "Reset",
-        "agree": "confirm",
-        "upload": "upload"
+        "agree": "Confirm",
+        "upload": "Upload"
     }
 }

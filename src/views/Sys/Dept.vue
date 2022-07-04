@@ -33,7 +33,7 @@
         </el-form-item>
         <el-form-item label="上级机构" prop="parentName">
           <popup-tree-input
-            :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'BV PY':dataForm.parentName"
+            :data="popupTreeData" :props="popupTreeProps" :prop="dataForm.parentName==null?'顶级':dataForm.parentName"
             :nodeKey="''+dataForm.parentId" :currentChangeHandle="handleTreeSelectChange">
           </popup-tree-input>
         </el-form-item>
@@ -90,7 +90,7 @@ export default {
     getParentMenuTree: function (tableTreeData) {
       let parent = {
         parentId: 0,
-        name: 'BV PY',
+        name: '顶级',
         children: tableTreeData
       };
       return [parent]

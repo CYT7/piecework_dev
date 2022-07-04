@@ -108,6 +108,7 @@ export default {
       dataFormRules: {//添加验证
 			  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
+        password:[{required: true, message: '请输入密码', trigger: 'blur'}],
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
         phone:[{validator:checkPhone,trigger:'blur'}]
       },

@@ -11,12 +11,11 @@ export const findPage = (data) => {
   })
 };
 //查询系数树
-export const findCoefficientTree = (params) => {
-  console.log(params)
+export const findCoefficientTree = (data) => {
   return axios({
     url: '/deptCoe/findCoefficientTree',
     method: 'post',
-    params
+    data
   })
 };
 //保存

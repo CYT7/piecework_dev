@@ -1,5 +1,5 @@
 <template>
-  <el-button :size="size" :type="type" :icon="icon" v-if="hasPerms(perms)?hasPerms(perms):''"
+  <el-button :size="size" :type="type" :icon="icon" :circle="circle" :round="round" v-if="hasPerms(perms)?hasPerms(perms):''"
     :loading="loading" :disabled="!hasPerms(perms)" @click="handleClick">
     {{label}}
   </el-button>
@@ -32,6 +32,14 @@ export default {
     disabled: {//按钮是否禁用
       type: Boolean,
       default: false
+    },
+    circle: {
+      type: Boolean,
+      default: false
+    },
+    round: {
+      type: Boolean,
+      default: true
     },
     perms: {//按钮权限标识，外部使用者传入
       type: String,

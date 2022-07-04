@@ -4,7 +4,7 @@
     <el-table :data="data.data" :highlight-current-row="highlightCurrentRow" @selection-change="selectionChange"
               @current-change="handleCurrentChange" v-loading="loading"
               :element-loading-text="$t('action.loading')" :border="border" :stripe="stripe"
-              :show-overflow-tooltip="showOverflowTooltip" :max-height="maxHeight"
+              :show-overflow-tooltip="showOverflowTooltip"
               :size="size" :align="align" style="width:100%;" >
       <el-table-column type="selection" width="40" v-if="showBatchOperation & showOperation"></el-table-column>
       <el-table-column v-for="column in columns" header-align="center" align="center"
@@ -57,7 +57,6 @@ export default {
     permsRecover: String,  //恢复权限标识
     size: {type: String, default: 'mini'},//尺寸样式
     align: {type: String, default: 'left'},//文本对齐方式
-    maxHeight: {type: Number, default: '100%'},//表格最大高度
     showOperation: {type: Boolean, default: true},//是否显示操作组件
     border: {type: Boolean, default: false},//是否显示边框
     stripe: {type: Boolean, default: true},//是否显示斑马线
