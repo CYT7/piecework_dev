@@ -23,7 +23,8 @@
         "confirms": "Confirm",
         "cancel": "Cancel",
         "reset": "Reset",
-        "agree": "Confirm",
+        "agree": "Agree",
+        "disagree": "Disagree",
         "upload": "Upload"
     }
 }

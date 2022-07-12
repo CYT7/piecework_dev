@@ -42,8 +42,19 @@
                                header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="status" label="状态" :formatter="statusFormat"
-                               sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
+                  <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="23%" >
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === 0" size="mini" type="danger">未确认</el-tag>
+                  <el-tag v-else-if="scope.row.status === 1" size="mini">通过</el-tag>
+                  <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
@@ -73,6 +84,12 @@
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="23%" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">未确认</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="mini">通过</el-tag>
             <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
           </template>
         </el-table-column>

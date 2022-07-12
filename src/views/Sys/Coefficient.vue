@@ -3,9 +3,7 @@
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
       <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item>
-          <el-input v-model="filters.name" placeholder="方案名查询"/>
-        </el-form-item>
+        <el-form-item><el-input v-model="filters.name" placeholder="方案名查询"/></el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')"
                      perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
@@ -13,7 +11,7 @@
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
                      :before-upload="beforeUpload" :http-request="UploadFile"
-                     accept=".xls,.xlsx">
+                     :show-file-list="false" accept=".xls,.xlsx">
             <kt-button icon="fa fa-upload" type="primary" perms="sys:coefficient:upload" :label="$t('action.upload')"/>
           </el-upload>
         </el-form-item>
@@ -38,38 +36,63 @@
                       width="100%" border fit highlight-current-row>
               <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable
                                header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="remark" label="备注" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="status" label="状态" :formatter="statusFormat"
-                               sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
-              <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
+              <el-table-column prop="title" label="标题" sortable
+                               header-align="center" align="center" min-width="100%"/>
+              <el-table-column prop="value" label="值" sortable
+                               header-align="center" align="center" min-width="50%"/>
+              <el-table-column label="变更" header-align="center" align="center" min-width="50%">
                 <template slot-scope="scope">
-                  <kt-button icon="fa fa-trash" :label="$t('action.delete')"
-                             perms="sys:coefficient:delete" type="danger" @click="handleDelete(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 0" icon="fa fa-lock"
-                             :label="$t('action.disable')" perms="sys:coefficient:disable"
-                             type="warning" @click="handleDisable(scope.row)"/>
-                  <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
-                             perms="sys:coefficient:recover" type="primary" @click="handleRecover(scope.row)"/>
+                  <el-popover width="10px" v-if="scope.row.remark!==null" placement="top-start"
+                              title="变化记录" trigger="click" :content= scope.row.remark>
+                    <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+                  </el-popover>
+                </template>
+              </el-table-column>
+              <el-table-column prop="status" sortable label="状态" header-align="center" align="center" min-width="50%" >
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
+                  <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="checkStatus" sortable label="审核" header-align="center" align="center" min-width="50%" >
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.checkStatus === 0" size="mini" type="danger">未确认</el-tag>
+                  <el-tag v-else-if="scope.row.checkStatus === 1" size="mini" type="success">通过</el-tag>
+                  <el-tag v-else-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
+              <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="50%">
+                <template slot-scope="scope">
+                  <el-tooltip :content="$t('action.delete')" x-placement="top">
+                    <kt-button icon="fa fa-trash" perms="sys:coefficient:delete" circle="true"
+                               type="danger" @click="deleteCoefficient(scope.row)"/>
+                  </el-tooltip>
+                  <el-tooltip :content="$t('action.disagree')" x-placement="top">
+                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" circle="true"
+                               perms="sys:coefficient:disable" type="warning" @click="disagreeCoefficient(scope.row)"/>
+                  </el-tooltip>
+                  <el-tooltip :content="$t('action.agree')" x-placement="top">
+                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" circle="true"
+                               perms="sys:coefficient:recover" type="primary" @click="agreeCoefficient(scope.row)"/>
+                  </el-tooltip>
                 </template>
               </el-table-column>
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="28%"/>
+        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="35%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="hourTargetOutput" label="每小时指标产量" header-align="center" align="center" min-width="43%"/>
-        <el-table-column prop="dayTargetOutput" label="8小时指标产量" header-align="center" align="center" min-width="43%"/>
+        <el-table-column prop="hourTargetOutput" label="每小时指标产量" header-align="center" align="center" min-width="45%"/>
+        <el-table-column prop="dayTargetOutput" label="8小时指标产量" header-align="center" align="center" min-width="45%"/>
         <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="45%"/>
         <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="30%"/>
-        <el-table-column label="变更" header-align="center" align="center" min-width="23%">
+        <el-table-column label="变更" header-align="center" align="center" min-width="20%">
           <template slot-scope="scope">
             <el-popover
               width="10px"
@@ -82,25 +105,33 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
+        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="25%" >
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
-            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="25%" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.checkStatus === 0" size="mini" type="danger">未确认</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 1" size="mini">通过</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="25%"/>
-        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="100%">
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="50%">
           <template slot-scope="scope">
-            <kt-button icon="fa fa-trash" :label="$t('action.delete')"
-                       perms="sys:coefficient:delete" type="danger" @click="handleBatchDelete(scope.row)"/>
-            <el-tooltip content="不通过" x-placement="top">
-              <kt-button v-if="scope.row.status === 0" icon="el-icon-error" circle="true"
-                         perms="sys:coefficient:disable" type="warning" @click="handleBatchDisable(scope.row)"/>
+            <el-tooltip :content="$t('action.delete')" x-placement="top">
+              <kt-button icon="fa fa-trash" circle="true"
+                         perms="sys:coefficient:delete" type="danger" @click="deleteScheme(scope.row)"/>
             </el-tooltip>
-            <el-tooltip :content="$t('action.recover')" x-placement="top">
-              <kt-button v-if="scope.row.status === 0" icon="el-icon-success" circle="true"
-                         perms="sys:coefficient:recover" type="primary" @click="handleBatchRecover(scope.row)"/>
+            <el-tooltip :content="$t('action.disagree')" x-placement="top">
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" circle="true"
+                         perms="sys:coefficient:disable" type="warning" @click="disagreeScheme(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.agree')" x-placement="top">
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" circle="true"
+                         perms="sys:coefficient:recover" type="primary" @click="agreeScheme(scope.row)"/>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -112,70 +143,9 @@
                        :total="totalSize" style="float:right;"/>
       </div>
     </div>
-    <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()"
-               label-width="140px" :size="size" style="text-align:left;">
-        <el-form-item label="选项" prop="type" v-if="operation">
-          <el-radio-group v-model="dataForm.types">
-            <el-radio v-for="(types, index) in TypeList" :label="index"
-                      :key="index" @change.native="ChangeHandle(index)">
-              {{types}}
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="部门" prop="deptName" v-if="operation">
-          <popup-tree-input
-            :data="deptData"
-            :props="deptTreeProps"
-            :prop="dataForm.deptName"
-            :node-key="''+dataForm.deptId"
-            :current-change-handle="deptTreeCurrentChangeHandle"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="系数方案" prop="coefficientSid">
-          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
-            <el-option v-for="item in coeSchemeData" :key="item.id"
-                       :label="item.title" :value="item.id"
-                       @click.native="CoeSchemeCurrentChange(item)"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="类型" prop="type">
-          <el-radio-group v-model="dataForm.type">
-            <el-radio v-for="(type, index) in pointsList" :label="index" :key="index">{{type}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="TypeList[dataForm.types] + '名'" prop="title">
-          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.types] + '名'"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="版本" prop="version">
-          <el-input v-model="dataForm.version" placeholder="请填写版本"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="绩效单价" prop="unitPrice">
-          <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="单价倍数" prop="multiple">
-          <el-input v-model="dataForm.multiple" placeholder="请输入单价倍数"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="multiple">
-          <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="multiple">
-          <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="系数值" prop="value">
-          <el-input v-model="dataForm.value" placeholder="请输入系数值"/>
-        </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="备注" prop="remark">
-          <el-input v-model="dataForm.remark" placeholder="请输入备注"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="dialogVisible=false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
-      </div>
-    </el-dialog>
-    <el-dialog title="导出系数" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px"
+    <!--下载-->
+    <el-dialog title="导出系数" width="20%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
                label-position="right" style="text-align:left;">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
@@ -208,21 +178,11 @@ export default {
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
-      operation: false, // true:新增, false:编辑
-      dialogVisible: false, // 新增编辑界面是否显示
-      editLoading: false,
-      // 新增编辑界面数据
-      TypeList:["方案", "系数"],
       downloadVisible:false,// 下载页面是否显示
       downForm:[],
-      dataForm: {},
-      pointsList: ["减分系数", "加分系数", "考勤系数"],
       deptData: [],
       coeSchemeData:[],
-      deptTreeProps: {
-        label: 'name',
-        children: 'children'
-      },
+      deptTreeProps: {label: 'name', children: 'children'},
     }
   },
   methods:{
@@ -255,63 +215,9 @@ export default {
       })
       this.loading = false
     },
-    // 显示新增界面
-    handleAdd: function () {
-      this.dialogVisible = true
-      this.operation = true
-      this.ChangeHandle(0)
-    },
-    // 显示编辑界面
-    editsCoefficient: function (params) {
-      this.dialogVisible = true
-      this.operation = false
-      this.dataForm = Object.assign({}, params)
-      this.dataForm.types = 1
-    },
-    // 显示编辑界面
-    editScheme: function (params) {
-      this.dialogVisible = true
-      this.operation = false
-      this.dataForm = Object.assign({}, params)
-      this.dataForm.types = 0
-    },
-    // 编辑
-    submitForm: function () {
-      this.$refs.dataForm.validate((valid) => {
-        if (valid) {
-          this.$confirm('确认提交吗？', '提示', {}).then(() => {
-            this.editLoading = true
-            let params = Object.assign({}, this.dataForm)
-            if (params.types===0){
-              this.$api.coefficient.saveScheme(params).then((res) => {
-                this.editLoading = false
-                if(res.code === 200) {
-                  this.$message({ message: '操作成功', type: 'success' })
-                  this.dialogVisible = false
-                  this.$refs['dataForm'].resetFields()
-                } else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
-                this.findPage(null)
-              })
-            }else{
-              this.$api.coefficient.save(params).then((res) => {
-                this.editLoading = false
-                if(res.code === 200) {
-                  this.$message({ message: '操作成功', type: 'success' })
-                  this.dialogVisible = false
-                  this.$refs['dataForm'].resetFields()
-                } else {this.$message({message: '操作失败, ' + res.msg, type: 'error'})}
-                this.findPage(null)
-              })
-            }
-          })
-        }else{
-          this.$message({message: '请完善表单信息', type: 'error'})
-        }
-      })
-    },
-    //批量删除
-    handleBatchDelete: function (params){
-      this.$confirm('确认删除选中的信息吗？','提示',{type:'warning'}).then(()=>{
+    // 删除系数方案
+    deleteScheme: function (params){
+      this.$confirm('确认删除选中的'+params.title+params.version+'吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
         this.$api.coefficient.DeleteScheme({'coeSchemeId':ids}).then(res=>{
@@ -325,9 +231,9 @@ export default {
         })
       })
     },
-    //批量禁用
-    handleBatchDisable: function (params){
-      this.$confirm('确认不通过选中的信息吗？','提示',{
+    // 禁用系数方案
+    disagreeScheme: function (params){
+      this.$confirm('确认不通过'+params.title+params.version+'的变化内容吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
@@ -344,7 +250,7 @@ export default {
       })
     },
     //批量恢复
-    handleBatchRecover: function (params){
+    agreeScheme: function (params){
       this.$confirm('确认通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
@@ -362,7 +268,7 @@ export default {
       })
     },
     //删除
-    handleDelete: function (params){
+    deleteCoefficient: function (params){
       this.$confirm('确认删除选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
@@ -381,7 +287,7 @@ export default {
       })
     },
     //禁用
-    handleDisable: function(params){
+    disagreeCoefficient: function(params){
       this.$confirm('确认不通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
@@ -399,7 +305,7 @@ export default {
       })
     },
     //恢复
-    handleRecover: function(params){
+    agreeCoefficient: function(params){
       this.$confirm('确认通过选中的信息吗？','提示',{
         type:'warning'
       }).then(()=>{
