@@ -51,7 +51,7 @@ export const saveScheme = (data) => {
     data
   })
 };
-//删除
+//删除系数
 export const Delete = (data) => {
   return axios({
     url: '/coefficient/delete',
@@ -59,23 +59,7 @@ export const Delete = (data) => {
     data
   })
 };
-//批量禁用
-export const disable = (data) => {
-  return axios({
-    url: '/coefficient/disable',
-    method: 'post',
-    data
-  })
-};
-//批量恢复
-export const recover = (data) => {
-  return axios({
-    url: '/coefficient/recover',
-    method: 'post',
-    data
-  })
-};
-//删除
+//删除方案
 export const DeleteScheme = (data) => {
   return axios({
     url: '/coefficient/deleteScheme',
@@ -83,18 +67,34 @@ export const DeleteScheme = (data) => {
     data
   })
 };
-//批量禁用
-export const disableScheme = (data) => {
+//通过方案
+export const confirmScheme = (data) => {
   return axios({
-    url: '/coefficient/disableScheme',
+    url: '/coefficient/confirmScheme',
     method: 'post',
     data
   })
 };
-//批量恢复
-export const recoverScheme = (data) => {
+//未通过方案
+export const unconfirmedScheme = (data) => {
   return axios({
-    url: '/coefficient/recoverScheme',
+    url: '/coefficient/unconfirmedScheme',
+    method: 'post',
+    data
+  })
+};
+//通过方案
+export const confirm = (data) => {
+  return axios({
+    url: '/coefficient/confirm',
+    method: 'post',
+    data
+  })
+};
+//未通过方案
+export const unconfirmed = (data) => {
+  return axios({
+    url: '/coefficient/unconfirmed',
     method: 'post',
     data
   })

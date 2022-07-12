@@ -42,28 +42,28 @@
                                header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
               <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
+              <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="25%" >
                 <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === 1" size="mini">正常</el-tag>
                   <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
-                  <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="23%" >
+              <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="25%" >
                 <template slot-scope="scope">
-                  <el-tag v-if="scope.row.status === 0" size="mini" type="danger">未确认</el-tag>
-                  <el-tag v-else-if="scope.row.status === 1" size="mini">通过</el-tag>
-                  <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+                  <el-tag v-if="scope.row.checkStatus === 0" size="mini" type="danger">未确认</el-tag>
+                  <el-tag v-if="scope.row.checkStatus === 1" size="mini">通过</el-tag>
+                  <el-tag v-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
                 </template>
               </el-table-column>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="100%">
                 <template slot-scope="scope">
                   <kt-button icon="fa fa-edit" :label="$t('action.edit')"
-                             perms="sys:deptCoe:edit" @click="handleEdit(scope.row)"/>
+                             perms="sys:deptCoe:edit" @click="editCoefficient(scope.row)"/>
                   <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
-                             perms="sys:deptCoe:disable"  type="warning" @click="handleDisable(scope.row)"/>
+                             perms="sys:deptCoe:disable"  type="warning" @click="disableCoefficient(scope.row)"/>
                   <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
-                             perms="sys:deptCoe:recover" type="primary" @click="handleRecover(scope.row)"/>
+                             perms="sys:deptCoe:recover" type="primary" @click="recoverCoefficient(scope.row)"/>
                 </template>
               </el-table-column>
             </el-table>
@@ -88,15 +88,25 @@
         </el-table-column>
         <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="23%" >
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">未确认</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="mini">通过</el-tag>
-            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+            <el-tag v-if="scope.row.checkStatus === 0" size="mini" type="danger">未确认</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 1" size="mini">通过</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="25%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="40%">
           <template slot-scope="scope">
-            <kt-button icon="fa fa-edit" :label="$t('action.edit')" perms="sys:deptCoe:edit" @click="handleEdits(scope.row)"/>
+            <el-tooltip :content="$t('action.edit')" x-placement="top">
+              <kt-button icon="fa fa-edit" perms="sys:deptCoe:edit" :circle="true" @click="editScheme(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.recover')" x-placement="top" v-if="scope.row.status === 0">
+              <kt-button icon="fa fa-unlock" perms="sys:deptCoe:recover" type="primary"
+                         :circle="true" @click="recoverScheme(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.disable')" x-placement="top" v-if="scope.row.status === 1">
+              <kt-button icon="fa fa-lock" perms="sys:deptCoe:disable" type="warning"
+                         :circle="true" @click="disableScheme(scope.row)"/>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -267,14 +277,14 @@ export default {
       this.ChangeHandle(0)
     },
     // 显示编辑界面
-    handleEdit: function (params) {
+    editCoefficient: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
       this.dataForm.types = 1
     },
     // 显示编辑界面
-    handleEdits: function (params) {
+    editScheme: function (params) {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params)
@@ -313,7 +323,7 @@ export default {
       })
     },
     //批量禁用
-    handleBatchDisable: function (params){
+    disableScheme: function (params){
       this.$confirm('确认禁用选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
@@ -329,7 +339,7 @@ export default {
       })
     },
     //批量恢复
-    handleBatchRecover: function (params){
+    recoverScheme: function (params){
       this.$confirm('确认恢复选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
@@ -345,7 +355,7 @@ export default {
       })
     },
     //禁用
-    handleDisable: function(params){
+    disableCoefficient: function(params){
       this.$confirm('确认禁用选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
@@ -361,7 +371,7 @@ export default {
       })
     },
     //恢复
-    handleRecover: function(params){
+    recoverCoefficient: function(params){
       this.$confirm('确认恢复选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;

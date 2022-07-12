@@ -36,45 +36,35 @@
                       width="100%" border fit highlight-current-row>
               <el-table-column prop="type" label="类型" :formatter="typeFormat" sortable
                                header-align="center" align="center" min-width="50%"/>
-              <el-table-column prop="title" label="标题" sortable
-                               header-align="center" align="center" min-width="100%"/>
-              <el-table-column prop="value" label="值" sortable
-                               header-align="center" align="center" min-width="50%"/>
-              <el-table-column label="变更" header-align="center" align="center" min-width="50%">
+              <el-table-column prop="title" label="标题" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="value" label="值" sortable header-align="center" align="center" min-width="50%"/>
+              <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="25%" >
                 <template slot-scope="scope">
-                  <el-popover width="10px" v-if="scope.row.remark!==null" placement="top-start"
-                              title="变化记录" trigger="click" :content= scope.row.remark>
-                    <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
-                  </el-popover>
-                </template>
-              </el-table-column>
-              <el-table-column prop="status" sortable label="状态" header-align="center" align="center" min-width="50%" >
-                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.status === 1" size="mini">正常</el-tag>
                   <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
-                  <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="checkStatus" sortable label="审核" header-align="center" align="center" min-width="50%" >
+              <el-table-column prop="checkStatus" label="审核" header-align="center" align="center" min-width="25%" >
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.checkStatus === 0" size="mini" type="danger">未确认</el-tag>
-                  <el-tag v-else-if="scope.row.checkStatus === 1" size="mini" type="success">通过</el-tag>
-                  <el-tag v-else-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
+                  <el-tag v-if="scope.row.checkStatus === 1" size="mini">通过</el-tag>
+                  <el-tag v-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
+              <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="50%">
                 <template slot-scope="scope">
                   <el-tooltip :content="$t('action.delete')" x-placement="top">
-                    <kt-button icon="fa fa-trash" perms="sys:coefficient:delete" circle="true"
-                               type="danger" @click="deleteCoefficient(scope.row)"/>
+                    <kt-button icon="fa fa-trash" perms="sys:coefficient:delete" :circle="true"
+                               v-if="scope.row.status===0" type="danger" @click="deleteCoefficient(scope.row)"/>
                   </el-tooltip>
                   <el-tooltip :content="$t('action.disagree')" x-placement="top">
-                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" circle="true"
-                               perms="sys:coefficient:disable" type="warning" @click="disagreeCoefficient(scope.row)"/>
+                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :circle="true"
+                               perms="sys:coefficient:unconfirmed" type="warning" @click="disagreeCoefficient(scope.row)"/>
                   </el-tooltip>
                   <el-tooltip :content="$t('action.agree')" x-placement="top">
-                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" circle="true"
-                               perms="sys:coefficient:recover" type="primary" @click="agreeCoefficient(scope.row)"/>
+                    <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :circle="true"
+                               perms="sys:coefficient:confirm" type="primary" @click="agreeCoefficient(scope.row)"/>
                   </el-tooltip>
                 </template>
               </el-table-column>
@@ -82,29 +72,16 @@
           </template>
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
-        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="35%"/>
-        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="hourTargetOutput" label="每小时指标产量" header-align="center" align="center" min-width="45%"/>
-        <el-table-column prop="dayTargetOutput" label="8小时指标产量" header-align="center" align="center" min-width="45%"/>
-        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="45%"/>
-        <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="30%"/>
-        <el-table-column label="变更" header-align="center" align="center" min-width="20%">
-          <template slot-scope="scope">
-            <el-popover
-              width="10px"
-              v-if="scope.row.remark!==null"
-              placement="top-start"
-              title="变化记录"
-              trigger="click"
-              :content= scope.row.remark>
-              <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
-            </el-popover>
-          </template>
-        </el-table-column>
+        <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
+        <el-table-column prop="unitPrice" label="单价" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="multiple" label="倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="hourTargetOutput" label="每小时指标" header-align="center" align="center" min-width="45%"/>
+        <el-table-column prop="dayTargetOutput" label="8小时指标" header-align="center" align="center" min-width="45%"/>
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="25%" >
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
@@ -118,20 +95,43 @@
             <el-tag v-else-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="25%"/>
+        <el-table-column label="变更" header-align="center" align="center" min-width="25%">
+          <template slot-scope="scope">
+            <el-popover width="10px" v-if="scope.row.remark!==null" placement="top-start"
+                        title="变化记录" trigger="click" :content= scope.row.remark>
+              <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column label="历史" header-align="center" align="center" min-width="25%">
+          <template slot-scope="scope">
+            <el-popover placement="left" width="600"
+                        title="历史记录" trigger="click">
+              <el-table :data="scope.row.schemeHistory" v-if="scope.row.schemeHistory!==null">
+                <el-table-column width="140" property="fieldName" label="字段名"></el-table-column>
+                <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
+                <el-table-column width="100" property="newValue" label="新值"></el-table-column>
+                <el-table-column width="100" property="createBy" label="修改人"></el-table-column>
+                <el-table-column width="160" property="createTime" label="修改时间" :formatter="dateFormat"></el-table-column>
+              </el-table>
+              <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="30%"/>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')" min-width="50%">
           <template slot-scope="scope">
             <el-tooltip :content="$t('action.delete')" x-placement="top">
-              <kt-button icon="fa fa-trash" circle="true"
+              <kt-button icon="fa fa-trash" :circle="true" v-if="scope.row.status===0"
                          perms="sys:coefficient:delete" type="danger" @click="deleteScheme(scope.row)"/>
             </el-tooltip>
             <el-tooltip :content="$t('action.disagree')" x-placement="top">
-              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" circle="true"
-                         perms="sys:coefficient:disable" type="warning" @click="disagreeScheme(scope.row)"/>
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :circle="true"
+                         perms="sys:coefficient:unconfirmed" type="warning" @click="disagreeScheme(scope.row)"/>
             </el-tooltip>
             <el-tooltip :content="$t('action.agree')" x-placement="top">
-              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" circle="true"
-                         perms="sys:coefficient:recover" type="primary" @click="agreeScheme(scope.row)"/>
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :circle="true"
+                         perms="sys:coefficient:confirm" type="primary" @click="agreeScheme(scope.row)"/>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -167,6 +167,7 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
+import {format} from "../../utils/datetime";
 export default {
   name: "Coefficient",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -178,6 +179,7 @@ export default {
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
+      checkStatus:'',
       downloadVisible:false,// 下载页面是否显示
       downForm:[],
       deptData: [],
@@ -238,7 +240,7 @@ export default {
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.disableScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.coefficient.unconfirmedScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -251,12 +253,12 @@ export default {
     },
     //批量恢复
     agreeScheme: function (params){
-      this.$confirm('确认通过选中的信息吗？','提示',{
+      this.$confirm('确认通过'+params.title+params.version+'吗？','提示',{
         type:'warning'
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.recoverScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.coefficient.confirmScheme({'coeSchemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -293,7 +295,7 @@ export default {
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.disable({'coefficientId':ids}).then(res=>{
+        this.$api.coefficient.unconfirmed({'coefficientId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -311,7 +313,7 @@ export default {
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.recover({'coefficientId':ids}).then(res=>{
+        this.$api.coefficient.confirm({'coefficientId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -369,8 +371,6 @@ export default {
         this.coeSchemeData = res
       })
     },
-    // 状态格式化
-    statusFormat: function (row, column){return row[column.property]===1?'正常':'禁用'},
     // 类型格式化
     typeFormat: function (row, column){
       if(row[column.property]===1){return '加分系数'}
@@ -434,6 +434,8 @@ export default {
         window.URL.revokeObjectURL(href)
       })
     },
+    //时间格式化
+    dateFormat: function (row, column){return format(row[column.property])},
   },
   mounted() {
     this.findPage()
