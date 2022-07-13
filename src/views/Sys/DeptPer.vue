@@ -55,7 +55,7 @@
         <el-table-column prop="attendance" label="出勤" header-align="center" align="center" width="48%" />
         <el-table-column prop="absence" label="缺勤" header-align="center" align="center" width="48%" />
         <el-table-column prop="tutoringName" label="被辅导员" header-align="center" align="center" width="70%" />
-        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center" width="70%" />
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" width="70%" />
         <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
@@ -182,8 +182,8 @@
             <el-option v-for="item in empPerData" :key="item.empNo" :label="item.empName" :value="item.empNo"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="辅导月数" prop="tutoringMonth">
-          <el-input v-model="dataForm.tutoringMonth" placeholder="请填写非计件时间"/>
+        <el-form-item label="辅导月份" prop="tutoringMonth">
+          <el-input-number v-model="dataForm.tutoringMonth" :min="0" :max="6" placeholder="请填写月份"/>
         </el-form-item>
         <el-form-item v-if="operation" v-for="(item,index) in dataForm.coefficientList" :key="index" :label="scoreFormat(item.type)" prop="coefficientList">
           <el-card>
@@ -460,6 +460,9 @@ export default {
     findCoefficientTree:function (item){
       this.$api.coefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
         this.coeSchemeData = res
+      });
+      this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
+        this.empPerData = res.data
       })
     },
     findCoeList: function (sid) {this.$api.coefficient.findCoeList({'sid':sid}).then((res)=>{

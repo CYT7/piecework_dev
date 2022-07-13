@@ -42,7 +42,7 @@
         <el-table-column prop="attendance" label="出勤" header-align="center" align="center" min-width="50%"  width="90%" />
         <el-table-column prop="absence" label="缺勤" header-align="center" align="center" min-width="50%"  width="90%" />
         <el-table-column prop="tutoringName" label="被辅导员" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center"  min-width="50%" width="90%" />
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center"  min-width="50%" width="90%" />
         <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
