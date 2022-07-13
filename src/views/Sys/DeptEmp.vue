@@ -24,8 +24,9 @@
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table permsEdit="sys:DeptEmp:edit" :data="pageResult" :columns="columns"
-              @findPage="findPage" @handleEdit="handleEdit">
+    <kt-table permsEdit="sys:DeptEmp:edit" permsDisable="sys:DeptEmp:disable" permsRecover="sys:DeptEmp:recover"
+              :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
+              @handleDisable="handleDisable" @handleRecover="handleRecover">
     </kt-table>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
@@ -81,6 +82,7 @@ export default {
         {prop:"phone", label:"手机", minWidth:'20%'},
         {prop:"email", label:"邮箱", minWidth:'20%'},
         {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
+        {prop:"checkStatus", label:"审核", minWidth:'20%', formatter:this.checkFormat},
       ],
       pageRequest: { pageNum: 1, pageSize: 10 },
       pageResult: {},
@@ -130,6 +132,10 @@ export default {
       this.operation = false
       this.dataForm = Object.assign({}, params.row)
     },
+    // 批量禁用
+    handleDisable: function (data) {this.$api.deptEmp.disable({'employeeList':data.params}).then(data.callback)},
+    //批量恢复
+    handleRecover: function (data) {this.$api.deptEmp.recover({'employeeList':data.params}).then(data.callback)},
     // 编辑
     submitForm: function () {
       this.$refs.dataForm.validate((valid) => {
@@ -161,6 +167,16 @@ export default {
     },
     // 状态格式化
     statusFormat: function (row, column){return row[column.property]===1 ?'正常':'禁用'},
+    checkFormat: function (row, column){
+      switch (row[column.property]) {
+        case 0:
+          return '未确认'
+        case 1:
+          return '确认'
+        default:
+          return '不通过'
+      }
+    },
     //上传鉴定
     beforeUpload(file){
       let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);

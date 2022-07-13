@@ -17,6 +17,8 @@
         "batchConfirm": "批量确认",
         "batchRecover": "批量恢复",
         "batchDisable": "批量禁用",
+        "batchDisagree": "批量不通过",
+        "batchAgree": "批量通过",
         "search": "查询",
         "loading": "拼命加载中",
         "submit": "提交",

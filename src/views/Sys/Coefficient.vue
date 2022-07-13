@@ -107,6 +107,7 @@
           <template slot-scope="scope">
             <el-popover placement="left" width="600"
                         title="历史记录" trigger="click">
+
               <el-table :data="scope.row.schemeHistory" v-if="scope.row.schemeHistory!==null">
                 <el-table-column width="140" property="fieldName" label="字段名"></el-table-column>
                 <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
@@ -179,7 +180,6 @@ export default {
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
-      checkStatus:'',
       downloadVisible:false,// 下载页面是否显示
       downForm:[],
       deptData: [],

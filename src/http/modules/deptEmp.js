@@ -27,3 +27,19 @@ export const save = (data) => {
     data
   })
 };
+//批量禁用
+export const disable = (data) => {
+  return axios({
+    url: '/DeptEmp/disable',
+    method: 'post',
+    data
+  })
+};
+//批量恢复
+export const recover = (data) => {
+  return axios({
+    url: '/DeptEmp/recover',
+    method: 'post',
+    data
+  })
+};

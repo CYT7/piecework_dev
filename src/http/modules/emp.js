@@ -44,17 +44,17 @@ export const save = (data) => {
   })
 };
 //批量禁用
-export const disable = (data) => {
+export const unconfirmed = (data) => {
   return axios({
-    url: '/emp/disable',
+    url: '/emp/unconfirmed',
     method: 'post',
     data
   })
 };
 //批量恢复
-export const recover = (data) => {
+export const confirm = (data) => {
   return axios({
-    url: '/emp/recover',
+    url: '/emp/confirm',
     method: 'post',
     data
   })

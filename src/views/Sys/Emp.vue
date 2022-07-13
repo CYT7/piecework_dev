@@ -24,9 +24,9 @@
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table permsEdit="sys:emp:edit" permsDelete="sys:emp:delete" permsDisable="sys:emp:disable" permsRecover="sys:emp:recover"
+    <kt-table permsDelete="sys:emp:delete" permsDisagree="sys:emp:unconfirmed" permsAgree="sys:emp:confirm"
               :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
-              @handleDelete="handleDelete" @handleDisable="handleDisable" @handleRecover="handleRecover">
+              @handleDelete="handleDelete" @handleDisagree="handleDisagree" @handleAgree="handleAgree">
     </kt-table>
     <!--新增编辑界面-->
     <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
@@ -79,6 +79,7 @@ export default {
         {prop:"email", label:"邮箱", minWidth:'20%'},
         {prop:"unitPrice", label:"绩效单价", minWidth:'20%'},
         {prop:"status", label:"状态", minWidth:'20%', formatter:this.statusFormat},
+        {prop:"checkStatus", label:"审核", minWidth:'20%', formatter:this.checkFormat},
       ],
       pageRequest: { pageNum: 1, pageSize: 10 },
       pageResult: {},
@@ -110,9 +111,9 @@ export default {
     // 批量删除
     handleDelete: function (data) {this.$api.emp.Delete({'employeeList':data.params}).then(data.callback)},
     // 批量禁用
-    handleDisable: function (data) {this.$api.emp.disable({'employeeList':data.params}).then(data.callback)},
+    handleDisagree: function (data) {this.$api.emp.unconfirmed({'employeeList':data.params}).then(data.callback)},
     //批量恢复
-    handleRecover: function (data) {this.$api.emp.recover({'employeeList':data.params}).then(data.callback)},
+    handleAgree: function (data) {this.$api.emp.confirm({'employeeList':data.params}).then(data.callback)},
     // 显示新增界面
     handleAdd: function () {
       this.dialogVisible = true
@@ -168,6 +169,17 @@ export default {
     },
     // 状态格式化
     statusFormat: function (row, column){return row[column.property]===1 ?'正常':'禁用'},
+    checkFormat: function (row, column){
+      console.log(row[column.property])
+      switch (row[column.property]) {
+        case 0:
+          return '未确认'
+        case 1:
+          return '确认'
+        default:
+          return '不通过'
+      }
+    },
     //上传鉴定
     beforeUpload(file){
       let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);

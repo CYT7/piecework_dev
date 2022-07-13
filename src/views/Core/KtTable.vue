@@ -20,8 +20,12 @@
                      :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
           <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
                      :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
-          <kt-button v-else-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
+          <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
                      :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
+          <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :label="$t('action.disagree')"
+                     :perms="permsDisagree" :size="size" type="warning" @click="handleDisagree(scope.$index, scope.row)" />
+          <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :label="$t('action.agree')"
+                     :perms="permsAgree" :size="size" type="primary" @click="handleAgree(scope.$index, scope.row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -35,6 +39,12 @@
                  style="float:left;" v-if="showBatchOperation & showOperation"/>
       <kt-button :label="$t('action.batchRecover')" :perms="permsRecover" :size="size"
                  type="primary" @click="handleBatchRecover()" :disabled="this.selections.length===0"
+                 style="float:left;" v-if="showBatchOperation & showOperation"/>
+      <kt-button :label="$t('action.batchDisagree')" :perms="permsDisagree" :size="size"
+                 type="waring" @click="handleBatchDisagree()" :disabled="this.selections.length===0"
+                 style="float:left;" v-if="showBatchOperation & showOperation"/>
+      <kt-button :label="$t('action.batchAgree')" :perms="permsAgree" :size="size"
+                 type="primary" @click="handleBatchAgree()" :disabled="this.selections.length===0"
                  style="float:left;" v-if="showBatchOperation & showOperation"/>
       <el-pagination layout="total, prev, pager, next, jumper" @current-change="refreshPageRequest"
                      :current-page="pageRequest.pageNum" :page-size="pageRequest.pageSize"
@@ -55,6 +65,8 @@ export default {
     permsDelete: String,  //删除权限标识
     permsDisable: String,  //禁用权限标识
     permsRecover: String,  //恢复权限标识
+    permsDisagree: String,  //不通过权限标识
+    permsAgree: String,  //通过权限标识
     size: {type: String, default: 'mini'},//尺寸样式
     align: {type: String, default: 'left'},//文本对齐方式
     showOperation: {type: Boolean, default: true},//是否显示操作组件
@@ -68,7 +80,8 @@ export default {
     return {
 			pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       loading: false,//加载标识
-      selections: []//列表选中列
+      selections: [],//列表选中列
+      checkStatus:''
     }
   },
   methods: {
@@ -98,6 +111,8 @@ export default {
     handleDisable: function (index, row) {let ids = [row.id];this.disable(ids)},
     //恢复
     handleRecover: function (index, row) {let ids = [row.id];this.recover(ids)},
+    handleDisagree: function (index, row) {let ids = [row.id];this.disagree(ids)},
+    handleAgree: function (index, row) {let ids = [row.id];this.Agree(ids)},
 		//批量删除
 		handleBatchDelete: function () {
       let ids = []
@@ -115,6 +130,18 @@ export default {
       let ids = []
       this.selections.forEach(t=>{if (t.status ===0){ids.push(t.id)}})
       this.recover(ids)
+    },
+    //批量不通过
+    handleBatchDisagree: function () {
+      let ids = []
+      this.selections.forEach(t=>{ids.push(t.id)})
+      this.disagree(ids)
+    },
+    //批量通过
+    handleBatchAgree: function () {
+      let ids = []
+      this.selections.forEach(t=>{ids.push(t.id)})
+      this.Agree(ids)
     },
 		//删除操作
 		delete: function (ids) {
@@ -169,7 +196,43 @@ export default {
         };
         this.$emit('handleRecover', {params:params, callback:callback})
       }).catch(() => {})
-    }
+    },
+    //恢复操作
+    disagree: function (ids) {
+      this.$confirm('确认操作选中的记录吗？', '提示', {type: 'warning'
+      }).then(() => {
+        let params = ids
+        this.loading = true;
+        let callback = res => {
+          if(res.code === 200) {
+            this.$message({message: '操作成功', type: 'success'});
+            this.findPage()
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          }
+          this.loading = false
+        };
+        this.$emit('handleDisagree', {params:params, callback:callback})
+      }).catch(() => {})
+    },
+    //恢复操作
+    Agree: function (ids) {
+      this.$confirm('确认通过选中的记录吗？', '提示', {type: 'warning'
+      }).then(() => {
+        let params = ids
+        this.loading = true;
+        let callback = res => {
+          if(res.code === 200) {
+            this.$message({message: '操作成功', type: 'success'});
+            this.findPage()
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+          }
+          this.loading = false
+        };
+        this.$emit('handleAgree', {params:params, callback:callback})
+      }).catch(() => {})
+    },
   },
   mounted() {this.refreshPageRequest(1)}
 }

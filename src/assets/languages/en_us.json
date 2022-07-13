@@ -17,6 +17,8 @@
         "batchConfirm": "Batch Confirm",
         "batchRecover": "Batch Recover",
         "batchDisable": "Batch Disable",
+        "batchDisagree": "Batch Disagree",
+        "batchAgree": "Batch Agree",
         "search": "Search",
         "loading": "Loading",
         "submit": "Submit",
