@@ -389,7 +389,6 @@ export default {
     // 获取部门列表
     findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {
       this.deptData = res.data
-      console.log(res.data)
     })},
     ChangeHandle: function(data){
       let type = data

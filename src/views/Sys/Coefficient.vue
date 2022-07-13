@@ -51,6 +51,30 @@
                   <el-tag v-if="scope.row.checkStatus === 2" size="mini" type="warning">未通过</el-tag>
                 </template>
               </el-table-column>
+              <el-table-column label="变更" header-align="center" align="center" min-width="25%">
+                <template slot-scope="scope">
+                  <el-popover width="10px" v-if="scope.row.remark!==null" placement="top-start"
+                              title="变化记录" trigger="click" :content= scope.row.remark>
+                    <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+                  </el-popover>
+                </template>
+              </el-table-column>
+              <el-table-column label="历史" header-align="center" align="center" min-width="25%">
+                <template slot-scope="scope">
+                  <el-popover v-if="scope.row.coefficientHistory!==undefined && scope.row.coefficientHistory != null
+                        && scope.row.coefficientHistory.length > 0"  placement="left"
+                              width="600" title="历史记录" trigger="click">
+                    <el-table :data="scope.row.coefficientHistory">
+                      <el-table-column width="140" property="fieldName" label="字段名"></el-table-column>
+                      <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
+                      <el-table-column width="100" property="newValue" label="新值"></el-table-column>
+                      <el-table-column width="100" property="createBy" label="修改人"></el-table-column>
+                      <el-table-column width="160" property="createTime" label="修改时间" :formatter="dateFormat"></el-table-column>
+                    </el-table>
+                    <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
+                  </el-popover>
+                </template>
+              </el-table-column>
               <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"/>
               <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="50%">
                 <template slot-scope="scope">
@@ -105,10 +129,10 @@
         </el-table-column>
         <el-table-column label="历史" header-align="center" align="center" min-width="25%">
           <template slot-scope="scope">
-            <el-popover placement="left" width="600"
-                        title="历史记录" trigger="click">
-
-              <el-table :data="scope.row.schemeHistory" v-if="scope.row.schemeHistory!==null">
+            <el-popover placement="left" width="600" title="历史记录" trigger="click"
+                        v-if="scope.row.schemeHistory!==undefined && scope.row.schemeHistory != null
+                        && scope.row.schemeHistory.length > 0">
+              <el-table :data="scope.row.schemeHistory">
                 <el-table-column width="140" property="fieldName" label="字段名"></el-table-column>
                 <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
                 <el-table-column width="100" property="newValue" label="新值"></el-table-column>
@@ -180,6 +204,8 @@ export default {
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
+      schemeHistory:'',
+      coefficientHistory:'',
       downloadVisible:false,// 下载页面是否显示
       downForm:[],
       deptData: [],
@@ -367,7 +393,7 @@ export default {
       this.dataForm.coefficientSid = data.id
     },
     findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+      this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
         this.coeSchemeData = res
       })
     },

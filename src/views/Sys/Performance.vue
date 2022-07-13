@@ -19,8 +19,8 @@
       <!--表格内容栏-->
       <el-table :data="pageResult" v-if="pageResult[0]!= null" stripe size="mini" style="width: 100%;" v-loading="loading" element-loading-text="$t('action.loading')"
                 @selection-change="selectionChange">
-        <el-table-column type="selection" width="40"/>
-        <el-table-column type="expand" width="20">
+        <el-table-column type="selection" width="30px"/>
+        <el-table-column type="expand" width="25px">
           <template slot-scope="props">
             <el-table stripe :data="[[]]" width="100%">
               <el-table-column label="工作绩效产量" header-align="center" align="center">
@@ -33,28 +33,34 @@
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="empNo" label="职工号" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="empName" label="姓名" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="schemeName" label="方案" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column label="分数" header-align="center" align="center" min-width="60%" width="100%">
+        <el-table-column prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="90%" />
+        <el-table-column prop="empNo" label="工号" header-align="center" align="center" min-width="50%"  width="90%" :formatter="empFormant"/>
+        <el-table-column prop="empName" label="姓名" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"  width="90%" />
+        <el-table-column prop="schemeName" label="方案" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="nonPieceTime" label="非计件" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="attendance" label="出勤" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="absence" label="缺勤" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="tutoringName" label="被辅导员" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="tutoringMonth" label="辅导月数" header-align="center" align="center"  min-width="50%" width="90%" />
+        <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
-                           header-align="center" align="center" min-width="80%">
+                           header-align="center" align="center" width="70%">
             <template slot-scope="scope">
               <span>{{scope.row.scoreList[i]?scope.row.scoreList[i].score:''}}</span>
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column sortable prop="score" label="总分数" header-align="center" align="center" min-width="50%" width="100%"/>
-        <el-table-column sortable prop="status" label="状态" header-align="center" align="center" min-width="50%" width="100%">
+        <el-table-column prop="score" label="绩效分" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="bonus" label="绩效工资" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="50%"  width="90%" >
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
           </template>
         </el-table-column>
-        <el-table-column sortable prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%" width="100%"/>
       </el-table>
       <!--分页栏-->
       <div class="toolbar" style="padding:10px;">
@@ -230,6 +236,9 @@ export default {
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
+    empFormant: function (row,column){
+      return row[column.property].toString().padStart(6,'0')
+    },
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
       if(item===1){return '加分'}

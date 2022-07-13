@@ -76,7 +76,7 @@ export default {
       size: 'small',
       filters: {name: ''},
       columns: [
-        {prop:"empNo", label:"职工号", minWidth:'20%'},
+        {prop:"empNo", label:"职工号", minWidth:'20%', formatter:this.empFormat},
         {prop:"name", label:"职工名", minWidth:'20%'},
         {prop:"deptName", label:"部门", minWidth:'20%'},
         {prop:"phone", label:"手机", minWidth:'20%'},
@@ -167,6 +167,7 @@ export default {
     },
     // 状态格式化
     statusFormat: function (row, column){return row[column.property]===1 ?'正常':'禁用'},
+    empFormat: function (row,column){return row[column.property].toString().padStart(6,'0')},
     checkFormat: function (row, column){
       switch (row[column.property]) {
         case 0:

@@ -156,7 +156,6 @@ export default {
         if (valid) {
           this.$confirm('确认提交吗？', '提示', {}).then(()=>{
             let params = Object.assign({}, this.dataForm)
-            console.log(params)
             this.$api.user.save(params).then((res) => {
               if(res.code === 200) {
                 if (params.username.toLowerCase() === 'admin'){

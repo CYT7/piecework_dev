@@ -198,7 +198,6 @@ export default {
 				let roleMenu = { roleId:roleId, menuId:checkedNodes[i].id }
 				roleMenus.push(roleMenu)
 			}
-			console.log(roleMenus)
 			this.$api.role.saveRoleMenus({"roleMenuList":roleMenus}).then((res) => {
 				if(res.code === 200) {this.$message({ message: '操作成功', type: 'success' })}
 				else {this.$message({message: res.msg, type: 'error'})}

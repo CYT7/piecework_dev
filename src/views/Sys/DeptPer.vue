@@ -47,7 +47,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="deptName" label="部门" header-align="center" align="center" width="50%" />
-        <el-table-column prop="empNo" label="工号" header-align="center" align="center" width="65%"/>
+        <el-table-column prop="empNo" label="工号" header-align="center" align="center" width="65%" :formatter="empFormant"/>
         <el-table-column prop="empName" label="姓名" header-align="center" align="center" width="58%" />
         <el-table-column prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" width="58%" />
         <el-table-column prop="schemeName" label="方案" header-align="center" align="center" width="95%" />
@@ -68,11 +68,10 @@
         <el-table-column prop="score" label="绩效分" header-align="center" align="center" width="58%" />
         <el-table-column prop="bonus" label="绩效工资" header-align="center" align="center" width="70%" />
         <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" width="58%" />
-        <el-table-column prop="status" label="状态" header-align="center" align="center" width="60%" >
+        <el-table-column prop="status" label="状态" header-align="center" align="center" width="65%" >
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.status === 0" size="mini" type="danger">禁用</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" size="mini">正常</el-tag>
-            <el-tag v-else-if="scope.row.status === 2" size="mini" type="warning">未通过</el-tag>
+            <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="center" :label="$t('action.operation')">
@@ -160,7 +159,7 @@
               v-model="dataForm.month"
               type="month"
               placeholder="选择月"
-              value-format="yyyy-MM-dd" @change="findEmpPerformance(dataForm)">
+              value-format="yyyy-MM-dd" @change="findCoefficientTree(dataForm)">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -281,7 +280,6 @@ export default {
       this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
       this.$api.deptPer.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
-        console.log(res.data)
         this.totalSize = res.totalSize
       })
       this.loading = false
@@ -453,15 +451,14 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {this.deptData = res.data
-      console.log(this.deptData)
     })},
     // 获取职工列表
     findEmpTree: function (deptId){
       this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
     },
     //获取方案树
-    findCoefficientTree:function (deptId){
-      this.$api.coefficient.findCoefficientTree({'deptId':deptId}).then((res)=>{
+    findCoefficientTree:function (item){
+      this.$api.coefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
         this.coeSchemeData = res
       })
     },
@@ -485,25 +482,16 @@ export default {
     deptTreeCurrentChange (data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
-      if (this.downForm.type === 1){
-        this.findCoefficientTree(data.id)
-      }
     },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
       this.dataForm.deptName = data.name
-      this.findCoefficientTree(data.id)
       this.findEmpTree(data.id)
     },
     empCurrentChangeHandle: function (data){
       this.dataForm.empNo = data.empNo
       this.dataForm.empName = data.name
-    },
-    findEmpPerformance:function (item){
-      this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
-        this.empPerData = res.data
-      })
     },
     CoeSchemeCurrentChange:function (data){
       this.dataForm.coefficientScheme = data.id
@@ -559,6 +547,9 @@ export default {
     },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
+    empFormant: function (row,column){
+      return row[column.property].toString().padStart(6,'0')
+    },
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
       switch (item) {
