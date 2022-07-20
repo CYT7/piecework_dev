@@ -71,6 +71,7 @@
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="detailed" label="明细" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
         <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
@@ -78,6 +79,8 @@
         <el-table-column prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="55%"/>
         <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="effectiveDate" label="生效日期" :formatter="dateFormat"
+                         header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="23%" >
@@ -123,20 +126,19 @@
       <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="submitForm()" label-width="100px" :size="size" style="text-align:left;">
         <el-form-item label="选项" prop="type" v-if="operation">
           <el-radio-group v-model="dataForm.types">
-            <el-radio v-for="(types, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{types}}</el-radio>
+            <el-radio v-for="(types, index) in TypeList" :label="index" :key="index"
+                      @change.native="ChangeHandle(index)">{{types}}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="部门" prop="deptName" v-if="operation">
           <popup-tree-input
-            :data="deptData"
-            :props="deptTreeProps"
-            :prop="dataForm.deptName"
-            :node-key="''+dataForm.deptId"
-            :current-change-handle="deptTreeCurrentChangeHandle"/>
+            :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
+            :node-key="''+dataForm.deptId" :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 1" label="系数方案" prop="coefficientSid">
+        <el-form-item v-if="dataForm.types === 1&&operation" label="系数方案" prop="coefficientSid">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
-            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
+                       :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 1" label="类型" prop="type">
@@ -145,10 +147,13 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="TypeList[dataForm.types] + '名'" prop="title">
-          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.types] + '名'"/>
+          <el-input v-model="dataForm.title" :placeholder="TypeList[dataForm.types] + '名'" :disabled="!operation"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="明细" prop="detailed">
+          <el-input v-model="dataForm.detailed" placeholder="请填写明细" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="版本" prop="version">
-          <el-input v-model="dataForm.version" placeholder="请填写版本"/>
+          <el-input v-model="dataForm.version" placeholder="请填写版本" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="绩效单价" prop="unitPrice">
           <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
@@ -161,6 +166,14 @@
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="dayTargetOutput">
           <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
+        </el-form-item>
+        <el-form-item v-if="dataForm.types === 0" label="入职日期" prop="entryDate">
+          <div class="block">
+            <el-date-picker
+              v-model="dataForm.effectiveDate" type="date"
+              placeholder="请选择入职日期" :picker-options="pickerOptions">
+            </el-date-picker>
+          </div>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="辅导月数" prop="tutoringMonth">
           <el-input v-model="dataForm.tutoringMonth" placeholder="请输入辅导月数，多个请用;分开"/>
@@ -205,6 +218,7 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
+import {formats} from "../../utils/datetime";
 const deptIds = sessionStorage.getItem("deptId");
 export default {
   name: "Coefficient",
@@ -237,6 +251,27 @@ export default {
       deptTreeProps: {
         label: 'name',
         children: 'children'
+      },
+      //日历快速选择
+      pickerOptions: {
+        shortcuts: [{
+          text: '今天',
+          onClick(picker) {picker.$emit('pick', new Date());}
+        }, {
+          text: '昨天',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: '一周前',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', date);
+          }
+        }]
       },
     }
   },
@@ -398,12 +433,14 @@ export default {
           id: 0,
           deptId:'',
           title:'',
+          detailed:'',
           version:'',
           unitPrice:'',
           multiple:'',
           hourTargetOutput:'',
           dayTargetOutput:'',
           tutoringMonth: '',
+          effectiveDate: '',
           tutoringProportion: '',
           startMonth:'',
           endMonth: '',
@@ -444,6 +481,9 @@ export default {
     typeFormat: function (row, column){
       if(row[column.property]===1){return '加分系数'}
       else{return '扣分系数'}
+    },
+    dateFormat: function (row, column) {
+      return formats(row[column.property])
     },
     //上传鉴定
     beforeUpload(file){

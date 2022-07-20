@@ -36,8 +36,8 @@
 			<el-form-item label="ID" prop="id" v-if="false">
         <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
       </el-form-item>
-			<el-form-item label="用户名" prop="username" v-if="operation">
-        <el-input v-model="dataForm.username" auto-complete="off"/>
+			<el-form-item label="用户名" prop="username">
+        <el-input v-model="dataForm.username" auto-complete="off" :disabled="!operation"/>
       </el-form-item>
 			<el-form-item label="中文名" prop="chineseName">
         <el-input v-model="dataForm.chineseName" auto-complete="off"/>

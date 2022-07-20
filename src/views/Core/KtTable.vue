@@ -5,7 +5,7 @@
               @current-change="handleCurrentChange" v-loading="loading"
               :element-loading-text="$t('action.loading')" :border="border" :stripe="stripe"
               :show-overflow-tooltip="showOverflowTooltip"
-              :size="size" :align="align" style="width:100%;" >
+              :size="size" :align="align" style="width:100%;">
       <el-table-column type="selection" width="40" v-if="showBatchOperation & showOperation"></el-table-column>
       <el-table-column v-for="column in columns" header-align="center" align="center"
         :prop="column.prop" :label="column.label" :width="column.width" :min-width="column.minWidth"
@@ -14,18 +14,46 @@
       </el-table-column>
       <el-table-column :label="$t('action.operation')" min-width="40%" v-if="showOperation" header-align="center" align="center">
         <template slot-scope="scope">
-          <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')"
-                     :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
-          <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')"
-                     :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')"
-                     :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')"
-                     :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :label="$t('action.disagree')"
-                     :perms="permsDisagree" :size="size" type="warning" @click="handleDisagree(scope.$index, scope.row)" />
-          <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :label="$t('action.agree')"
-                     :perms="permsAgree" :size="size" type="primary" @click="handleAgree(scope.$index, scope.row)" />
+          <div v-if="circle">
+            <el-tooltip :content="$t('action.edit')" x-placement="top">
+              <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :circle="circle"
+                         :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.delete')" x-placement="top" v-if="scope.row.status === 0">
+              <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :circle="circle"
+                         :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
+            </el-tooltip>
+            <el-tooltip :content="$t('action.disable')" x-placement="top" v-if="scope.row.status === 1">
+              <kt-button v-if="permsDisable?permsDisable:''" icon="fa fa-lock" :circle="circle"
+                         :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)"  />
+            </el-tooltip>
+            <el-tooltip :content="$t('action.recover')" x-placement="top" v-if="scope.row.status === 0">
+              <kt-button v-if="permsRecover?permsRecover:''" icon="fa fa-unlock" :circle="circle"
+                         :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)"  />
+            </el-tooltip>
+            <el-tooltip :content="$t('action.disagree')" x-placement="top" v-if="scope.row.checkStatus === 0">
+              <kt-button v-if="permsDisagree?permsDisagree:''" icon="fa fa-times" :circle="circle"
+                         :perms="permsDisagree" :size="size" type="warning" @click="handleDisagree(scope.$index, scope.row)"  />
+            </el-tooltip>
+            <el-tooltip :content="$t('action.disagree')" x-placement="top" v-if="scope.row.checkStatus === 0">
+              <kt-button v-if="permsAgree?permsAgree:''" icon="fa fa-check" :circle="circle"
+                         :perms="permsAgree" :size="size" type="primary" @click="handleAgree(scope.$index, scope.row)"  />
+            </el-tooltip>
+          </div>
+          <div v-else>
+            <kt-button v-if="permsEdit?permsEdit:''" icon="fa fa-edit" :label="$t('action.edit')" :circle="circle"
+                       :perms="permsEdit" :size="size" @click="handleEdit(scope.$index, scope.row)" />
+            <kt-button v-if="permsDelete?permsDelete:''" icon="fa fa-trash" :label="$t('action.delete')" :circle="circle"
+                       :perms="permsDelete" :size="size" type="danger" @click="handleDelete(scope.$index, scope.row)" />
+            <kt-button v-if="scope.row.status === 1" icon="fa fa-lock" :label="$t('action.disable')" :circle="circle"
+                       :perms="permsDisable" :size="size" type="warning" @click="handleDisable(scope.$index, scope.row)" />
+            <kt-button v-if="scope.row.status === 0" icon="fa fa-unlock" :label="$t('action.recover')" :circle="circle"
+                       :perms="permsRecover" :size="size" type="primary" @click="handleRecover(scope.$index, scope.row)" />
+            <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :label="$t('action.disagree')" :circle="circle"
+                       :perms="permsDisagree" :size="size" type="warning" @click="handleDisagree(scope.$index, scope.row)" />
+            <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :label="$t('action.agree')" :circle="circle"
+                       :perms="permsAgree" :size="size" type="primary" @click="handleAgree(scope.$index, scope.row)" />
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -67,6 +95,7 @@ export default {
     permsRecover: String,  //恢复权限标识
     permsDisagree: String,  //不通过权限标识
     permsAgree: String,  //通过权限标识
+    circle: {type: Boolean, default: false},//是否显示操作组件
     size: {type: String, default: 'mini'},//尺寸样式
     align: {type: String, default: 'left'},//文本对齐方式
     showOperation: {type: Boolean, default: true},//是否显示操作组件
@@ -74,7 +103,8 @@ export default {
     stripe: {type: Boolean, default: true},//是否显示斑马线
     highlightCurrentRow: {type: Boolean, default: true},//是否高亮当前行
     showOverflowTooltip: {type: Boolean, default: true},//是否单行显示
-    showBatchOperation: {type: Boolean, default: true}//是否显示操作组件
+    showBatchOperation: {type: Boolean, default: true},//是否显示操作组件
+
   },
   data() {
     return {

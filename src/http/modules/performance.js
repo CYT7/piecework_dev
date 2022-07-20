@@ -10,3 +10,19 @@ export const findPage = (data) => {
     data
   })
 };
+//通过绩效
+export const confirm = (data) => {
+  return axios({
+    url: '/performance/agree',
+    method: 'post',
+    data
+  })
+};
+//未通过绩效
+export const disagree = (data) => {
+  return axios({
+    url: '/performance/disagree',
+    method: 'post',
+    data
+  })
+};

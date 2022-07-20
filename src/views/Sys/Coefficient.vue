@@ -69,7 +69,7 @@
                       <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
                       <el-table-column width="100" property="newValue" label="新值"></el-table-column>
                       <el-table-column width="100" property="createBy" label="修改人"></el-table-column>
-                      <el-table-column width="160" property="createTime" label="修改时间" :formatter="dateFormat"></el-table-column>
+                      <el-table-column width="160" property="createTime" label="修改时间" :formatter="timeFormat"></el-table-column>
                     </el-table>
                     <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
                   </el-popover>
@@ -97,6 +97,7 @@
         </el-table-column>
         <el-table-column sortable prop="deptName" label="部门" header-align="center" align="center" min-width="30%"/>
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
+        <el-table-column sortable prop="detailed" label="明细" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
         <el-table-column prop="unitPrice" label="单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="multiple" label="倍数" header-align="center" align="center" min-width="30%"/>
@@ -104,6 +105,8 @@
         <el-table-column prop="dayTargetOutput" label="8小时指标" header-align="center" align="center" min-width="45%"/>
         <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="tutoringProportion" label="辅导比例" header-align="center" align="center" min-width="50%"/>
+        <el-table-column prop="effectiveDate" label="生效日期" :formatter="dateFormat"
+                         header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="startMonth" label="开始月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="endMonth" label="结束月份" header-align="center" align="center" min-width="50%"/>
         <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="25%" >
@@ -137,7 +140,7 @@
                 <el-table-column width="100" property="oldValue" label="旧值"></el-table-column>
                 <el-table-column width="100" property="newValue" label="新值"></el-table-column>
                 <el-table-column width="100" property="createBy" label="修改人"></el-table-column>
-                <el-table-column width="160" property="createTime" label="修改时间" :formatter="dateFormat"></el-table-column>
+                <el-table-column width="160" property="createTime" label="修改时间" :formatter="timeFormat"></el-table-column>
               </el-table>
               <el-button slot="reference" size="mini" icon="el-icon-view" circle/>
             </el-popover>
@@ -192,7 +195,7 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
-import {format} from "../../utils/datetime";
+import {format, formats} from "../../utils/datetime";
 export default {
   name: "Coefficient",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -461,7 +464,10 @@ export default {
       })
     },
     //时间格式化
-    dateFormat: function (row, column){return format(row[column.property])},
+    timeFormat: function (row, column){return format(row[column.property])},
+    dateFormat: function (row, column) {
+      return formats(row[column.property])
+    },
   },
   mounted() {
     this.findPage()

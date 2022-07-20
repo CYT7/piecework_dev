@@ -458,8 +458,10 @@ export default {
     },
     //获取方案树
     findCoefficientTree:function (item){
+      console.log(item)
       this.$api.coefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
         this.coeSchemeData = res
+        console.log(res)
       });
       this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
         this.empPerData = res.data

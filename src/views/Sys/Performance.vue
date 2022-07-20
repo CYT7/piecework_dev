@@ -34,15 +34,23 @@
           </template>
         </el-table-column>
         <el-table-column prop="deptName" label="部门" header-align="center" align="center" min-width="50%" width="90%" />
-        <el-table-column prop="empNo" label="工号" header-align="center" align="center" min-width="50%"  width="90%" :formatter="empFormant"/>
+        <el-table-column prop="empNo" label="工号" header-align="center" align="center"
+                         min-width="50%"  width="90%" :formatter="empFormant"/>
         <el-table-column prop="empName" label="姓名" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="month" label="月份" header-align="center" align="center" :formatter="dateFormat" min-width="50%"  width="90%" />
-        <el-table-column prop="schemeName" label="方案" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="nonPieceTime" label="非计件" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="attendance" label="出勤" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="absence" label="缺勤" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="tutoringName" label="被辅导员" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center"  min-width="50%" width="90%" />
+        <el-table-column prop="month" label="月份" header-align="center" align="center"
+                         :formatter="dateFormat" min-width="50%"  width="90%" />
+        <el-table-column prop="schemeName" label="方案" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="nonPieceTime" label="非计件" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="attendance" label="出勤" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="absence" label="缺勤" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="tutoringName" label="被辅导员" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center"
+                         align="center"  min-width="50%" width="90%" />
         <el-table-column label="分数" header-align="center" align="center">
           <el-table-column v-for="(item,i) in pageResult[0].scoreList" :key="i"
                            :label="scoreFormat(item.type)"
@@ -52,13 +60,37 @@
             </template>
           </el-table-column>
         </el-table-column>
-        <el-table-column prop="score" label="绩效分" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="bonus" label="绩效工资" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="updateBy" label="更新人" header-align="center" align="center" min-width="50%"  width="90%" />
-        <el-table-column prop="status" label="状态" header-align="center" align="center" min-width="50%"  width="90%" >
+        <el-table-column prop="score" label="绩效分" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="bonus" label="绩效工资" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="updateBy" label="更新人" header-align="center"
+                         align="center" min-width="50%"  width="90%" />
+        <el-table-column prop="status" label="状态" header-align="center"
+                         align="center" min-width="50%"  width="90%" >
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 0" size="small">已确认</el-tag>
             <el-tag v-else-if="scope.row.status === 1" size="small">未确认</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="checkStatus" label="审核" header-align="center"
+                         align="center" min-width="50%"  width="90%" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.checkStatus === 0" size="small">待审核</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 1" size="small">通过</el-tag>
+            <el-tag v-else-if="scope.row.checkStatus === 2" size="small">未通过</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column header-align="center" align="center" :label="$t('action.operation')"  min-width="50%">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('action.disagree')" x-placement="top">
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-times" :circle="true"
+                         perms="sys:performance:disagree" type="warning" @click="disagreePerformance(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip :content="$t('action.agree')" x-placement="top">
+              <kt-button v-if="scope.row.checkStatus === 0" icon="fa fa-check" :circle="true"
+                         perms="sys:performance:agree" type="primary" @click="agreePerformance(scope.row)"/>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -197,6 +229,36 @@ export default {
         deptId: '',
       }
     },
+    //不通过
+    disagreePerformance: function (params) {
+      this.$confirm('确定不通过选中的信息吗?', '提示', {type: 'warning'}).then(() => {
+        this.loading = true;
+        this.$api.performance.disagree({'performanceId':[params.id]}).then(res=>{
+          if (res.code === 200) {
+            this.$message({message: res.msg, type: 'success'})
+            this.findPage()
+          }else {
+            this.$message({message:res.msg, type: 'error'})
+          }
+          this.loading = false
+        })
+      });
+    },
+    //通过
+    agreePerformance: function (params) {
+      this.$confirm('确定通过选中的信息吗?', '提示', {type: 'warning'}).then(() => {
+        this.loading = true;
+        this.$api.performance.confirm({'performanceId':[params.id]}).then(res=>{
+          if (res.code === 200) {
+            this.$message({message: res.msg, type: 'success'})
+            this.findPage()
+          }else {
+            this.$message({message:res.msg, type: 'error'})
+          }
+          this.loading = false
+        })
+      });
+    },
     submitDown:function (){
       this.$refs.downForm.validate((valid)=>{
         if (valid){
@@ -241,9 +303,18 @@ export default {
     },
     dateFormats:function (item){return formats(item)},
     scoreFormat: function (item){
-      if(item===1){return '加分'}
-      else if (item === 0){return '扣分'}
-      else{return '考勤'}
+      switch (item) {
+        case 0:
+          return '扣分';
+        case 1:
+          return '加分';
+        case 2:
+          return '非计件';
+        case 3:
+          return '辅导';
+        default:
+          return '标准产量';
+      }
     },
   },
   mounted() {
