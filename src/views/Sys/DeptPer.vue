@@ -1,29 +1,45 @@
 <template>
   <div class="page-container">
     <!--工具栏-->
-    <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-      <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item>
-          <el-input v-model="filters.name" placeholder="职工名" />
+    <div class="toolbar" style="float:left;padding-top:10px;">
+      <el-form :inline="true" :model="filters" :size="size" ref="filters" class="el-form--inline">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
+                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+        </el-form-item>
+        <el-form-item label="方案名" prop="scheme">
+          <el-input v-model="filters.scheme" placeholder="方案名查询"/>
+        </el-form-item>
+        <el-form-item label="职工名" prop="empName">
+          <el-input v-model="filters.empName" placeholder="职工名查询" />
+        </el-form-item>
+        <el-form-item label="月份范围" prop="months">
+          <el-date-picker v-model="filters.monthRange" type="monthrange" unlink-panels range-separator="至"
+                          start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:DeptPer:view" type="primary" @click="findPage()"/>
-        </el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:DeptPer:add" type="primary" @click="handleAdd"/>
-        </el-form-item>
-        <el-form-item>
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
-                     :before-upload="beforeUpload" :http-request="UploadFile"
-                     accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:DeptPer:upload" :label="$t('action.upload')"/>
-          </el-upload>
-        </el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-file-excel-o" label="下载" perms="sys:DeptPer:download" type="primary" @click="handleDownLoad"/>
-        </el-form-item>
-        <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:DeptPer:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip :content="$t('action.search')" x-placement="top">
+            <kt-button icon="fa fa-search" :circle="true" perms="sys:DeptPer:view" type="primary" @click="findPage()"/>
+          </el-tooltip>
+          <el-tooltip :content="$t('action.reset')" x-placement="top">
+            <kt-button icon="fa fa-repeat" :circle="true" perms="sys:DeptPer:view" type="primary" @click="resetFindPage"/>
+          </el-tooltip>
+          <el-tooltip :content="$t('action.add')" x-placement="top">
+            <kt-button icon="fa fa-plus" :circle="true" perms="sys:DeptPer:add" type="primary" @click="handleAdd"/>
+          </el-tooltip>
+          <el-tooltip :content="$t('action.upload')" x-placement="top">
+            <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                       :before-upload="beforeUpload" :http-request="UploadFile"
+                       accept=".xls,.xlsx">
+              <kt-button icon="fa fa-upload" :circle="true" type="primary" perms="sys:DeptPer:upload"/>
+            </el-upload>
+          </el-tooltip>
+          <el-tooltip content="下载" x-placement="top">
+            <kt-button perms="sys:DeptPer:download" icon="fa fa-file-excel-o" :circle="true" @click="handleDownLoad"/>
+          </el-tooltip>
+          <el-tooltip content="刷新" x-placement="top">
+            <kt-button perms="sys:DeptPer:view" icon="fa fa-refresh" :circle="true" @click="findPage(null)"/>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -220,7 +236,7 @@ export default {
     return{
       size: "small",
       loading: false,//加载标识
-      filters: {name: ""},//查询
+      filters: {deptId:'',deptName:'',scheme:'',empName:'',monthRange:''},//查询
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,//总共数量
       selections: [],//列表选中列
@@ -274,11 +290,18 @@ export default {
     }
   },
   methods:{
+    resetFindPage : function (){
+      this.$refs['filters'].resetFields()
+      this.filters= {deptId:'',deptName:'',scheme:'',empName:'',monthRange:''}
+      this.filters.deptId = deptIds
+      this.filters.monthRange = [new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0), new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0)];
+      this.findPage()
+    },
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
-      this.$api.deptPer.findPage(this.pageRequest).then((res) => {
+      this.filters.pageRequest = this.pageRequest
+      this.$api.deptPer.findPage(this.filters).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
       })
@@ -300,9 +323,9 @@ export default {
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
       this.pageRequest.pageSize = 10;
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
+      this.filters.pageRequest = this.pageRequest
       this.loading = true;
-      this.$api.deptPer.findPage(this.pageRequest).then((res) => {
+      this.$api.deptPer.findPage( this.filters).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
       })
@@ -452,6 +475,11 @@ export default {
     // 获取部门列表
     findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {this.deptData = res.data
     })},
+    // 菜单树选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
+    },
     // 获取职工列表
     findEmpTree: function (deptId){
       this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
@@ -572,6 +600,8 @@ export default {
     },
   },
   mounted() {
+    this.filters.deptId = deptIds
+    this.filters.monthRange = [new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0), new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0)];
     this.findPage()
     this.findDeptTree(deptIds)
   },

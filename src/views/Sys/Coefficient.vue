@@ -2,11 +2,21 @@
   <div class="page-container">
     <!--工具栏-->
     <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
-      <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="方案名查询"/></el-form-item>
+      <el-form :inline="true" :model="filters" :size="size" ref="filters">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
+                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+        </el-form-item>
+        <el-form-item label="方案" prop="name">
+          <el-input v-model="filters.name" placeholder="方案名查询"/>
+        </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')"
                      perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-search" :label="$t('action.reset')"
+                     perms="sys:emp:view" type="primary" @click="resetFindPage"/>
         </el-form-item>
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
@@ -99,8 +109,9 @@
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="detailed" label="明细" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
-        <el-table-column prop="unitPrice" label="单价" header-align="center" align="center" min-width="30%"/>
-        <el-table-column prop="multiple" label="倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="unitPrice" label="标准单价" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="performanceUnitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="hourTargetOutput" label="每小时指标" header-align="center" align="center" min-width="45%"/>
         <el-table-column prop="dayTargetOutput" label="8小时指标" header-align="center" align="center" min-width="45%"/>
         <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
@@ -203,7 +214,7 @@ export default {
     return{
       size: "small",
       loading: false,//加载标识
-      filters: {name: ""},
+      filters: {deptId:'',name:'',deptName:''},
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
@@ -217,10 +228,15 @@ export default {
     }
   },
   methods:{
+    resetFindPage : function (){
+      this.$refs['filters'].resetFields()
+      this.filters={deptId:'',name:'',deptName:''}
+      this.findPage()
+    },
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name: 'deptId', value: this.filters.deptId}]
       this.$api.coefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
@@ -352,6 +368,11 @@ export default {
           this.loading = false
         })
       })
+    },
+    // 菜单树选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},

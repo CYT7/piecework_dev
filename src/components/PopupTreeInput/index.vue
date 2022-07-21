@@ -12,7 +12,7 @@
         :expand-on-click-node="true">
       </el-tree>
     </el-popover>
-    <el-input v-model="prop" v-popover:popover :readonly="true" :placeholder="placeholder" style="cursor:pointer;"></el-input>
+    <el-input v-model="prop" v-popover:popover :readonly="true" :placeholder="placeholder" style="cursor:pointer;" ></el-input>
   </div>
 </template>
 <script>

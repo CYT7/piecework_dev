@@ -1,17 +1,35 @@
 <template>
   <div class="page-container">
     <!--工具栏-->
-    <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-      <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="职工名" /></el-form-item>
-        <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:performance:view" type="primary" @click="findPage()"/>
+    <div class="toolbar" style="float:left;padding-top:10px;">
+      <el-form :inline="true" :model="filters" :size="size" ref="filters" class="el-form--inline">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
+                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+        </el-form-item>
+        <el-form-item label="方案名" prop="scheme">
+          <el-input v-model="filters.scheme" placeholder="方案名查询"/>
+        </el-form-item>
+        <el-form-item label="职工名" prop="empName">
+          <el-input v-model="filters.empName" placeholder="职工名查询" />
+        </el-form-item>
+        <el-form-item label="月份范围" prop="months">
+          <el-date-picker v-model="filters.monthRange" type="monthrange" unlink-panels range-separator="至"
+                          start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-file-excel-o" label="导出" perms="sys:performance:download" type="primary" @click="handleDownLoad"/>
-        </el-form-item>
-        <el-form-item>
-          <el-tooltip content="刷新" x-placement="top"><kt-button perms="sys:performance:view" icon="fa fa-refresh" @click="findPage(null)"/></el-tooltip>
+          <el-tooltip :content="$t('action.search')" x-placement="top">
+            <kt-button icon="fa fa-search" :circle="true" perms="sys:performance:view" type="primary" @click="findPage()"/>
+          </el-tooltip>
+          <el-tooltip :content="$t('action.reset')" x-placement="top">
+            <kt-button icon="fa fa-repeat" :circle="true" perms="sys:performance:view" type="primary" @click="resetFindPage"/>
+          </el-tooltip>
+          <el-tooltip content="导出" x-placement="top">
+            <kt-button icon="fa fa-file-excel-o" :circle="true" perms="sys:performance:download" type="primary" @click="handleDownLoad"/>
+          </el-tooltip>
+          <el-tooltip content="刷新" x-placement="top">
+            <kt-button perms="sys:performance:view" :circle="true" icon="fa fa-refresh" @click="findPage(null)"/>
+          </el-tooltip>
         </el-form-item>
       </el-form>
     </div>
@@ -150,7 +168,7 @@ export default {
     return{
       size: "small",
       loading: false,//加载标识
-      filters: {name: ""},//查询
+      filters: {deptId:'',deptName:'',scheme:'',empName:'',monthRange:''},
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,//总共数量
       selections: [],//列表选中列
@@ -192,11 +210,18 @@ export default {
     }
   },
   methods:{
+    resetFindPage : function (){
+      this.$refs['filters'].resetFields()
+      this.filters= {deptId:'',deptName:'',scheme:'',empName:'',monthRange:''}
+      this.filters.monthRange = [new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0), new Date(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0, 0)];
+      this.findPage()
+    },
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
-      this.$api.performance.findPage(this.pageRequest).then((res) => {
+      console.log(this.pageRequest.params)
+      this.filters.pageRequest = this.pageRequest
+      this.$api.performance.findPage(this.filters).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
       })
@@ -213,9 +238,9 @@ export default {
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
       this.pageRequest.pageSize = 10;
-      this.pageRequest.params = [{name:'name', value:this.filters.name}]
+      this.filters.pageRequest = this.pageRequest
       this.loading = true;
-      this.$api.performance.findPage(this.pageRequest).then((res) => {
+      this.$api.performance.findPage( this.filters).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
       })
@@ -296,6 +321,11 @@ export default {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
     },
+    // 菜单树选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
+    },
     // 时间格式化
     dateFormat: function (row, column){return formats(row[column.property])},
     empFormant: function (row,column){
@@ -318,6 +348,7 @@ export default {
     },
   },
   mounted() {
+    this.filters.monthRange =[ new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0),new Date(new Date().getFullYear(), new Date().getMonth(),1,0,0,0)]
     this.findPage()
     this.findDeptTree()
   },

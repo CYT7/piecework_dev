@@ -1,9 +1,15 @@
 <template>
   <div class="page-container">
     <!--工具栏-->
-    <div class="toolbar" style="float: left;padding-left: 15px;padding-top: 10px">
-      <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="方案名查询"/></el-form-item>
+    <div class="toolbar" style="float: left;padding-top: 10px">
+      <el-form :inline="true" :model="filters" :size="size" ref="filters">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
+                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+        </el-form-item>
+        <el-form-item label="方案" prop="name">
+          <el-input v-model="filters.name" placeholder="方案名查询"/>
+        </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')"
                      perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/>
@@ -73,8 +79,9 @@
         <el-table-column sortable prop="title" label="方案名" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="detailed" label="明细" header-align="center" align="center" min-width="40%"/>
         <el-table-column sortable prop="version" label="版本" header-align="center" align="center" min-width="35%"/>
-        <el-table-column prop="unitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="unitPrice" label="标准单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="multiple" label="单价倍数" header-align="center" align="center" min-width="30%"/>
+        <el-table-column prop="performanceUnitPrice" label="绩效单价" header-align="center" align="center" min-width="30%"/>
         <el-table-column prop="hourTargetOutput" label="每小时指标产量分数" header-align="center" align="center" min-width="55%"/>
         <el-table-column prop="dayTargetOutput" label="8小时指标产量分数" header-align="center" align="center" min-width="55%"/>
         <el-table-column prop="tutoringMonth" label="辅导月份" header-align="center" align="center" min-width="50%"/>
@@ -167,11 +174,11 @@
         <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="dayTargetOutput">
           <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="入职日期" prop="entryDate">
+        <el-form-item v-if="dataForm.types === 0" label="生效日期" prop="entryDate">
           <div class="block">
             <el-date-picker
               v-model="dataForm.effectiveDate" type="date"
-              placeholder="请选择入职日期" :picker-options="pickerOptions">
+              placeholder="请选择生效日期" :picker-options="pickerOptions">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -218,7 +225,7 @@ import PopupTreeInput from "../../components/PopupTreeInput";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
-import {formats} from "../../utils/datetime";
+import {Dateformat} from "../../utils/datetime";
 const deptIds = sessionStorage.getItem("deptId");
 export default {
   name: "Coefficient",
@@ -227,7 +234,7 @@ export default {
     return{
       size: "small",
       loading: false,//加载标识
-      filters: {name: ""},
+      filters: {deptId:'',name:'',deptName:''},
       pageRequest: {pageNum: 1, pageSize: 10},//分页信息
       totalSize:0,
       pageResult: [],
@@ -276,10 +283,15 @@ export default {
     }
   },
   methods:{
+    resetFindPage : function (){
+      this.$refs['filters'].resetFields()
+      this.filters={deptId:'',name:'',deptName:''}
+      this.findPage()
+    },
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:this.filters}]
       this.$api.deptCoefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
@@ -425,6 +437,11 @@ export default {
     findDeptTree: function (deptId) {this.$api.dept.findDeptTree({'deptId':deptId}).then((res) => {
       this.deptData = res.data
     })},
+    // 菜单树选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
+    },
     ChangeHandle: function(data){
       let type = data
       if (data===0){
@@ -483,7 +500,7 @@ export default {
       else{return '扣分系数'}
     },
     dateFormat: function (row, column) {
-      return formats(row[column.property])
+      return Dateformat(row[column.property])
     },
     //上传鉴定
     beforeUpload(file){
@@ -544,6 +561,7 @@ export default {
     },
   },
   mounted() {
+    this.filters.deptId = deptIds
     this.findPage()
     this.findDeptTree(deptIds)
   },

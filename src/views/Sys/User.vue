@@ -32,7 +32,8 @@
 	</kt-table>
 	<!--新增编辑界面-->
 	<el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size" label-position="right">
+		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules"
+             ref="dataForm" :size="size" label-position="right">
 			<el-form-item label="ID" prop="id" v-if="false">
         <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
       </el-form-item>
@@ -85,6 +86,13 @@ const checkPhone = (rule,value,callback) =>{
   if (!value){callback();}
   else{if (isPhone(value)){callback();}else{return callback(new Error('手机格式不正确'))}}
 }
+const validatePass = (rule,value,callback) =>{
+  if (value.length===0||!value){
+    callback(new Error("请选择部门"))
+  }else{
+    callback();
+  }
+}
 export default {
 	components:{PopupTreeInput, KtTable, KtButton,},
 	data() {
@@ -110,7 +118,9 @@ export default {
         chineseName:[{required: true, message: '请输入名字', trigger: 'blur'}],
         password:[{required: true, message: '请输入密码', trigger: 'blur'}],
         email:[{required: true, validator:checkEmail,trigger: 'blur'}],
-        phone:[{validator:checkPhone,trigger:'blur'}]
+        phone:[{validator:checkPhone,trigger:'blur'}],
+        deptName:[{ required: true, validator: validatePass, trigger: "change" }],
+        userRoles:[{required: true, message: "分配角色不能为空", trigger: ["blur",'change'],type: 'array'}],
       },
 			dataForm: {},// 新增编辑界面数据
 			deptData: [],//部门数据

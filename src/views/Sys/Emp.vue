@@ -2,11 +2,21 @@
   <div class="page-container">
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-      <el-form :inline="true" :model="filters" :size="size">
-        <el-form-item><el-input v-model="filters.name" placeholder="职工名"/></el-form-item>
+      <el-form :inline="true" :model="filters" :size="size" ref="filters">
+        <el-form-item label="部门" prop="deptName">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
+                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+        </el-form-item>
+        <el-form-item label="职工名" prop="name">
+          <el-input v-model="filters.name" placeholder="职工名"/>
+        </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')"
                      perms="sys:emp:view" type="primary" @click="findPage(null)"/>
+        </el-form-item>
+        <el-form-item>
+          <kt-button icon="fa fa-search" :label="$t('action.reset')"
+                     perms="sys:emp:view" type="primary" @click="resetFindPage"/>
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
@@ -114,7 +124,7 @@ export default {
   data() {
     return {
       size: 'small',
-      filters: {name: ''},
+      filters: {deptId:'',name:'',deptName:''},
       columns: [
         {prop: "empNo", label: "职工号", minWidth: '30%', formatter: this.empFormat},
         {prop: "name", label: "职工名", minWidth: '30%'},
@@ -170,12 +180,15 @@ export default {
     }
   },
   methods: {
+    resetFindPage : function (){
+      this.$refs['filters'].resetFields();
+      this.filters={deptId: '',name:'',deptName:''}
+      this.findPage(null);
+    },
     // 获取分页数据
     findPage: function (data) {
-      if (data !== null) {
-        this.pageRequest = data.pageRequest
-      }
-      this.pageRequest.params = [{name: 'name', value: this.filters.name}]
+      if (data !== null) {this.pageRequest = data.pageRequest}
+      this.pageRequest.params = [{name: 'name', value: this.filters.name},{name: 'deptId', value: this.filters.deptId}]
       this.$api.emp.findPage(this.pageRequest).then((res) => {
         this.pageResult = res
       }).then(data != null ? data.callback : '')
@@ -251,6 +264,11 @@ export default {
       this.dataForm.deptId = data.id
       this.dataForm.deptName = data.name
       this.findEmpTree(data.id)
+    },
+    // 菜单树选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
     },
     // 获取职工列表
     findEmpTree: function (deptId) {
