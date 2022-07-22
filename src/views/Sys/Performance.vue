@@ -122,21 +122,21 @@
       </div>
     </div>
     <el-dialog title="导出绩效" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right"
+               style="text-align:left;" :rules="downFormRules">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="downForm.type">
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId" :currentChangeHandle="deptTreeCurrentChange"/>
         </el-form-item>
         <el-form-item label="月份" prop="month">
           <div class="block">
-            <el-date-picker
-              v-model="downForm.month"
-              type="monthrange"
-              unlink-panels
-              range-separator="至"
-              start-placeholder="开始月份"
-              end-placeholder="结束月份"
-              :picker-options="pickerOptions">
+            <el-date-picker v-model="downForm.month" type="monthrange" unlink-panels
+              range-separator="至" start-placeholder="开始月份" end-placeholder="结束月份" :picker-options="pickerOptions">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -159,6 +159,14 @@ import {formats} from "../../utils/datetime";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
+const InspectionType = (rule, value, callback)=>{
+  console.log(value)
+  if (value===null||value===''){
+    callback(new Error("请选择导出类型"))
+  }else{
+    callback();
+  }
+}
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -181,6 +189,10 @@ export default {
       deptTreeProps: {
         label: 'name',
         children: 'children'
+      },
+      TypeList:['导出绩效','导出详细绩效'],
+      downFormRules:{
+        type:[ { required: true, message: '请选择导出类型', trigger: 'change' }]
       },
       pickerOptions: {
         shortcuts: [{
@@ -248,6 +260,7 @@ export default {
     handleDownLoad: function (){
       this.downloadVisible = true
       this.downForm = {
+        type:'',
         month:[],
         name:'',
         deptId: '',
