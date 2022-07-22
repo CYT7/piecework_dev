@@ -125,8 +125,7 @@
       <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
-                            :nodeKey="''+downForm.deptId"
-                            :currentChangeHandle="deptTreeCurrentChange"/>
+                            :nodeKey="''+downForm.deptId" :currentChangeHandle="deptTreeCurrentChange"/>
         </el-form-item>
         <el-form-item label="月份" prop="month">
           <div class="block">

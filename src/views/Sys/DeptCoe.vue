@@ -15,6 +15,10 @@
                      perms="sys:deptCoe:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
+          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
+                     perms="sys:deptCoe:view" type="primary" @click="resetFindPage"/>
+        </el-form-item>
+        <el-form-item>
           <kt-button icon="fa fa-plus" :label="$t('action.add')"
                      perms="sys:deptCoe:add" type="primary" @click="handleAdd"/>
         </el-form-item>
@@ -204,11 +208,18 @@
       </div>
     </el-dialog>
     <el-dialog title="导出系数" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
+               label-position="right" style="text-align:left;">
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
                             :currentChangeHandle="deptTreeCurrentChange"/>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="schemeId">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
+                       :value="item.id" @click.native="SchemeCurrentChange(item)"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -286,12 +297,13 @@ export default {
     resetFindPage : function (){
       this.$refs['filters'].resetFields()
       this.filters={deptId:'',name:'',deptName:''}
+      this.filters.deptId = deptIds
       this.findPage()
     },
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:this.filters}]
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:this.filters.deptId}]
       this.$api.deptCoefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
         this.totalSize = res.totalSize
@@ -309,7 +321,7 @@ export default {
     refreshPageRequest: function (pageNum) {
       this.pageRequest.pageNum = pageNum;
       this.pageRequest.pageSize = 10;
-      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:deptIds}]
+      this.pageRequest.params = [{name:'name', value:this.filters.name},{name:'deptId', value:this.filters.deptId}]
       this.loading = true;
       this.$api.deptCoefficient.findPage(this.pageRequest).then((res) => {
         this.pageResult = res.data
@@ -487,6 +499,9 @@ export default {
     CoeSchemeCurrentChange:function (data){
       this.dataForm.coefficientSid = data.id
     },
+    SchemeCurrentChange: function (data){
+      this.downForm.schemeId = data.id
+    },
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
         this.coeSchemeData = res
@@ -527,11 +542,14 @@ export default {
       this.downloadVisible = true
       this.downForm = {
         deptId: '',
+        schemeId:'',
       }
     },
     submitDown:function (){
       this.$refs.downForm.validate((valid)=>{
         if (valid){
+          this.downForm.deptId = this.downForm.deptId === '' ? deptIds : this.downForm.deptId
+          console.log(this.downForm)
           let params = Object.assign({},this.downForm)
           this.exportExcelFile(params);
           this.downloadVisible = false;

@@ -15,7 +15,7 @@
                      perms="sys:coefficient:view" type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.reset')"
+          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
                      perms="sys:emp:view" type="primary" @click="resetFindPage"/>
         </el-form-item>
         <el-form-item>
@@ -190,6 +190,12 @@
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
                             :currentChangeHandle="deptTreeCurrentChange"/>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="schemeId">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
+                       :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -376,33 +382,6 @@ export default {
     },
     // 获取部门列表
     findDeptTree: function () {this.$api.dept.findTree().then((res) => {this.deptData = res.data})},
-    ChangeHandle: function(data){
-      let type = data
-      if (data===0){
-        this.dataForm = {
-          types:type,
-          id: 0,
-          deptId:'',
-          title:'',
-          version:'',
-          unitPrice:'',
-          multiple:'',
-          hourTargetOutput:'',
-          dayTargetOutput:'',
-        }
-      }else{
-        this.dataForm = {
-          types:type,
-          id: 0,
-          deptId:'',
-          coefficientSid:'',
-          type:'',
-          title:'',
-          value:'',
-          remark:'',
-        }
-      }
-    },
     // 菜单树选中
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
@@ -412,9 +391,11 @@ export default {
     deptTreeCurrentChange (data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
+      this.findCoefficientTree(data.id)
     },
     CoeSchemeCurrentChange:function (data){
-      this.dataForm.coefficientSid = data.id
+      this.downForm.schemeId = data.id
+      this.downForm.schemeName = data.title
     },
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
@@ -451,7 +432,8 @@ export default {
     handleDownLoad: function (){
       this.downloadVisible = true
       this.downForm = {
-        deptId: '',
+        deptId: 0,
+        schemeId:''
       }
     },
     submitDown:function (){
