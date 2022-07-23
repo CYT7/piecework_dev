@@ -7,15 +7,12 @@
         <el-form-item>
           <kt-button icon="fa fa-search" :label="$t('action.search')"
                      perms="sys:DeptEmp:view" type="primary" @click="findPage(null)"/>
-        </el-form-item>
-        <el-form-item>
+          <kt-button perms="sys:DeptEmp:download" icon="fa fa-file-excel-o" label="导出" @click="handleDownLoad"/>
           <el-tooltip content="刷新" x-placement="top">
             <kt-button perms="sys:DeptEmp:view" icon="fa fa-refresh" @click="findPage(null)"/>
           </el-tooltip>
-          <el-tooltip content="导出" placement="top">
-            <kt-button perms="sys:DeptEmp:download" icon="fa fa-file-excel-o" @click="exportExcelFile"/>
-          </el-tooltip>
         </el-form-item>
+
       </el-form>
     </div>
     <!--表格内容栏-->
@@ -68,6 +65,26 @@
         <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
       </div>
     </el-dialog>
+    <!--下载-->
+    <el-dialog title="导出" width="20%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
+               label-position="right" style="text-align:left;">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="downForm.type">
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="部门" prop="deptName" v-if="this.downForm.type===0">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
+                            :nodeKey="''+downForm.deptId"
+                            :currentChangeHandle="deptTreeCurrentChange"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -115,6 +132,8 @@ export default {
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false,
+      downloadVisible:false,// 下载页面是否显示
+      TypeList:['导出职工','上传模板'],
       dataFormRules: {
         empNo: [{required: true, message: '请输入职工号', trigger: 'blur'}],
         name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
@@ -123,7 +142,7 @@ export default {
       },
       // 新增编辑界面数据
       dataForm: {},
-      downloadForm:{},
+      downForm: [],
       deptData: [],
       deptTreeProps: {label: 'name', children: 'children'},
       empData:[],
@@ -284,10 +303,30 @@ export default {
         }
       })
     },
-    exportExcelFile: function () {
-      this.downloadForm.deptId = deptIds;
-      this.downloadForm.name = this.filters.name;
-      axios.post(baseUrl + '/DeptEmp/download', this.downloadForm, {
+    handleDownLoad: function (){
+      this.downloadVisible = true
+      this.downForm = {
+        type: '',
+        deptId:''
+      }
+    },
+    deptTreeCurrentChange (data) {
+      this.downForm.deptId = data.id
+      this.downForm.deptName = data.name
+    },
+    submitDown:function (){
+      this.$refs.downForm.validate((valid)=>{
+        if (valid){
+          let params = Object.assign({},this.downForm)
+          params.deptId = params.deptId === '' ? deptIds : params.deptId;
+          this.exportExcelFile(params);
+          this.downloadVisible = false;
+          this.$refs['downForm'].resetFields()
+        }
+      })
+    },
+    exportExcelFile: function (params) {
+      axios.post(baseUrl + '/DeptEmp/download', params, {
         headers: {
           'token': Cookies.get('token'),
           'Content-Type': 'application/json;charset=UTF-8'

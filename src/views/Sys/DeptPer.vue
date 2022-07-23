@@ -111,15 +111,15 @@
       <el-form :model="downForm" ref="downForm" :size="size" label-width="100px" label-position="right" style="text-align:left;">
         <el-form-item label="下载" prop="type">
           <el-radio-group v-model="downForm.type">
-            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index" @change.native="ChangeHandle(index)">{{type}}</el-radio>
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="部门" prop="deptName">
+        <el-form-item label="部门" prop="deptId">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
                             :currentChangeHandle="deptTreeCurrentChange"/>
         </el-form-item>
-        <el-form-item label="月份" prop="month" v-if="downForm.type===0">
+        <el-form-item label="月份" prop="month" v-if="downForm.type===0||downForm.type===1">
           <div class="block">
             <el-date-picker
               v-model="downForm.month"
@@ -132,17 +132,18 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="月" prop="month" v-if="downForm.type===1">
+        <el-form-item label="月" prop="templateMonth" v-if="downForm.type===2">
           <div class="block" style="width: 100%">
             <el-date-picker
-              v-model="downForm.months"
+              v-model="downForm.templateMonth"
               type="month"
-              placeholder="选择月">
+              placeholder="选择月"
+              @change="findDownScheme(downForm)" >
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="系数方案" prop="coefficientSid" v-if="downForm.type===1">
-          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.coefficientSid">
+        <el-form-item label="系数方案" prop="schemeId" v-if="downForm.type===1||downForm.type===2">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
             <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeChange(item)"></el-option>
           </el-select>
         </el-form-item>
@@ -247,7 +248,7 @@ export default {
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       downloadVisible:false,// 下载页面是否显示
-      TypeList:['导出绩效','导出填写模板'],
+      TypeList:['导出绩效','导出详细绩效','导出填写模板'],
       editLoading: false,
       // 新增编辑界面数据
       dataForm: [],
@@ -352,26 +353,14 @@ export default {
     },
     handleDownLoad: function (){
       this.downloadVisible = true
-      this.ChangeHandle(0)
-    },
-    ChangeHandle: function(data){
-      let type = data
-      if (data===0){
-        this.downForm = {
-          month:[],
-          deptId: '',
-          deptName:'',
-          type:type
-        }
-      }else{
-        this.downForm = {
-          months:'',
-          deptId: '',
-          deptName:'',
-          type:type,
-          coefficientSid:'',
-          schemeName:"",
-        }
+      this.downForm = {
+        type:'',
+        month:[],
+        templateMonth: '',
+        name:'',
+        deptId: '',
+        schemeId: '',
+        empName: '',
       }
     },
     //显示编辑界面
@@ -485,11 +474,15 @@ export default {
       this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
     },
     //获取方案树
-    findCoefficientTree:function (item){
-      console.log(item)
-      this.$api.coefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
+    findDownScheme:function (item){
+      this.$api.deptCoefficient.findCoefficientTree({deptId:item.deptId,month:item.templateMonth}).then((res)=>{
         this.coeSchemeData = res
-        console.log(res)
+      });
+    },
+    //获取方案树
+    findCoefficientTree:function (item){
+      this.$api.deptCoefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
+        this.coeSchemeData = res
       });
       this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
         this.empPerData = res.data
@@ -520,7 +513,6 @@ export default {
     deptTreeCurrentChangeHandle (data) {
       this.dataForm.deptId = data.id
       this.dataForm.deptName = data.name
-      this.findEmpTree(data.id)
     },
     empCurrentChangeHandle: function (data){
       this.dataForm.empNo = data.empNo
@@ -531,8 +523,9 @@ export default {
       this.findCoeList(data.id)
     },
     CoeSchemeChange:function (data){
-      this.downForm.coefficientSid = data.id
+      this.downForm.schemeId = data.id
       this.downForm.schemeName = data.title
+
     },
     //上传鉴定
     beforeUpload(file){

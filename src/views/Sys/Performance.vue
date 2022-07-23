@@ -140,8 +140,13 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="职工" prop="name">
-          <el-input v-model="downForm.name" placeholder="查询某职工"/>
+        <el-form-item label="系数方案" prop="schemeId" v-if="downForm.type===1">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title" :value="item.id" @click.native="CoeSchemeChange(item)"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="职工" prop="empName">
+          <el-input v-model="downForm.empName" placeholder="查询某职工"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -159,14 +164,6 @@ import {formats} from "../../utils/datetime";
 import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
-const InspectionType = (rule, value, callback)=>{
-  console.log(value)
-  if (value===null||value===''){
-    callback(new Error("请选择导出类型"))
-  }else{
-    callback();
-  }
-}
 export default {
   name: "Performance",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -186,6 +183,7 @@ export default {
       downloadVisible:false,// 下载页面是否显示
       downForm:[],
       deptData: [],
+      coeSchemeData: [],
       deptTreeProps: {
         label: 'name',
         children: 'children'
@@ -230,7 +228,6 @@ export default {
     //获取分页数据
     findPage: function () {
       this.loading = true;
-      console.log(this.pageRequest.params)
       this.filters.pageRequest = this.pageRequest
       this.$api.performance.findPage(this.filters).then((res) => {
         this.pageResult = res.data
@@ -264,6 +261,8 @@ export default {
         month:[],
         name:'',
         deptId: '',
+        schemeId: '',
+        empName: '',
       }
     },
     //不通过
@@ -300,11 +299,32 @@ export default {
       this.$refs.downForm.validate((valid)=>{
         if (valid){
           let params = Object.assign({},this.downForm)
-          this.exportExcelFile(params);
-          this.downloadVisible = false;
-          this.$refs['downForm'].resetFields()
+          console.log(params)
+          if (params.type === 1){
+            if (params.deptId === ''){
+              this.$message({message: '请选择部门', type: 'warning'});
+            }else{
+              this.exportExcelFile(params);
+              this.downloadVisible = false;
+              this.$refs['downForm'].resetFields()
+            }
+          }else {
+            this.exportExcelFile(params);
+            this.downloadVisible = false;
+            this.$refs['downForm'].resetFields()
+          }
         }
       })
+    },
+    //获取方案树
+    findCoefficientTree:function (deptId){
+      this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
+        this.coeSchemeData = res
+      });
+    },
+    CoeSchemeChange:function (data){
+      this.downForm.schemeId = data.id
+      this.downForm.schemeName = data.title
     },
     //下载文件
     exportExcelFile: function (params) {
@@ -332,6 +352,7 @@ export default {
     deptTreeCurrentChange (data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
+      this.findCoefficientTree(data.id)
     },
     // 菜单树选中
     deptTreeFilters(data) {
