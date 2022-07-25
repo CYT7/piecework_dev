@@ -16,7 +16,7 @@
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
-                     perms="sys:emp:view" type="primary" @click="resetFindPage"/>
+                     perms="sys:coefficient:view" type="primary" @click="resetFindPage"/>
         </el-form-item>
         <el-form-item>
           <el-upload action="#" class="el-upload" :limit="1" ref="upload"
@@ -183,9 +183,19 @@
       </div>
     </div>
     <!--下载-->
-    <el-dialog title="导出系数" width="20%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+    <el-dialog title="导出系数" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
                label-position="right" style="text-align:left;">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="downForm.type">
+            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="模板选择" prop="type" v-if="downForm.type===1">
+          <el-radio-group v-model="downForm.templateSelection">
+            <el-radio v-for="(type, index) in templateList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
@@ -231,6 +241,8 @@ export default {
       deptData: [],
       coeSchemeData:[],
       deptTreeProps: {label: 'name', children: 'children'},
+      TypeList:['导出','上传模板'],
+      templateList: ['方案&系数', '方案', '系数'],
     }
   },
   methods:{
@@ -420,6 +432,8 @@ export default {
     UploadFile(param){
       const formData = new FormData()
       formData.append('file', param.file) // 要提交给后台的文件
+      formData.append('type', '1')
+      formData.append('schemeId', '0')
       this.$api.coefficient.upload(formData).then(res=>{
         if(res.code === 200) {
           this.$message({ message: '操作成功', type: 'success' })
@@ -433,7 +447,10 @@ export default {
       this.downloadVisible = true
       this.downForm = {
         deptId: 0,
-        schemeId:''
+        deptName:'',
+        schemeId:'',
+        schemeName: '',
+        templateSelection:''
       }
     },
     submitDown:function (){
