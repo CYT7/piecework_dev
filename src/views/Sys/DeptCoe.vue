@@ -23,11 +23,12 @@
                      perms="sys:deptCoe:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
-                     :before-upload="beforeUpload" :http-request="UploadFile"
-                     accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:deptCoe:upload" :label="$t('action.upload')"/>
-          </el-upload>
+          <kt-button icon="fa fa-upload" type="primary" perms="sys:deptCoe:upload" :label="$t('action.upload')" @click="handleUpload"/>
+<!--          <el-upload action="#" class="el-upload" :limit="1" ref="upload"-->
+<!--                     :before-upload="beforeUpload" :http-request="UploadFile"-->
+<!--                     accept=".xls,.xlsx">-->
+<!--            <kt-button icon="fa fa-upload" type="primary" perms="sys:deptCoe:upload" :label="$t('action.upload')"/>-->
+<!--          </el-upload>-->
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-file-excel-o" label="导出"
@@ -207,9 +208,19 @@
         <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="导出系数" width="30%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+    <el-dialog title="导出" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
-               label-position="right" style="text-align:left;">
+               label-position="right" style="text-align:left;" :rules="downFormRules">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="downForm.type">
+            <el-radio v-for="(type, index) in downList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="模板选择" prop="type" v-if="downForm.type===1">
+          <el-radio-group v-model="downForm.templateSelection">
+            <el-radio v-for="(type, index) in templateList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
@@ -218,13 +229,43 @@
         <el-form-item label="系数方案" prop="schemeId">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
             <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
-                       :value="item.id" @click.native="SchemeCurrentChange(item)"></el-option>
+                       :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
         <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
+    <!--上传-->
+    <el-dialog title="上传" width="25%" :visible.sync="uploadVisible" :close-on-click-modal="false">
+      <el-form :model="uploadForm" ref="uploadForm" :size="size" label-width="80px"
+               label-position="right" style="text-align:left;" :rules="uploadFormRules">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="uploadForm.type">
+            <el-radio v-for="(type, index) in templateList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="部门" prop="deptName" v-if="uploadForm.type===2">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="uploadForm.deptName"
+                            :nodeKey="''+uploadForm.deptId"
+                            :currentChangeHandle="deptTreeUploadCurrentChange"/>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="schemeId" v-if="uploadForm.type===2">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="uploadForm.schemeId">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
+                       :value="item.id" @click.native="CoeSchemeUploadCurrentChange(item)"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="uploadVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                   :before-upload="beforeUpload" :http-request="UploadFile"
+                   :show-file-list="false" accept=".xls,.xlsx">
+          <el-button :size="size" type="primary">{{$t('action.upload')}}</el-button>
+        </el-upload>
       </div>
     </el-dialog>
   </div>
@@ -238,6 +279,13 @@ import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
 import {Dateformat} from "../../utils/datetime";
 const deptIds = sessionStorage.getItem("deptId");
+const validatePass = (rule,value,callback) =>{
+  if (value.length===0||!value){
+    callback(new Error("请选择部门"))
+  }else{
+    callback();
+  }
+}
 export default {
   name: "Coefficient",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -260,12 +308,23 @@ export default {
       },
       // 新增编辑界面数据
       TypeList:["方案", "系数"],
+      pointsList: ["减分系数", "加分系数", "考勤系数"],
       downloadVisible:false,// 下载页面是否显示
+      uploadVisible:false,// 下载页面是否显示
+      uploadForm:[],
       downForm:[],
       dataForm: {},
-      pointsList: ["减分系数", "加分系数", "考勤系数"],
+      downList:['导出','上传模板'],
+      templateList: ['方案&系数', '方案', '系数'],
       deptData: [],
       coeSchemeData:[],
+      uploadFormRules:{
+        type:[ { required: true, message: '请上传导出类型', trigger: 'change' }]
+      },
+      downFormRules:{
+        type: [{required: true, message: '请选择导出类型', trigger: 'change'}],
+        deptName:[{ required: true, validator: validatePass, trigger: "change" }],
+      },
       deptTreeProps: {
         label: 'name',
         children: 'children'
@@ -502,6 +561,15 @@ export default {
     SchemeCurrentChange: function (data){
       this.downForm.schemeId = data.id
     },
+    deptTreeUploadCurrentChange (data) {
+      this.uploadForm.deptId = data.id
+      this.uploadForm.deptName = data.name
+      this.findCoefficientTree(data.id)
+    },
+    CoeSchemeUploadCurrentChange:function (data){
+      this.uploadForm.schemeId = data.id
+      this.uploadForm.schemeName = data.title
+    },
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
         this.coeSchemeData = res
@@ -527,29 +595,52 @@ export default {
       return extension && isLt2M
     },
     UploadFile(param){
-      const formData = new FormData()
-      formData.append('file', param.file) // 要提交给后台的文件
-      this.$api.coefficient.upload(formData).then(res=>{
-        if(res.code === 200) {
-          this.$message({ message: '操作成功', type: 'success' })
-          this.$refs['upload'].clearFiles();
-        } else {
-          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-        }
-      })
+      if (this.uploadForm.type===null||this.uploadForm.type===''){
+        this.$message({message: '请选择上传类型', type: 'error'});
+        this.$refs['upload'].clearFiles();
+      }else if(this.uploadForm.type===2&&this.uploadForm.schemeId ===''){
+        this.$message({message: '请选择方案然后再上传', type: 'error'});
+        this.$refs['upload'].clearFiles();
+      }else{
+        const formData = new FormData()
+        formData.append('file', param.file) // 要提交给后台的文件
+        formData.append('type', this.uploadForm.type)
+        formData.append('schemeId', this.uploadForm.schemeId === ''||this.uploadForm.schemeId === null ? 0 : this.uploadForm.schemeId);
+        this.$api.coefficient.upload(formData).then(res=>{
+          if(res.code === 200) {
+            this.$message({ message: '操作成功', type: 'success' })
+            this.$refs['upload'].clearFiles();
+            this.$refs['uploadForm'].resetFields()
+            this.uploadVisible = false
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$refs['upload'].clearFiles();
+          }
+        })
+      }
     },
     handleDownLoad: function (){
       this.downloadVisible = true
       this.downForm = {
+        type:'',
+        templateSelection:'',
         deptId: '',
+        deptName:'',
         schemeId:'',
+        schemeName: '',
+      }
+    },
+    handleUpload: function (){
+      this.uploadVisible = true;
+      this.uploadForm = {
+        type:"",
+        schemeId:""
       }
     },
     submitDown:function (){
       this.$refs.downForm.validate((valid)=>{
         if (valid){
           this.downForm.deptId = this.downForm.deptId === '' ? deptIds : this.downForm.deptId
-          console.log(this.downForm)
           let params = Object.assign({},this.downForm)
           this.exportExcelFile(params);
           this.downloadVisible = false;

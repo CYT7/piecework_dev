@@ -19,11 +19,7 @@
                      perms="sys:coefficient:view" type="primary" @click="resetFindPage"/>
         </el-form-item>
         <el-form-item>
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
-                     :before-upload="beforeUpload" :http-request="UploadFile"
-                     :show-file-list="false" accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:coefficient:upload" :label="$t('action.upload')"/>
-          </el-upload>
+          <kt-button icon="fa fa-upload" type="primary" perms="sys:coefficient:upload" :label="$t('action.upload')" @click="handleUpload"/>
         </el-form-item>
         <el-form-item>
           <kt-button icon="fa fa-file-excel-o" label="导出"
@@ -183,7 +179,7 @@
       </div>
     </div>
     <!--下载-->
-    <el-dialog title="导出系数" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+    <el-dialog title="导出" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
                label-position="right" style="text-align:left;">
         <el-form-item label="选项" prop="type">
@@ -213,6 +209,36 @@
         <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
       </div>
     </el-dialog>
+    <!--上传-->
+    <el-dialog title="上传" width="25%" :visible.sync="uploadVisible" :close-on-click-modal="false">
+      <el-form :model="uploadForm" ref="uploadForm" :size="size" label-width="80px"
+               label-position="right" style="text-align:left;" :rules="uploadFormRules">
+        <el-form-item label="选项" prop="type">
+          <el-radio-group v-model="uploadForm.type">
+            <el-radio v-for="(type, index) in templateList" :label="index" :key="index">{{type}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="部门" prop="deptName" v-if="uploadForm.type===2">
+          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="uploadForm.deptName"
+                            :nodeKey="''+uploadForm.deptId"
+                            :currentChangeHandle="deptTreeUploadCurrentChange"/>
+        </el-form-item>
+        <el-form-item label="系数方案" prop="schemeId" v-if="uploadForm.type===2">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="uploadForm.schemeId">
+            <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
+                       :value="item.id" @click.native="CoeSchemeUploadCurrentChange(item)"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="uploadVisible = false">{{$t('action.cancel')}}</el-button>
+        <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                   :before-upload="beforeUpload" :http-request="UploadFile"
+                   :show-file-list="false" accept=".xls,.xlsx">
+          <el-button :size="size" type="primary">{{$t('action.upload')}}</el-button>
+        </el-upload>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -223,6 +249,7 @@ import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
 import {format, formats} from "../../utils/datetime";
+
 export default {
   name: "Coefficient",
   components: {PopupTreeInput, KtButton, KtTable},
@@ -237,7 +264,13 @@ export default {
       schemeHistory:'',
       coefficientHistory:'',
       downloadVisible:false,// 下载页面是否显示
+      uploadVisible:false,// 下载页面是否显示
+      uploadForm:[],
       downForm:[],
+      uploadFormRules:{
+        type:[ { required: true, message: '请选择上传类型', trigger: 'change' }]
+      },
+
       deptData: [],
       coeSchemeData:[],
       deptTreeProps: {label: 'name', children: 'children'},
@@ -409,6 +442,15 @@ export default {
       this.downForm.schemeId = data.id
       this.downForm.schemeName = data.title
     },
+    deptTreeUploadCurrentChange (data) {
+      this.uploadForm.deptId = data.id
+      this.uploadForm.deptName = data.name
+      this.findCoefficientTree(data.id)
+    },
+    CoeSchemeUploadCurrentChange:function (data){
+      this.uploadForm.schemeId = data.id
+      this.uploadForm.schemeName = data.title
+    },
     findCoefficientTree:function (deptId){
       this.$api.coefficient.findCoefficientTree({deptId:deptId}).then((res)=>{
         this.coeSchemeData = res
@@ -430,27 +472,46 @@ export default {
       return extension && isLt2M
     },
     UploadFile(param){
-      const formData = new FormData()
-      formData.append('file', param.file) // 要提交给后台的文件
-      formData.append('type', '1')
-      formData.append('schemeId', '0')
-      this.$api.coefficient.upload(formData).then(res=>{
-        if(res.code === 200) {
-          this.$message({ message: '操作成功', type: 'success' })
-          this.$refs['upload'].clearFiles();
-        } else {
-          this.$message({message: '操作失败, ' + res.msg, type: 'error'})
-        }
-      })
+      if (this.uploadForm.type===null||this.uploadForm.type===''){
+        this.$message({message: '请选择上传类型', type: 'error'});
+        this.$refs['upload'].clearFiles();
+      }else if(this.uploadForm.type===2&&this.uploadForm.schemeId ===''){
+        this.$message({message: '请选择方案然后再上传', type: 'error'});
+        this.$refs['upload'].clearFiles();
+      }else{
+        const formData = new FormData()
+        formData.append('file', param.file) // 要提交给后台的文件
+        formData.append('type', this.uploadForm.type)
+        formData.append('schemeId', this.uploadForm.schemeId === ''||this.uploadForm.schemeId === null ? 0 : this.uploadForm.schemeId);
+        this.$api.coefficient.upload(formData).then(res=>{
+          if(res.code === 200) {
+            this.$message({ message: '操作成功', type: 'success' })
+            this.$refs['upload'].clearFiles();
+            this.$refs['uploadForm'].resetFields()
+            this.uploadVisible = false
+          } else {
+            this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+            this.$refs['upload'].clearFiles();
+          }
+        })
+      }
+    },
+    handleUpload: function (){
+      this.uploadVisible = true;
+      this.uploadForm = {
+        type:"",
+        schemeId:""
+      }
     },
     handleDownLoad: function (){
       this.downloadVisible = true
       this.downForm = {
-        deptId: 0,
+        type:'',
+        templateSelection:'',
+        deptId: '',
         deptName:'',
         schemeId:'',
         schemeName: '',
-        templateSelection:''
       }
     },
     submitDown:function (){
