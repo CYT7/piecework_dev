@@ -445,7 +445,7 @@ export default {
       this.$confirm('确认禁用选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.deptCoefficient.disableScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.deptCoefficient.disableScheme({'schemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'禁用成功',type:'success'})
             this.findPage();
@@ -461,7 +461,7 @@ export default {
       this.$confirm('确认恢复选中的信息吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.deptCoefficient.recoverScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.deptCoefficient.recoverScheme({'schemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'恢复成功',type:'success'})
             this.findPage();

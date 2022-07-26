@@ -14,7 +14,9 @@
           <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:emp:view" type="primary" @click="findPage(null)"/>
           <kt-button icon="fa fa-repeat" :label="$t('action.reset')" perms="sys:emp:view" type="primary" @click="resetFindPage"/>
           <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload" :before-upload="beforeUpload" :http-request="UploadFile" accept=".xls,.xlsx">
+          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
+                     :before-upload="beforeUpload" :http-request="UploadFile"
+                     :show-file-list="false" accept=".xls,.xlsx">
             <kt-button icon="fa fa-upload" type="primary" perms="sys:emp:upload" :label="$t('action.upload')"/>
           </el-upload>
           <kt-button perms="sys:emp:download" icon="fa fa-file-excel-o" label="导出" @click="handleDownLoad"/>
@@ -89,7 +91,7 @@
       </div>
     </el-dialog>
     <!--下载-->
-    <el-dialog title="导出" width="20%" :visible.sync="downloadVisible" :close-on-click-modal="false">
+    <el-dialog title="导出" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
       <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
                label-position="right" style="text-align:left;">
         <el-form-item label="选项" prop="type">
@@ -118,7 +120,7 @@ import {isEmail, isPhone} from "../../utils/validate";
 import {baseUrl} from "../../utils/global";
 import axios from "axios";
 import Cookies from "js-cookie";
-import {formats} from "../../utils/datetime";
+import {Dateformat} from "../../utils/datetime";
 const checkEmail = (rule,value,callback) =>{
   if (!value){return callback(new Error('请输入邮箱'));}
   else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
@@ -296,7 +298,7 @@ export default {
     },
     // 时间格式化
     dateFormat: function (row, column) {
-      return formats(row[column.property])
+      return Dateformat(row[column.property])
     },
     // 审核状态格式化
     checkFormat: function (row, column) {
@@ -340,7 +342,8 @@ export default {
       this.downloadVisible = true
       this.downForm = {
         type: '',
-        deptId:''
+        deptId:'',
+        deptName: ''
       }
     },
     deptTreeCurrentChange (data) {

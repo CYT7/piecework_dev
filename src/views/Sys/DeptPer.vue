@@ -27,16 +27,22 @@
           <el-tooltip :content="$t('action.add')" x-placement="top">
             <kt-button icon="fa fa-plus" :circle="true" perms="sys:DeptPer:add" type="primary" @click="handleAdd"/>
           </el-tooltip>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip :content="$t('action.upload')" x-placement="top">
             <el-upload action="#" class="el-upload" :limit="1" ref="upload"
                        :before-upload="beforeUpload" :http-request="UploadFile"
-                       accept=".xls,.xlsx">
+                       :show-file-list="false" accept=".xls,.xlsx">
               <kt-button icon="fa fa-upload" :circle="true" type="primary" perms="sys:DeptPer:upload"/>
             </el-upload>
           </el-tooltip>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip content="下载" x-placement="top">
             <kt-button perms="sys:DeptPer:download" icon="fa fa-file-excel-o" :circle="true" @click="handleDownLoad"/>
           </el-tooltip>
+        </el-form-item>
+        <el-form-item>
           <el-tooltip content="刷新" x-placement="top">
             <kt-button perms="sys:DeptPer:view" icon="fa fa-refresh" :circle="true" @click="findPage(null)"/>
           </el-tooltip>
@@ -165,11 +171,6 @@
                             :nodeKey="''+dataForm.deptId"
                             :currentChangeHandle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item label="职工" prop="empNo">
-          <el-select style="width: 100%" placeholder="选择职工" value-key="id" v-model="dataForm.empNo">
-            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="月份" prop="month">
           <div class="block">
             <el-date-picker
@@ -179,6 +180,11 @@
               value-format="yyyy-MM-dd" @change="findCoefficientTree(dataForm)">
             </el-date-picker>
           </div>
+        </el-form-item>
+        <el-form-item label="职工" prop="empNo">
+          <el-select style="width: 100%" placeholder="选择职工" value-key="id" v-model="dataForm.empNo">
+            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo" @click.native="empCurrentChangeHandle(item)"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item v-if="operation" label="系数方案" prop="coefficientSid">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientScheme">
@@ -469,16 +475,13 @@ export default {
       this.filters.deptId = data.id
       this.filters.deptName = data.name
     },
-    // 获取职工列表
-    findEmpTree: function (deptId){
-      this.$api.emp.findEmpTree({'deptId':deptId}).then((res)=>{this.empData = res.data})
-    },
     //获取方案树
     findDownScheme:function (item){
       this.$api.deptCoefficient.findCoefficientTree({deptId:item.deptId,month:item.templateMonth}).then((res)=>{
         this.coeSchemeData = res
       });
     },
+
     //获取方案树
     findCoefficientTree:function (item){
       this.$api.deptCoefficient.findCoefficientTree({deptId:item.deptId,month:item.month}).then((res)=>{
@@ -487,8 +490,11 @@ export default {
       this.$api.deptPer.findEmp({"deptId":item.deptId,"month":item.month}).then((res)=>{
         this.empPerData = res.data
       })
+      this.$api.deptEmp.findEmpTree({'deptId':item.deptId,"month":item.month}).then((res)=>{
+        this.empData = res
+      })
     },
-    findCoeList: function (sid) {this.$api.coefficient.findCoeList({'sid':sid}).then((res)=>{
+    findCoeList: function (schemeId) {this.$api.coefficient.findCoeList({'schemeId':schemeId}).then((res)=>{
       let CoeList = []
       res.forEach(i=>{
         let points = i.points;

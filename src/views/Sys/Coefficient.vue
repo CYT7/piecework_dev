@@ -318,7 +318,7 @@ export default {
       this.$confirm('确认删除选中的'+params.title+params.version+'吗？','提示',{type:'warning'}).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.DeleteScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.coefficient.DeleteScheme({'schemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -336,7 +336,7 @@ export default {
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.unconfirmedScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.coefficient.unconfirmedScheme({'schemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
@@ -354,7 +354,7 @@ export default {
       }).then(()=>{
         let ids = [params.id]
         this.loading = true;
-        this.$api.coefficient.confirmScheme({'coeSchemeId':ids}).then(res=>{
+        this.$api.coefficient.confirmScheme({'schemeId':ids}).then(res=>{
           if (res.code===200){
             this.$message({message:'操作成功',type:'success'})
             this.findPage();
