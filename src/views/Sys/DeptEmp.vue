@@ -56,9 +56,6 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="绩效单价" prop="unitPrice">
-          <el-input v-model="dataForm.unitPrice" auto-complete="off" placeholder="输入绩效单价"/>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -196,7 +193,6 @@ export default {
         bu: '',
         entryDate: '',
         startPerformance: '',
-        unitPrice: '',
         status: 1,
       }
     },

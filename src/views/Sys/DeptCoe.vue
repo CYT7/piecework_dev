@@ -147,8 +147,8 @@
             :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
             :node-key="''+dataForm.deptId" :current-change-handle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 1&&operation" label="系数方案" prop="coefficientSid">
-          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.coefficientSid">
+        <el-form-item v-if="dataForm.types === 1&&operation" label="系数方案" prop="schemeId">
+          <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="dataForm.schemeId">
             <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
                        :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
           </el-select>
@@ -168,18 +168,18 @@
           <el-input v-model="dataForm.version" placeholder="请填写版本" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="绩效单价" prop="unitPrice">
-          <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价"/>
+          <el-input v-model="dataForm.unitPrice" placeholder="请输入绩效单价" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="绩效单价倍数" prop="multiple">
-          <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数"/>
+          <el-input v-model="dataForm.multiple" placeholder="请输入绩效单价倍数" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="每小时指标产量分数" prop="hourTargetOutput">
-          <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数"/>
+          <el-input v-model="dataForm.hourTargetOutput" placeholder="请输入每小时指标产量分数" :disabled="!operation"/>
         </el-form-item>
         <el-form-item v-if="dataForm.types === 0" label="8小时指标产量分数" prop="dayTargetOutput">
-          <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数"/>
+          <el-input v-model="dataForm.dayTargetOutput" placeholder="请输入8小时指标产量分数" :disabled="!operation"/>
         </el-form-item>
-        <el-form-item v-if="dataForm.types === 0" label="生效日期" prop="entryDate">
+        <el-form-item v-if="dataForm.types === 0" label="生效日期" prop="entryDate" :disabled="!operation">
           <div class="block">
             <el-date-picker
               v-model="dataForm.effectiveDate" type="date"
@@ -229,7 +229,7 @@
         <el-form-item label="系数方案" prop="schemeId">
           <el-select style="width: 100%" placeholder="选择系数方案" value-key="id" v-model="downForm.schemeId">
             <el-option v-for="item in coeSchemeData" :key="item.id" :label="item.title"
-                       :value="item.id" @click.native="CoeSchemeCurrentChange(item)"></el-option>
+                       :value="item.id" @click.native="SchemeCurrentChange(item)"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -308,7 +308,7 @@ export default {
       },
       // 新增编辑界面数据
       TypeList:["方案", "系数"],
-      pointsList: ["减分系数", "加分系数", "考勤系数"],
+      pointsList: ["减分系数", "加分系数"],
       downloadVisible:false,// 下载页面是否显示
       uploadVisible:false,// 下载页面是否显示
       uploadForm:[],
@@ -538,7 +538,7 @@ export default {
           types:type,
           id: 0,
           deptId:'',
-          coefficientSid:'',
+          schemeId:'',
           type:'',
           title:'',
           value:'',
@@ -554,9 +554,10 @@ export default {
     deptTreeCurrentChange (data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
+      this.findCoefficientTree(data.id)
     },
     CoeSchemeCurrentChange:function (data){
-      this.dataForm.coefficientSid = data.id
+      this.dataForm.schemeId = data.id
     },
     SchemeCurrentChange: function (data){
       this.downForm.schemeId = data.id

@@ -21,7 +21,7 @@
       <el-form :model="dataForm" label-width="auto" :rules="dataFormRules" ref="dataForm" :size="size">
         <el-form-item label="ID" prop="id" v-if="false"><el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/></el-form-item>
         <el-form-item label="角色名" prop="name"><el-input v-model="dataForm.name" auto-complete="off"/></el-form-item>
-        <el-form-item label="备注 " prop="remark"><el-input v-model="dataForm.remark" auto-complete="off" type="textarea"/></el-form-item>
+        <el-form-item label="备注 " prop="remark"><el-input v-model="dataForm.remark" auto-complete="off"/></el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>

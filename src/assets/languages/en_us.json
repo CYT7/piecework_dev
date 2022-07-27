@@ -27,6 +27,8 @@
         "reset": "Reset",
         "agree": "Agree",
         "disagree": "Disagree",
-        "upload": "Upload"
+        "upload": "Upload",
+        "export": "Export",
+        "refresh": "Refresh"
     }
 }

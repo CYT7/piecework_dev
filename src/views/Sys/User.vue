@@ -5,12 +5,12 @@
       <el-form :inline="true" :model="filters" :size="size">
         <el-form-item><el-input v-model="filters.name" placeholder="用户名查询"/></el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')"
-                     perms="sys:user:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:user:view"
+                     type="primary" @click="findPage(null)"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')"
-                     perms="sys:user:add" type="primary" @click="handleAdd" />
+          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:user:add"
+                     type="primary" @click="handleAdd" />
         </el-form-item>
         <el-form-item>
           <el-tooltip content="刷新" x-placement="top">

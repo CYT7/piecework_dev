@@ -81,9 +81,6 @@
             </el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item label="绩效单价" prop="unitPrice">
-          <el-input v-model="dataForm.unitPrice" auto-complete="off" placeholder="输入绩效单价"/>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
@@ -160,6 +157,9 @@ export default {
         name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
         email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
         phone: [{validator:checkPhone, trigger: 'blur' }],
+        deptName: [{ required: true, message: '请选择部门', trigger: 'change' }],
+        superior: [{ required: true, message: '请选择职工的N+1', trigger: 'change' }],
+        bu: [{ required: true, message: '请输入BU', trigger: 'blur' }],
       },
       // 新增编辑界面数据
       dataForm: {},
@@ -233,7 +233,6 @@ export default {
         bu: '',
         entryDate: '',
         startPerformance: '',
-        unitPrice: '',
         status: 1,
       }
     },
@@ -331,12 +330,14 @@ export default {
         if (res.code === 200) {
           this.$message({message: res.msg, type: 'success'})
           this.$refs['upload'].clearFiles();
+          this.findPage(null)
         } else {
           this.$message({message: res.msg, type: 'error'})
           this.$refs['upload'].clearFiles();
+          this.findPage(null)
         }
       })
-      this.findPage(null)
+
     },
     handleDownLoad: function (){
       this.downloadVisible = true
