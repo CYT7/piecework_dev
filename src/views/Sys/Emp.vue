@@ -57,8 +57,8 @@
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
                             :nodeKey="''+dataForm.deptId" :currentChangeHandle="deptTreeCurrentChangeHandle"/>
         </el-form-item>
-        <el-form-item label="N+1" prop="superior">
-          <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.superior">
+        <el-form-item label="N+1" prop="supervisor">
+          <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.supervisor">
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo"/>
           </el-select>
         </el-form-item>
@@ -230,6 +230,7 @@ export default {
         phone: '',
         email: '',
         superior: '',
+        supervisor: '',
         bu: '',
         entryDate: '',
         startPerformance: '',

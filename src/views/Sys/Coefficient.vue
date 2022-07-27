@@ -279,7 +279,7 @@ export default {
       deptData: [], // 部门数据
       schemeData: [], //方案数据
       deptTreeProps: {label: 'name', children: 'children'},
-      TypeList: ['导出', '上传模板'], // 选项
+      TypeList: ['导出', '上传模板'], //导出选项
       templateList: ['方案&系数', '方案', '系数'], // 模板选项
     };
   },
@@ -590,7 +590,7 @@ export default {
       if (row[column.property] === 1) {return '加分系数'}
       else{ return '扣分系数' }
     },
-    //时间格式化
+    // 时间格式化
     timeFormat: function (row, column) {return format(row[column.property])},
     //日期格式化
     dateFormat: function (row, column) {return Dateformat(row[column.property])},
