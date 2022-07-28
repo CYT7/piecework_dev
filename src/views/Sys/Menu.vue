@@ -10,7 +10,7 @@
 	</div>
 	<!--表格树内容栏-->
     <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;"
-              v-loading="loading" element-loading-text="$t('action.loading')">
+              v-loading="loading" :element-loading-text="$t('action.loading')">
       <table-tree-column prop="name" header-align="center" width="150" label="名称"/>
       <el-table-column header-align="center" align="center" label="图标">
         <template slot-scope="scope"><i :class="scope.row.icon || ''"/></template>

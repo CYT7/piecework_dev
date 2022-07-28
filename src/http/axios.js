@@ -33,7 +33,6 @@ export default function $axios(options) {
         }
         //需要重定向到错误页面
         const errorInfo = error.response;
-        console.log(errorInfo);
         if (errorInfo) {
           error = errorInfo.data;  //页面catch的时能拿到详细的错误信息,看最下边的Promise.reject
           const errorStatus = errorInfo.status; //404 403 500 ...

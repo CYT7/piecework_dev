@@ -10,7 +10,7 @@
 	</div>
 	<!--表格树内容栏-->
     <el-table :data="tableTreeData" stripe size="mini" style="width: 100%;"
-              v-loading="loading" element-loading-text="$t('action.loading')"
+              v-loading="loading" :element-loading-text="$t('action.loading')"
               row-key="id" :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column prop="name" header-align="center" align="center" min-width="50%" label="部门"/>
       <el-table-column prop="parentName" header-align="center" align="center" min-width="50%" label="上级部门"/>

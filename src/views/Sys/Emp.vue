@@ -59,7 +59,8 @@
         </el-form-item>
         <el-form-item label="N+1" prop="supervisor">
           <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.supervisor">
-            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo"/>
+            <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo"
+                       @click.native="superiorChange(item)"/>
           </el-select>
         </el-form-item>
         <el-form-item label="BU" prop="bu">
@@ -276,6 +277,10 @@ export default {
       this.dataForm.deptId = data.id
       this.dataForm.deptName = data.name
       this.findEmpTree(data.id)
+    },
+    superiorChange(data) {
+      this.dataForm.superior = data.empNo
+      this.dataForm.supervisor = data.name
     },
     // 菜单树选中
     deptTreeFilters(data) {
