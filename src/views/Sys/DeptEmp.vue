@@ -17,7 +17,7 @@
                      perms="sys:emp:view" type="primary" @click="resetFindPage"/>
           <kt-button perms="sys:DeptEmp:download" icon="fa fa-file-excel-o"
                      :label="$t('action.export')" @click="handleDownLoad"/>
-          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
+          <kt-button icon="fa fa-repeat" :label="$t('action.refresh')"
                      perms="sys:DeptEmp:view" @click="findPage(null)"/>
         </el-form-item>
       </el-form>
@@ -211,6 +211,7 @@ export default {
     // 获取分页数据
     findPage: function (data) {
       if (data !== null) {this.pageRequest = data.pageRequest}
+      this.filters.deptId = this.filters.deptId === '' ? deptIds : this.filters.deptId
       this.pageRequest.params = [{name: 'name', value: this.filters.name}, {name: 'deptId', value: this.filters.deptId}]
       this.$api.deptEmp.findPage(this.pageRequest).then((res) => {
         this.pageResult = res

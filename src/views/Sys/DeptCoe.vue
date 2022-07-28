@@ -592,7 +592,10 @@ export default {
     // 保存方案选择
     saveSchemeChange: function (data) {this.dataForm.schemeId = data.id},
     // 导出方案选中
-    exportSchemeChange: function (data) {this.downForm.schemeId = data.id},
+    exportSchemeChange: function (data) {
+      this.downForm.schemeId = data.id
+      this.downForm.schemeName = data.title
+    },
     // 上传方案选中
     uploadSchemeChange: function (data) {
       this.uploadForm.schemeId = data.id
