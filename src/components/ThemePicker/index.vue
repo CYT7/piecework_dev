@@ -1,6 +1,6 @@
 <template>
-  <el-color-picker class="theme-picker" popper-class="theme-picker-dropdown"
-    v-model="theme" :size="size">
+  <el-color-picker v-model="theme" :size="size"
+                   class="theme-picker" popper-class="theme-picker-dropdown">
   </el-color-picker>
 </template>
 <script>
@@ -26,7 +26,7 @@ export default {
     }
   },
   mounted() {
-    if(this.default != null) {
+    if (this.default != null) {
       this.theme = this.default;
       this.$emit('onThemeChange', this.theme);
       this.showSuccess = false
@@ -64,14 +64,14 @@ export default {
           return new RegExp(oldVal, 'i').test(text) && !/Chalk Variables/.test(text)
         });
       styles.forEach(style => {
-        const { innerText } = style;
+        const {innerText} = style;
         if (typeof innerText !== 'string') return;
         style.innerText = this.updateStyle(innerText, originalCluster, themeCluster)
       });
       //响应外部操作
       this.$emit('onThemeChange', val);
-      if(this.showSuccess) {
-        this.$message({ message: '换肤成功', type: 'success' })
+      if (this.showSuccess) {
+        this.$message({message: '换肤成功', type: 'success'})
       } else {
         this.showSuccess = true
       }

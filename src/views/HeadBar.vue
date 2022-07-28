@@ -1,10 +1,10 @@
 <template>
-  <div class="headboard" :style="{'background':themeColor}"
-    :class="collapse?'position-collapse-left':'position-left'">
+  <div :class="collapse?'position-collapse-left':'position-left'" :style="{'background':themeColor}"
+       class="headboard">
     <!-- 导航收缩 -->
     <span class="hamburg">
-      <el-menu class="el-menu-demo" :background-color="themeColor" text-color="#fff"
-        :active-text-color="themeColor" mode="horizontal">
+      <el-menu :active-text-color="themeColor" :background-color="themeColor" class="el-menu-demo"
+               mode="horizontal" text-color="#fff">
         <el-menu-item index="1" @click="onCollapse">
           <hamburger :isActive="collapse"/>
         </el-menu-item>
@@ -12,32 +12,32 @@
     </span>
     <!-- 导航菜单 -->
     <span class="navbar">
-      <el-menu :default-active="activeIndex" class="el-menu-demo"
-          :background-color="themeColor" text-color="#fff"
-               active-text-color="#ffd04b" mode="horizontal">
-        <el-menu-item index="1" @click="$router.push('/')">{{$t("common.home")}}</el-menu-item>
+      <el-menu :background-color="themeColor" :default-active="activeIndex"
+               active-text-color="#ffd04b" class="el-menu-demo"
+               mode="horizontal" text-color="#fff">
+        <el-menu-item index="1" @click="$router.push('/')">{{ $t("common.home") }}</el-menu-item>
       </el-menu>
     </span>
     <!-- 工具栏 -->
     <span class="toolbar">
-      <el-menu class="el-menu-demo" :background-color="themeColor" text-color="#14889A"
-        :active-text-color="themeColor" mode="horizontal">
+      <el-menu :active-text-color="themeColor" :background-color="themeColor" class="el-menu-demo"
+               mode="horizontal" text-color="#14889A">
         <el-menu-item index="1">
           <!-- 主题切换 -->
-          <theme-picker class="theme-picker" :default="themeColor" @onThemeChange="onThemeChange"/>
+          <theme-picker :default="themeColor" class="theme-picker" @onThemeChange="onThemeChange"/>
         </el-menu-item>
-        <el-menu-item index="2" v-popover:popover-lang>
+        <el-menu-item v-popover:popover-lang index="2">
           <!-- 语言切换 -->
-          <li style="color:#fff;" class="fa fa-language fa-lg"></li>
-          <el-popover ref="popover-lang" placement="bottom-start" trigger="click" v-model="langVisible">
+          <li class="fa fa-language fa-lg" style="color:#fff;"></li>
+          <el-popover ref="popover-lang" v-model="langVisible" placement="bottom-start" trigger="click">
             <div class="lang-item" @click="changeLanguage('zh_cn')">简体中文</div>
             <div class="lang-item" @click="changeLanguage('en_us')">English</div>
           </el-popover>
         </el-menu-item>
-        <el-menu-item index="3" v-popover:popover-personal>
+        <el-menu-item v-popover:popover-personal index="3">
           <!-- 用户信息 -->
           <span class="user-info fa fa-user"></span>
-          <el-popover ref="popover-personal" placement="bottom-end" trigger="click" :visible-arrow="false">
+          <el-popover ref="popover-personal" :visible-arrow="false" placement="bottom-end" trigger="click">
             <personal-panel :user="user"></personal-panel>
           </el-popover>
         </el-menu-item>
@@ -46,12 +46,13 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 import Hamburger from "../components/Hamburger";
 import ThemePicker from "../components/ThemePicker";
 import PersonalPanel from "./Core/PersonalPanel";
+
 export default {
-  components:{
+  components: {
     PersonalPanel,
     ThemePicker,
     Hamburger,
@@ -65,9 +66,13 @@ export default {
   },
   methods: {
     //折叠导航栏
-    onCollapse: function() {this.$store.commit('onCollapse')},
+    onCollapse: function () {
+      this.$store.commit('onCollapse')
+    },
     //切换主题
-    onThemeChange: function(themeColor) {this.$store.commit('setThemeColor', themeColor)},
+    onThemeChange: function (themeColor) {
+      this.$store.commit('setThemeColor', themeColor)
+    },
     //语言切换
     changeLanguage(lang) {
       this.$i18n.locale = lang === '' ? 'zh_cn' : lang;
@@ -77,21 +82,23 @@ export default {
   mounted() {
     const user = sessionStorage.getItem("user");
     if (user) {
-      const params = {name:user};
+      const params = {name: user};
       this.$api.user.findByName(params).then((res) => {
-				if(res.code === 200) {this.user = res.data;}
+        if (res.code === 200) {
+          this.user = res.data;
+        }
       })
     }
   },
-  computed:{
+  computed: {
     ...mapState({
-      themeColor: state=>state.app.themeColor,
-      collapse: state=>state.app.collapse
+      themeColor: state => state.app.themeColor,
+      collapse: state => state.app.collapse
     })
   }
 }
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .headboard {
   position: fixed;
   top: 0;
@@ -103,9 +110,19 @@ export default {
   border-left-width: 1px;
   border-left-style: solid;
 }
-.hamburg {float: left;}
-.navbar {float: left;}
-.toolbar {float: right;}
+
+.hamburg {
+  float: left;
+}
+
+.navbar {
+  float: left;
+}
+
+.toolbar {
+  float: right;
+}
+
 .lang-item {
   font-size: 16px;
   padding-left: 8px;
@@ -113,14 +130,17 @@ export default {
   padding-bottom: 8px;
   cursor: pointer;
 }
+
 .lang-item:hover {
   font-size: 18px;
   background: #b0d6ce4d;
 }
+
 .user-info {
   font-size: 20px;
   color: #fff;
   cursor: pointer;
+
   img {
     width: 40px;
     height: 40px;
@@ -129,7 +149,16 @@ export default {
     float: right;
   }
 }
-.badge {line-height: 18px;}
-.position-left {left: 110px;}
-.position-collapse-left {left: 55px;}
+
+.badge {
+  line-height: 18px;
+}
+
+.position-left {
+  left: 110px;
+}
+
+.position-collapse-left {
+  left: 55px;
+}
 </style>

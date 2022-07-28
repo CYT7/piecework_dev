@@ -1,4 +1,5 @@
 import axios from '../axios'
+
 /**
  * 用户管理模块
  **/
@@ -28,11 +29,11 @@ export const findPermissions = (params) => {
 };
 //保存
 export const save = (data) => {
-    return axios({
-        url: '/user/save',
-        method: 'post',
-        data
-    })
+  return axios({
+    url: '/user/save',
+    method: 'post',
+    data
+  })
 };
 //更新用户密码
 export const updatePwd = (data) => {
@@ -44,11 +45,11 @@ export const updatePwd = (data) => {
 };
 //删除
 export const Delete = (data) => {
-    return axios({
-        url: '/user/delete',
-        method: 'post',
-        data
-    })
+  return axios({
+    url: '/user/delete',
+    method: 'post',
+    data
+  })
 };
 //批量禁用
 export const disable = (data) => {

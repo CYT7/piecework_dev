@@ -1,4 +1,5 @@
 import axios from '../axios'
+
 /**
  * 部门绩效管理模块
  **/
@@ -46,7 +47,7 @@ export const upload = (data) => {
   return axios({
     url: '/DeptPer/upload',
     method: 'post',
-    headers:{'Content-Type':'multipart/form-data'},
+    headers: {'Content-Type': 'multipart/form-data'},
     data,
   })
 };

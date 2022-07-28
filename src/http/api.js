@@ -14,4 +14,4 @@ import * as performance from "./modules/performance";
 import * as role from './modules/role';
 import * as user from './modules/user';
 //默认全部导出
-export default {coefficient,dept,deptCoefficient,deptEmp,deptPer,emp,log,login,menu,performance,role,user,}
+export default {coefficient, dept, deptCoefficient, deptEmp, deptPer, emp, log, login, menu, performance, role, user,}

@@ -1,34 +1,34 @@
 {
-    "common": {
-        "home": "Home",
-        "login": "Login",
-        "logout": "Logout",
-        "config": "Config",
-        "exit": "Exit"
-    },
-    "action": {
-        "operation": "Operation",
-        "add": "Add",
-        "edit": "Edit",
-        "delete": "Delete",
-        "disable": "Disable",
-        "recover": "Recover",
-        "batchDelete": "Batch Delete",
-        "batchConfirm": "Batch Confirm",
-        "batchRecover": "Batch Recover",
-        "batchDisable": "Batch Disable",
-        "batchDisagree": "Batch Disagree",
-        "batchAgree": "Batch Agree",
-        "search": "Search",
-        "loading": "Loading",
-        "submit": "Submit",
-        "confirms": "Confirm",
-        "cancel": "Cancel",
-        "reset": "Reset",
-        "agree": "Agree",
-        "disagree": "Disagree",
-        "upload": "Upload",
-        "export": "Export",
-        "refresh": "Refresh"
-    }
+  "common": {
+    "home": "Home",
+    "login": "Login",
+    "logout": "Logout",
+    "config": "Config",
+    "exit": "Exit"
+  },
+  "action": {
+    "operation": "Operation",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "disable": "Disable",
+    "recover": "Recover",
+    "batchDelete": "Batch Delete",
+    "batchConfirm": "Batch Confirm",
+    "batchRecover": "Batch Recover",
+    "batchDisable": "Batch Disable",
+    "batchDisagree": "Batch Disagree",
+    "batchAgree": "Batch Agree",
+    "search": "Search",
+    "loading": "Loading",
+    "submit": "Submit",
+    "confirms": "Confirm",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "upload": "Upload",
+    "export": "Export",
+    "refresh": "Refresh"
+  }
 }

@@ -2,57 +2,57 @@
   <div class="page-container">
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-      <el-form :inline="true" :model="filters" :size="size" ref="filters">
+      <el-form ref="filters" :inline="true" :model="filters" :size="size">
         <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
-                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+          <popup-tree-input :currentChangeHandle="deptTreeFilters" :data="deptData" :nodeKey="''+filters.deptId"
+                            :prop="filters.deptName" :props="deptTreeProps"/>
         </el-form-item>
         <el-form-item label="职工名" prop="name">
           <el-input v-model="filters.name" placeholder="职工名"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')"
+          <kt-button :label="$t('action.search')" icon="fa fa-search"
                      perms="sys:DeptEmp:view" type="primary" @click="findPage(null)"/>
-          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
+          <kt-button :label="$t('action.reset')" icon="fa fa-repeat"
                      perms="sys:emp:view" type="primary" @click="resetFindPage"/>
-          <kt-button perms="sys:DeptEmp:download" icon="fa fa-file-excel-o"
-                     :label="$t('action.export')" @click="handleDownLoad"/>
-          <kt-button icon="fa fa-repeat" :label="$t('action.refresh')"
+          <kt-button :label="$t('action.export')" icon="fa fa-file-excel-o"
+                     perms="sys:DeptEmp:download" @click="handleDownLoad"/>
+          <kt-button :label="$t('action.refresh')" icon="fa fa-repeat"
                      perms="sys:DeptEmp:view" @click="findPage(null)"/>
         </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table permsEdit="sys:DeptEmp:edit" permsDisable="sys:DeptEmp:disable" permsRecover="sys:DeptEmp:recover"
-              :data="pageResult" :columns="columns" @findPage="findPage" @handleEdit="handleEdit"
-              @handleDisable="handleDisable" @handleRecover="handleRecover" :circle="true">
+    <kt-table :circle="true" :columns="columns" :data="pageResult"
+              permsDisable="sys:DeptEmp:disable" permsEdit="sys:DeptEmp:edit" permsRecover="sys:DeptEmp:recover" @findPage="findPage"
+              @handleDisable="handleDisable" @handleEdit="handleEdit" @handleRecover="handleRecover">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?$t('action.add'):$t('action.edit')" width="25%"
-               :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" label-width="100px" :rules="dataFormRules"
-               ref="dataForm" :size="size" label-position="right">
-        <el-form-item label="ID" prop="id" v-if="false">
+    <el-dialog :close-on-click-modal="false" :title="operation?$t('action.add'):$t('action.edit')"
+               :visible.sync="dialogVisible" width="25%">
+      <el-form ref="dataForm" :model="dataForm" :rules="dataFormRules"
+               :size="size" label-position="right" label-width="100px">
+        <el-form-item v-if="false" label="ID" prop="id">
           <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
         </el-form-item>
         <el-form-item label="职工号" prop="empNo">
-          <el-input v-model="dataForm.empNo" auto-complete="off" placeholder="请输入职工号" :disabled="!operation"/>
+          <el-input v-model="dataForm.empNo" :disabled="!operation" auto-complete="off" placeholder="请输入职工号"/>
         </el-form-item>
         <el-form-item label="职工名" prop="name">
-          <el-input v-model="dataForm.name" auto-complete="off" placeholder="请输入职工名" :disabled="!operation"/>
+          <el-input v-model="dataForm.name" :disabled="!operation" auto-complete="off" placeholder="请输入职工名"/>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="dataForm.email" type="email" auto-complete="off" placeholder="请输入邮箱"/>
+          <el-input v-model="dataForm.email" auto-complete="off" placeholder="请输入邮箱" type="email"/>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
           <el-input v-model="dataForm.phone" auto-complete="off" placeholder="请输入手机"/>
         </el-form-item>
         <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
-                            :nodeKey="''+dataForm.deptId" :currentChangeHandle="saveDeptChange"/>
+          <popup-tree-input :currentChangeHandle="saveDeptChange" :data="deptData" :nodeKey="''+dataForm.deptId"
+                            :prop="dataForm.deptName" :props="deptTreeProps"/>
         </el-form-item>
         <el-form-item label="N+1" prop="supervisor">
-          <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.supervisor">
+          <el-select v-model="dataForm.supervisor" placeholder="请选择N+1" style="width: 100%" value-key="id">
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name"
                        :value="item.empNo" @click.native="superiorChange(item)"/>
           </el-select>
@@ -60,34 +60,36 @@
         <el-form-item label="开始绩效日期" prop="startPerformance">
           <div class="block">
             <el-date-picker
-              v-model="dataForm.startPerformance" type="date"
-              placeholder="请选择开始绩效日期" :picker-options="pickerOptions">
+              v-model="dataForm.startPerformance" :picker-options="pickerOptions"
+              placeholder="请选择开始绩效日期" type="date">
             </el-date-picker>
           </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
+        <el-button :size="size" @click.native="dialogVisible = false">{{ $t('action.cancel') }}</el-button>
+        <el-button :loading="editLoading" :size="size" type="primary" @click.native="submitForm">
+          {{ $t('action.submit') }}
+        </el-button>
       </div>
     </el-dialog>
     <!--下载-->
-    <el-dialog title="导出" width="20%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px" :rules="downFormRules"
-               label-position="right" style="text-align:left;">
+    <el-dialog :close-on-click-modal="false" :visible.sync="downloadVisible" title="导出" width="20%">
+      <el-form ref="downForm" :model="downForm" :rules="downFormRules" :size="size" label-position="right"
+               label-width="80px" style="text-align:left;">
         <el-form-item label="选项" prop="type">
           <el-radio-group v-model="downForm.type">
-            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
+            <el-radio v-for="(type, index) in TypeList" :key="index" :label="index">{{ type }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="部门" prop="deptName" v-if="this.downForm.type===0">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
-                            :nodeKey="''+downForm.deptId" :currentChangeHandle="exportDeptChange"/>
+        <el-form-item v-if="this.downForm.type===0" label="部门" prop="deptName">
+          <popup-tree-input :currentChangeHandle="exportDeptChange" :data="deptData" :nodeKey="''+downForm.deptId"
+                            :prop="downForm.deptName" :props="deptTreeProps"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+        <el-button :size="size" @click.native="downloadVisible = false">{{ $t('action.cancel') }}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitDown">{{ $t('action.submit') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -101,17 +103,32 @@ import axios from "axios";
 import {baseUrl} from "../../utils/global";
 import Cookies from "js-cookie";
 import {formats} from "../../utils/datetime";
+
 const deptIds = sessionStorage.getItem("deptId");
-const checkEmail = (rule,value,callback) =>{
-  if (!value){callback();}
-  else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
+const checkEmail = (rule, value, callback) => {
+  if (!value) {
+    callback();
+  } else {
+    if (isEmail(value)) {
+      callback();
+    } else {
+      return callback(new Error('邮箱格式不正确'))
+    }
+  }
 }
-const checkPhone = (rule,value,callback) =>{
-  if (!value){callback();}
-  else{if (isPhone(value)){callback();}else{return callback(new Error('手机格式不正确'))}}
+const checkPhone = (rule, value, callback) => {
+  if (!value) {
+    callback();
+  } else {
+    if (isPhone(value)) {
+      callback();
+    } else {
+      return callback(new Error('手机格式不正确'))
+    }
+  }
 }
 export default {
-  components:{PopupTreeInput, KtTable, KtButton,},
+  components: {PopupTreeInput, KtTable, KtButton,},
   data() {
     return {
       size: 'small',
@@ -128,27 +145,29 @@ export default {
         {prop: "status", label: "状态", minWidth: '50%', formatter: this.statusFormat},
         {prop: "checkStatus", label: "审核", minWidth: '50%', formatter: this.checkFormat},
       ], // 表格列
-      pageRequest: { pageNum: 1, pageSize: 10 }, // 分页请求
+      pageRequest: {pageNum: 1, pageSize: 10}, // 分页请求
       pageResult: {}, // 分页结果
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
       editLoading: false, // 编辑加载
-      downloadVisible:false,// 下载页面是否显示
-      TypeList:['导出职工'], // 导出选项
+      downloadVisible: false,// 下载页面是否显示
+      TypeList: ['导出职工'], // 导出选项
       dataFormRules: {
-        email: [{validator:checkEmail, trigger: 'blur' }],
-        phone: [{validator:checkPhone, trigger: 'blur' }],
+        email: [{validator: checkEmail, trigger: 'blur'}],
+        phone: [{validator: checkPhone, trigger: 'blur'}],
       }, // 保存信息规矩
       downFormRules: {type: [{required: true, message: '请选择导出类型', trigger: 'change'}]}, // 导出选项
       dataForm: {}, // 新增编辑信息
       downForm: [], // 导出信息
       deptData: [], // 部门数据
       deptTreeProps: {label: 'name', children: 'children'},
-      empData:[], // 职工数据
+      empData: [], // 职工数据
       pickerOptions: {
         shortcuts: [{
           text: '今天',
-          onClick(picker) {picker.$emit('pick', new Date());}
+          onClick(picker) {
+            picker.$emit('pick', new Date());
+          }
         }, {
           text: '昨天',
           onClick(picker) {
@@ -195,11 +214,11 @@ export default {
       this.dataForm = Object.assign({}, params.row)
     },
     // 显示导出界面
-    handleDownLoad: function (){
+    handleDownLoad: function () {
       this.downloadVisible = true
       this.downForm = {
         type: '',
-        deptId:''
+        deptId: ''
       }
     },
     // 重置查找页面
@@ -210,7 +229,9 @@ export default {
     },
     // 获取分页数据
     findPage: function (data) {
-      if (data !== null) {this.pageRequest = data.pageRequest}
+      if (data !== null) {
+        this.pageRequest = data.pageRequest
+      }
       this.filters.deptId = this.filters.deptId === '' ? deptIds : this.filters.deptId
       this.pageRequest.params = [{name: 'name', value: this.filters.name}, {name: 'deptId', value: this.filters.deptId}]
       this.$api.deptEmp.findPage(this.pageRequest).then((res) => {
@@ -244,7 +265,7 @@ export default {
       this.findEmpTree(data.id)
     },
     // 导出部门选中
-    exportDeptChange (data) {
+    exportDeptChange(data) {
       this.downForm.deptId = data.id
       this.downForm.deptName = data.name
     },
@@ -281,11 +302,17 @@ export default {
       })
     },
     // 状态格式化
-    statusFormat: function (row, column) {return row[column.property] === 1 ? '正常' : '禁用'},
+    statusFormat: function (row, column) {
+      return row[column.property] === 1 ? '正常' : '禁用'
+    },
     // 职工号格式化
-    empFormat: function (row, column) {return row[column.property].toString().padStart(6, '0')},
+    empFormat: function (row, column) {
+      return row[column.property].toString().padStart(6, '0')
+    },
     // 时间格式化
-    dateFormat: function (row, column) {return formats(row[column.property])},
+    dateFormat: function (row, column) {
+      return formats(row[column.property])
+    },
     // 审核状态格式化
     checkFormat: function (row, column) {
       switch (row[column.property]) {
@@ -302,8 +329,12 @@ export default {
       let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
       const extension = (testMsg === 'xls' || testMsg === 'xlsx')
       const isLt2M = file.size / 1024 / 1024 < 10     //这里做文件大小限制
-      if (!extension) {this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});}
-      if (!isLt2M) {this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});}
+      if (!extension) {
+        this.$message({message: '上传文件只能是 xls、xlsx格式!', type: 'warning'});
+      }
+      if (!isLt2M) {
+        this.$message({message: '上传文件大小不能超过 10MB!', type: 'warning'});
+      }
       return extension && isLt2M
     },
     // 上传文件
@@ -321,10 +352,10 @@ export default {
       })
     },
     // 导出前校验
-    submitDown:function (){
-      this.$refs.downForm.validate((valid)=>{
-        if (valid){
-          let params = Object.assign({},this.downForm)
+    submitDown: function () {
+      this.$refs.downForm.validate((valid) => {
+        if (valid) {
+          let params = Object.assign({}, this.downForm)
           params.deptId = params.deptId === '' ? deptIds : params.deptId;
           this.exportExcelFile(params);
           this.downloadVisible = false;

@@ -1,4 +1,5 @@
 import axios from '../axios'
+
 /**
  * 职工管理模块
  **/
@@ -7,7 +8,7 @@ export const upload = (data) => {
   return axios({
     url: '/emp/upload',
     method: 'post',
-    headers:{'Content-Type':'multipart/form-data'},
+    headers: {'Content-Type': 'multipart/form-data'},
     data,
   })
 };
@@ -28,7 +29,7 @@ export const findPage = (data) => {
   })
 };
 //根据部门id导出职工列表
-export const findEmpTree =(params) =>{
+export const findEmpTree = (params) => {
   return axios({
     url: '/emp/findEmpTree',
     method: 'post',

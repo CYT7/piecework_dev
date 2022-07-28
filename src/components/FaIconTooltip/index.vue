@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip class="tooltip" placement="top" effect="light">
+  <el-tooltip class="tooltip" effect="light" placement="top">
     <div slot="content">
       <p>推荐使用 Font Aweson 图标</p>
       <p>使用步骤：</p>
@@ -16,10 +16,11 @@ export default {
     return {};
   },
   methods: {},
-  mounted() {}
+  mounted() {
+  }
 };
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .tooltip {
   padding: 10px;
 }

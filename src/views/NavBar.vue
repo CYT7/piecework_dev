@@ -1,48 +1,64 @@
 <template>
-	<div class="menu-bar-container">
+  <div class="menu-bar-container">
     <!-- logo -->
-    <div class="logo" :style="{'background-color':themeColor}" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
-      @click="$router.push('/')">
-        <img v-if="collapse" src="../assets/logo.png" alt="logo"/> <div>{{collapse?'':appName}}</div>
+    <div :class="collapse?'menu-bar-collapse-width':'menu-bar-width'" :style="{'background-color':themeColor}"
+         class="logo"
+         @click="$router.push('/')">
+      <img v-if="collapse" alt="logo" src="../assets/logo.png"/>
+      <div>{{ collapse ? '' : appName }}</div>
     </div>
     <!-- 导航菜单 -->
-    <el-menu ref="navMenu" default-active="1" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'"
-             :collapse="collapse" :collapse-transition="false" :unique-opened="true  "
-             @open="handleOpen" @close="handleClose" @select="handleSelect">
+    <el-menu ref="navMenu" :class="collapse?'menu-bar-collapse-width':'menu-bar-width'" :collapse="collapse"
+             :collapse-transition="false" :unique-opened="true  " default-active="1"
+             @close="handleClose" @open="handleOpen" @select="handleSelect">
       <!-- 导航菜单树组件，动态加载菜单 -->
       <menu-tree v-for="item in navTree" :key="item.id" :menu="item"></menu-tree>
     </el-menu>
-	</div>
+  </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 import MenuTree from "../components/MenuTree";
+
 export default {
-  components:{MenuTree},
+  components: {MenuTree},
   computed: {
     ...mapState({
-      appName: state=>state.app.appName,
-      themeColor: state=>state.app.themeColor,
-      collapse: state=>state.app.collapse,
-      navTree: state=>state.menu.navTree
+      appName: state => state.app.appName,
+      themeColor: state => state.app.themeColor,
+      collapse: state => state.app.collapse,
+      navTree: state => state.menu.navTree
     }),
     mainTabs: {
-      get () { return this.$store.state.tab.mainTabs },
-      set (val) { this.$store.commit('updateMainTabs', val) }
+      get() {
+        return this.$store.state.tab.mainTabs
+      },
+      set(val) {
+        this.$store.commit('updateMainTabs', val)
+      }
     },
     mainTabsActiveName: {
-      get () { return this.$store.state.tab.mainTabsActiveName },
-      set (val) { this.$store.commit('updateMainTabsActiveName', val) }
+      get() {
+        return this.$store.state.tab.mainTabsActiveName
+      },
+      set(val) {
+        this.$store.commit('updateMainTabsActiveName', val)
+      }
     }
   },
   watch: {$route: 'handleRoute'},
-  created () {this.handleRoute(this.$route)},
+  created() {
+    this.handleRoute(this.$route)
+  },
   methods: {
-    handleOpen() {},
-    handleClose() {},
-    handleSelect() {},
+    handleOpen() {
+    },
+    handleClose() {
+    },
+    handleSelect() {
+    },
     // 路由操作处理
-    handleRoute (route) {
+    handleRoute(route) {
       // tab标签页选中, 如果不存在则先添加
       let tab = this.mainTabs.filter(item => item.name === route.name)[0];
       if (!tab) {
@@ -55,7 +71,7 @@ export default {
       }
       this.mainTabsActiveName = tab.name;
       // 切换标签页时同步更新高亮菜单
-      if(this.$refs.navMenu != null) {
+      if (this.$refs.navMenu != null) {
         this.$refs.navMenu.activeIndex = '' + route.meta.index;
         this.$refs.navMenu.initOpenedMenu()
       }
@@ -63,33 +79,37 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .menu-bar-container {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   z-index: 1020;
+
   .el-menu {
-    position:absolute;
+    position: absolute;
     top: 60px;
     bottom: 0;
     text-align: left;
   }
+
   .logo {
-    position:absolute;
+    position: absolute;
     top: 0;
     height: 60px;
     line-height: 60px;
     background: #545c64;
-    cursor:pointer;
+    cursor: pointer;
+
     img {
-        width: 40px;
-        height: 40px;
-        border-radius: 0;
-        margin: 10px 10px 10px 10px;
-        float: left;
+      width: 40px;
+      height: 40px;
+      border-radius: 0;
+      margin: 10px 10px 10px 10px;
+      float: left;
     }
+
     div {
       font-size: 22px;
       color: white;
@@ -97,7 +117,13 @@ export default {
       padding-left: 20px;
     }
   }
-  .menu-bar-width {width: 110px;}
-  .menu-bar-collapse-width {width: 55px;}
+
+  .menu-bar-width {
+    width: 110px;
+  }
+
+  .menu-bar-collapse-width {
+    width: 55px;
+  }
 }
 </style>

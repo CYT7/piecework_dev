@@ -1,11 +1,13 @@
 <template>
-  <el-button :size="size" :type="type" :icon="icon" :circle="circle" :round="round" v-if="hasPerms(perms)?hasPerms(perms):''"
-    :loading="loading" :disabled="!hasPerms(perms)" @click="handleClick">
-    {{label}}
+  <el-button v-if="hasPerms(perms)?hasPerms(perms):''" :circle="circle" :disabled="!hasPerms(perms)" :icon="icon" :loading="loading"
+             :round="round"
+             :size="size" :type="type" @click="handleClick">
+    {{ label }}
   </el-button>
 </template>
 <script>
 import {hasPermission} from "../../permission";
+
 export default {
   name: 'KtButton',
   props: {
@@ -46,12 +48,19 @@ export default {
       default: null
     }
   },
-  data() {return {}},
-  methods: {
-    handleClick: function () {this.$emit('click', {})},//按钮操作处理函数
-    hasPerms: function (perms) {return hasPermission(perms) & !this.disabled}//根据权限标识和外部指示状态进行权限判断
+  data() {
+    return {}
   },
-  mounted() {}
+  methods: {
+    handleClick: function () {
+      this.$emit('click', {})
+    },//按钮操作处理函数
+    hasPerms: function (perms) {
+      return hasPermission(perms) & !this.disabled
+    }//根据权限标识和外部指示状态进行权限判断
+  },
+  mounted() {
+  }
 }
 </script>
 <style scoped>

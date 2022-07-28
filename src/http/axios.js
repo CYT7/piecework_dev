@@ -20,7 +20,8 @@ export default function $axios(options) {
           config.headers.token = token
         } else {
           //重定向到登录页面
-          router.push('/login').then(() => {})
+          router.push('/login').then(() => {
+          })
         }
         return config
       },
@@ -38,7 +39,8 @@ export default function $axios(options) {
           const errorStatus = errorInfo.status; //404 403 500 ...
           router.push({
             path: `/error/${errorStatus}`
-          }).then(() => {})
+          }).then(() => {
+          })
         }
         return Promise.reject(error) //调用拿到(catch)返回的错误信息
       }

@@ -2,17 +2,18 @@
   <div>
     <el-popover ref="popover" :placement="placement" trigger="click">
       <el-tree
+        ref="popupTree"
         :data="data"
+        :default-expand-all="defaultExpandAll"
+        :expand-on-click-node="true"
+        :highlight-current="true"
         :props="props"
         node-key="nodeKey"
-        ref="popupTree"
-        @current-change="currentChangeHandle"
-        :default-expand-all="defaultExpandAll"
-        :highlight-current="true"
-        :expand-on-click-node="true">
+        @current-change="currentChangeHandle">
       </el-tree>
     </el-popover>
-    <el-input v-model="prop" v-popover:popover :readonly="true" :placeholder="placeholder" style="cursor:pointer;" ></el-input>
+    <el-input v-model="prop" v-popover:popover :placeholder="placeholder" :readonly="true"
+              style="cursor:pointer;"></el-input>
   </div>
 </template>
 <script>

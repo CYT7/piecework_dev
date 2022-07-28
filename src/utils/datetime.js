@@ -2,17 +2,20 @@
  * 时间日期相关操作
  **/
 //时间格式化
-export function format (datetime) {
+export function format(datetime) {
   return formatWithSeparator(datetime, "/", ":");
 }
-export function formats (datetime) {
+
+export function formats(datetime) {
   return formatWithSeparators(datetime, "/");
 }
-export function Dateformat (datetime) {
+
+export function Dateformat(datetime) {
   return formatToDate(datetime, "/");
 }
+
 //时间格式化
-export function formatWithSeparator (datetime, dateSeparator, timeSeparator) {
+export function formatWithSeparator(datetime, dateSeparator, timeSeparator) {
   if (datetime != null) {
     const dateMat = new Date(datetime);
     const year = dateMat.getFullYear();
@@ -24,7 +27,8 @@ export function formatWithSeparator (datetime, dateSeparator, timeSeparator) {
     return year + dateSeparator + month + dateSeparator + day + " " + hh + timeSeparator + mm + timeSeparator + ss;
   }
 }
-export function formatWithSeparators (datetime, dateSeparator) {
+
+export function formatWithSeparators(datetime, dateSeparator) {
   if (datetime != null) {
     const dateMat = new Date(datetime);
     const year = dateMat.getFullYear();
@@ -32,7 +36,8 @@ export function formatWithSeparators (datetime, dateSeparator) {
     return year + dateSeparator + month;
   }
 }
-export function formatToDate(datetime, dateSeparator){
+
+export function formatToDate(datetime, dateSeparator) {
   if (datetime != null) {
     const dateMat = new Date(datetime);
     const year = dateMat.getFullYear();

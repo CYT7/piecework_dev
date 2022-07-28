@@ -2,65 +2,67 @@
   <div class="page-container">
     <!--工具栏-->
     <div class="toolbar" style="float:left;padding-top:10px;padding-left:15px;">
-      <el-form :inline="true" :model="filters" :size="size" ref="filters">
+      <el-form ref="filters" :inline="true" :model="filters" :size="size">
         <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="filters.deptName"
-                            :nodeKey="''+filters.deptId" :currentChangeHandle="deptTreeFilters"/>
+          <popup-tree-input :currentChangeHandle="deptTreeFilters" :data="deptData" :nodeKey="''+filters.deptId"
+                            :prop="filters.deptName" :props="deptTreeProps"/>
         </el-form-item>
         <el-form-item label="职工名" prop="name">
           <el-input v-model="filters.name" placeholder="职工名"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')"
+          <kt-button :label="$t('action.search')" icon="fa fa-search"
                      perms="sys:emp:view" type="primary" @click="findPage(null)"/>
-          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
+          <kt-button :label="$t('action.reset')" icon="fa fa-repeat"
                      perms="sys:emp:view" type="primary" @click="resetFindPage"/>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')"
-                     perms="sys:emp:add" type="primary" @click="handleAdd" />
+          <kt-button :label="$t('action.add')" icon="fa fa-plus"
+                     perms="sys:emp:add" type="primary" @click="handleAdd"/>
         </el-form-item>
         <el-form-item>
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload" :before-upload="beforeUpload"
-                     :http-request="UploadFile" :show-file-list="false" accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:emp:upload" :label="$t('action.upload')"/>
+          <el-upload ref="upload" :before-upload="beforeUpload" :http-request="UploadFile" :limit="1" :show-file-list="false"
+                     accept=".xls,.xlsx" action="#" class="el-upload">
+            <kt-button :label="$t('action.upload')" icon="fa fa-upload" perms="sys:emp:upload" type="primary"/>
           </el-upload>
         </el-form-item>
         <el-form-item>
-          <kt-button perms="sys:emp:download" icon="fa fa-file-excel-o" :label="$t('action.export')" @click="handleDownLoad"/>
-          <kt-button perms="sys:emp:view" icon="fa fa-refresh" :label="$t('action.refresh')" @click="findPage(null)"/>
+          <kt-button :label="$t('action.export')" icon="fa fa-file-excel-o" perms="sys:emp:download"
+                     @click="handleDownLoad"/>
+          <kt-button :label="$t('action.refresh')" icon="fa fa-refresh" perms="sys:emp:view" @click="findPage(null)"/>
         </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
-    <kt-table permsDelete="sys:emp:delete" permsDisagree="sys:emp:unconfirmed" permsAgree="sys:emp:confirm"
-              permsEdit = "sys:emp:edit" :data="pageResult" :columns="columns" @findPage="findPage"
-              @handleEdit="handleEdit" @handleDelete="handleDelete"  @handleDisagree="handleDisagree"
-              @handleAgree="handleAgree" :circle="true">
+    <kt-table :circle="true" :columns="columns" :data="pageResult"
+              permsAgree="sys:emp:confirm" permsDelete="sys:emp:delete" permsDisagree="sys:emp:unconfirmed" permsEdit="sys:emp:edit"
+              @findPage="findPage" @handleAgree="handleAgree" @handleDelete="handleDelete"
+              @handleDisagree="handleDisagree" @handleEdit="handleEdit">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?$t('action.add'):$t('action.edit')" width="25%" :visible.sync="dialogVisible" :close-on-click-modal="false">
-      <el-form :model="dataForm" label-width="100px" :rules="dataFormRules"
-               ref="dataForm" :size="size" label-position="right">
-        <el-form-item label="ID" prop="id" v-if="false">
+    <el-dialog :close-on-click-modal="false" :title="operation?$t('action.add'):$t('action.edit')" :visible.sync="dialogVisible"
+               width="25%">
+      <el-form ref="dataForm" :model="dataForm" :rules="dataFormRules"
+               :size="size" label-position="right" label-width="100px">
+        <el-form-item v-if="false" label="ID" prop="id">
           <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"/>
         </el-form-item>
         <el-form-item label="职工号" prop="empNo">
-          <el-input v-model="dataForm.empNo" auto-complete="off" placeholder="请输入职工号" :disabled="!operation"/>
+          <el-input v-model="dataForm.empNo" :disabled="!operation" auto-complete="off" placeholder="请输入职工号"/>
         </el-form-item>
         <el-form-item label="职工名" prop="name">
-          <el-input v-model="dataForm.name" auto-complete="off" placeholder="请输入职工名" :disabled="!operation"/>
+          <el-input v-model="dataForm.name" :disabled="!operation" auto-complete="off" placeholder="请输入职工名"/>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="dataForm.email" type="email" auto-complete="off" placeholder="请输入邮箱"/>
+          <el-input v-model="dataForm.email" auto-complete="off" placeholder="请输入邮箱" type="email"/>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
           <el-input v-model="dataForm.phone" auto-complete="off" placeholder="请输入手机"/>
         </el-form-item>
         <el-form-item label="部门" prop="deptName">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
-                            :nodeKey="''+dataForm.deptId" :currentChangeHandle="saveDeptChange"/>
+          <popup-tree-input :currentChangeHandle="saveDeptChange" :data="deptData" :nodeKey="''+dataForm.deptId"
+                            :prop="dataForm.deptName" :props="deptTreeProps"/>
         </el-form-item>
         <el-form-item label="N+1" prop="supervisor">
-          <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.supervisor">
+          <el-select v-model="dataForm.supervisor" placeholder="请选择N+1" style="width: 100%" value-key="id">
             <el-option v-for="item in empData" :key="item.empNo" :label="item.name" :value="item.empNo"
                        @click.native="superiorChange(item)"/>
           </el-select>
@@ -71,43 +73,45 @@
         <el-form-item label="入职日期" prop="entryDate">
           <div class="block">
             <el-date-picker
-              v-model="dataForm.entryDate" type="date"
-              placeholder="请选择入职日期" :picker-options="pickerOptions">
+              v-model="dataForm.entryDate" :picker-options="pickerOptions"
+              placeholder="请选择入职日期" type="date">
             </el-date-picker>
           </div>
         </el-form-item>
         <el-form-item label="开始绩效日期" prop="startPerformance">
           <div class="block">
             <el-date-picker
-              v-model="dataForm.startPerformance" type="date"
-              placeholder="请选择开始绩效日期" :picker-options="pickerOptions">
+              v-model="dataForm.startPerformance" :picker-options="pickerOptions"
+              placeholder="请选择开始绩效日期" type="date">
             </el-date-picker>
           </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
+        <el-button :size="size" @click.native="dialogVisible = false">{{ $t('action.cancel') }}</el-button>
+        <el-button :loading="editLoading" :size="size" type="primary" @click.native="submitForm">
+          {{ $t('action.submit') }}
+        </el-button>
       </div>
     </el-dialog>
     <!--下载-->
-    <el-dialog title="导出" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px" :rules="downFormRules"
-               label-position="right" style="text-align:left;">
+    <el-dialog :close-on-click-modal="false" :visible.sync="downloadVisible" title="导出" width="25%">
+      <el-form ref="downForm" :model="downForm" :rules="downFormRules" :size="size" label-position="right"
+               label-width="80px" style="text-align:left;">
         <el-form-item label="选项" prop="type">
           <el-radio-group v-model="downForm.type">
-            <el-radio v-for="(type, index) in TypeList" :label="index" :key="index">{{type}}</el-radio>
+            <el-radio v-for="(type, index) in TypeList" :key="index" :label="index">{{ type }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="部门" prop="deptName" v-if="this.downForm.type===0">
-          <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
-                            :nodeKey="''+downForm.deptId"
-                            :currentChangeHandle="exportDeptChange"/>
+        <el-form-item v-if="this.downForm.type===0" label="部门" prop="deptName">
+          <popup-tree-input :currentChangeHandle="exportDeptChange" :data="deptData" :nodeKey="''+downForm.deptId"
+                            :prop="downForm.deptName"
+                            :props="deptTreeProps"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button :size="size" @click.native="downloadVisible = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitDown">{{$t('action.submit')}}</el-button>
+        <el-button :size="size" @click.native="downloadVisible = false">{{ $t('action.cancel') }}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitDown">{{ $t('action.submit') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -121,16 +125,31 @@ import {baseUrl} from "../../utils/global";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {Dateformat} from "../../utils/datetime";
-const checkEmail = (rule,value,callback) =>{
-  if (!value){return callback(new Error('请输入邮箱'));}
-  else{if (isEmail(value)){callback();}else{return callback(new Error('邮箱格式不正确'))}}
+
+const checkEmail = (rule, value, callback) => {
+  if (!value) {
+    return callback(new Error('请输入邮箱'));
+  } else {
+    if (isEmail(value)) {
+      callback();
+    } else {
+      return callback(new Error('邮箱格式不正确'))
+    }
+  }
 }
-const checkPhone = (rule,value,callback) =>{
-  if (!value){callback();}
-  else{if (isPhone(value)){callback();}else{return callback(new Error('手机格式不正确'))}}
+const checkPhone = (rule, value, callback) => {
+  if (!value) {
+    callback();
+  } else {
+    if (isPhone(value)) {
+      callback();
+    } else {
+      return callback(new Error('手机格式不正确'))
+    }
+  }
 }
 export default {
-  components:{PopupTreeInput, KtTable, KtButton,},
+  components: {PopupTreeInput, KtTable, KtButton,},
   data() {
     return {
       size: 'small',

@@ -7,5 +7,5 @@
 // export const baseUrl = 'http://192.168.101.2:8001'
 export const baseUrl = 'http://localhost:8000';
 export default {
-    baseUrl,
+  baseUrl,
 }

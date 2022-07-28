@@ -1,4 +1,5 @@
 import axios from '../axios'
+
 /**
  * 角色管理模块
  **/
@@ -27,25 +28,25 @@ export const findRoleMenus = (params) => {
 };
 //保存
 export const save = (data) => {
-    return axios({
-        url: '/role/save',
-        method: 'post',
-        data
-    })
+  return axios({
+    url: '/role/save',
+    method: 'post',
+    data
+  })
 };
 //删除
 export const Delete = (data) => {
-    return axios({
-        url: '/role/delete',
-        method: 'post',
-        data
-    })
+  return axios({
+    url: '/role/delete',
+    method: 'post',
+    data
+  })
 };
 //保存角色菜单集合
 export const saveRoleMenus = (data) => {
-    return axios({
-        url: '/role/saveRoleMenus',
-        method: 'post',
-        data
-    })
+  return axios({
+    url: '/role/saveRoleMenus',
+    method: 'post',
+    data
+  })
 };
