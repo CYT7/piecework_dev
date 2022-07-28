@@ -11,31 +11,33 @@
           <el-input v-model="filters.name" placeholder="职工名"/>
         </el-form-item>
         <el-form-item>
-          <kt-button icon="fa fa-search" :label="$t('action.search')" perms="sys:emp:view" type="primary" @click="findPage(null)"/>
-          <kt-button icon="fa fa-repeat" :label="$t('action.reset')" perms="sys:emp:view" type="primary" @click="resetFindPage"/>
-          <kt-button icon="fa fa-plus" :label="$t('action.add')" perms="sys:emp:add" type="primary" @click="handleAdd" />
-          <el-upload action="#" class="el-upload" :limit="1" ref="upload"
-                     :before-upload="beforeUpload" :http-request="UploadFile"
-                     :show-file-list="false" accept=".xls,.xlsx">
-            <kt-button icon="fa fa-upload" type="primary" perms="sys:emp:upload" :label="$t('action.upload')"/>
-          </el-upload>
-          <kt-button perms="sys:emp:download" icon="fa fa-file-excel-o" label="导出" @click="handleDownLoad"/>
+          <kt-button icon="fa fa-search" :label="$t('action.search')"
+                     perms="sys:emp:view" type="primary" @click="findPage(null)"/>
+          <kt-button icon="fa fa-repeat" :label="$t('action.reset')"
+                     perms="sys:emp:view" type="primary" @click="resetFindPage"/>
+          <kt-button icon="fa fa-plus" :label="$t('action.add')"
+                     perms="sys:emp:add" type="primary" @click="handleAdd" />
         </el-form-item>
         <el-form-item>
-          <el-tooltip content="刷新" x-placement="top">
-            <kt-button perms="sys:emp:view" icon="fa fa-refresh" @click="findPage(null)"/>
-          </el-tooltip>
+          <el-upload action="#" class="el-upload" :limit="1" ref="upload" :before-upload="beforeUpload"
+                     :http-request="UploadFile" :show-file-list="false" accept=".xls,.xlsx">
+            <kt-button icon="fa fa-upload" type="primary" perms="sys:emp:upload" :label="$t('action.upload')"/>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <kt-button perms="sys:emp:download" icon="fa fa-file-excel-o" :label="$t('action.export')" @click="handleDownLoad"/>
+          <kt-button perms="sys:emp:view" icon="fa fa-refresh" :label="$t('action.refresh')" @click="findPage(null)"/>
         </el-form-item>
       </el-form>
     </div>
     <!--表格内容栏-->
     <kt-table permsDelete="sys:emp:delete" permsDisagree="sys:emp:unconfirmed" permsAgree="sys:emp:confirm"
               permsEdit = "sys:emp:edit" :data="pageResult" :columns="columns" @findPage="findPage"
-              @handleEdit="handleEdit" @handleDelete="handleDelete" :circle="true"
-              @handleDisagree="handleDisagree" @handleAgree="handleAgree">
+              @handleEdit="handleEdit" @handleDelete="handleDelete"  @handleDisagree="handleDisagree"
+              @handleAgree="handleAgree" :circle="true">
     </kt-table>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="25%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?$t('action.add'):$t('action.edit')" width="25%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" label-width="100px" :rules="dataFormRules"
                ref="dataForm" :size="size" label-position="right">
         <el-form-item label="ID" prop="id" v-if="false">
@@ -55,7 +57,7 @@
         </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="dataForm.deptName"
-                            :nodeKey="''+dataForm.deptId" :currentChangeHandle="deptTreeCurrentChangeHandle"/>
+                            :nodeKey="''+dataForm.deptId" :currentChangeHandle="saveDeptChange"/>
         </el-form-item>
         <el-form-item label="N+1" prop="supervisor">
           <el-select style="width: 100%" placeholder="请选择N+1" value-key="id" v-model="dataForm.supervisor">
@@ -90,7 +92,7 @@
     </el-dialog>
     <!--下载-->
     <el-dialog title="导出" width="25%" :visible.sync="downloadVisible" :close-on-click-modal="false">
-      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px"
+      <el-form :model="downForm" ref="downForm" :size="size" label-width="80px" :rules="downFormRules"
                label-position="right" style="text-align:left;">
         <el-form-item label="选项" prop="type">
           <el-radio-group v-model="downForm.type">
@@ -100,7 +102,7 @@
         <el-form-item label="部门" prop="deptName" v-if="this.downForm.type===0">
           <popup-tree-input :data="deptData" :props="deptTreeProps" :prop="downForm.deptName"
                             :nodeKey="''+downForm.deptId"
-                            :currentChangeHandle="deptTreeCurrentChange"/>
+                            :currentChangeHandle="exportDeptChange"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -132,7 +134,7 @@ export default {
   data() {
     return {
       size: 'small',
-      filters: {deptId:'',name:'',deptName:''},
+      filters: {deptId: '', name: '', deptName: ''}, // 查询信息
       columns: [
         {prop: "empNo", label: "职工号", minWidth: '30%', formatter: this.empFormat},
         {prop: "name", label: "职工名", minWidth: '30%'},
@@ -146,34 +148,35 @@ export default {
         {prop: "detailed", label: "方案明细", minWidth: '50%'},
         {prop: "status", label: "状态", minWidth: '30%', formatter: this.statusFormat},
         {prop: "checkStatus", label: "审核", minWidth: '30%', formatter: this.checkFormat},
-      ],
-      pageRequest: { pageNum: 1, pageSize: 10 },
-      pageResult: {},
+      ], //表格列
+      pageRequest: {pageNum: 1, pageSize: 10}, // 分页请求
+      pageResult: {}, // 分页结果
       operation: false, // true:新增, false:编辑
       dialogVisible: false, // 新增编辑界面是否显示
-      editLoading: false,
-      downloadVisible:false,// 下载页面是否显示
+      downloadVisible: false,// 下载页面是否显示
+      editLoading: false, // 编辑加载
       dataFormRules: {
         empNo: [{required: true, message: '请输入职工号', trigger: 'blur'}],
-        name: [{ required: true, message: '请输入职工名', trigger: 'blur' }],
-        email: [{ required: true, validator:checkEmail, trigger: 'blur' }],
-        phone: [{validator:checkPhone, trigger: 'blur' }],
-        deptName: [{ required: true, message: '请选择部门', trigger: 'change' }],
-        superior: [{ required: true, message: '请选择职工的N+1', trigger: 'change' }],
-        bu: [{ required: true, message: '请输入BU', trigger: 'blur' }],
-      },
-      // 新增编辑界面数据
-      dataForm: {},
-      downForm: [],
-      deptData: [],
-      TypeList:['导出职工','上传模板'],
-      deptTreeProps: { label: 'name', children: 'children'},
-      empData:[],
-      //日历快速选择
+        name: [{required: true, message: '请输入职工名', trigger: 'blur'}],
+        email: [{required: true, validator: checkEmail, trigger: 'blur'}],
+        phone: [{validator: checkPhone, trigger: 'blur'}],
+        deptName: [{required: true, message: '请选择部门', trigger: 'change'}],
+        superior: [{required: true, message: '请选择职工的N+1', trigger: 'change'}],
+        bu: [{required: true, message: '请输入BU', trigger: 'blur'}],
+      }, // 保存信息规矩
+      downFormRules: {type: [{required: true, message: '请选择导出类型', trigger: 'change'}]}, // 导出选项
+      dataForm: {}, // 新增编辑信息
+      downForm: [], // 导出信息
+      empData: [], // 职工数据
+      deptData: [], // 部门数据
+      deptTreeProps: {label: 'name', children: 'children'},
+      TypeList: ['导出职工', '上传模板'], // 导出选项
       pickerOptions: {
         shortcuts: [{
           text: '今天',
-          onClick(picker) {picker.$emit('pick', new Date());}
+          onClick(picker) {
+            picker.$emit('pick', new Date());
+          }
         }, {
           text: '昨天',
           onClick(picker) {
@@ -189,35 +192,10 @@ export default {
             picker.$emit('pick', date);
           }
         }]
-      },
-    }
+      }, //日历快速选择
+    };
   },
   methods: {
-    resetFindPage : function (){
-      this.$refs['filters'].resetFields();
-      this.filters={deptId: '',name:'',deptName:''}
-      this.findPage(null);
-    },
-    // 获取分页数据
-    findPage: function (data) {
-      if (data !== null) {this.pageRequest = data.pageRequest}
-      this.pageRequest.params = [{name: 'name', value: this.filters.name},{name: 'deptId', value: this.filters.deptId}]
-      this.$api.emp.findPage(this.pageRequest).then((res) => {
-        this.pageResult = res
-      }).then(data != null ? data.callback : '')
-    },
-    // 批量删除
-    handleDelete: function (data) {
-      this.$api.emp.Delete({'employeeList': data.params}).then(data.callback)
-    },
-    // 批量禁用
-    handleDisagree: function (data) {
-      this.$api.emp.unconfirmed({'employeeList': data.params}).then(data.callback)
-    },
-    // 批量恢复
-    handleAgree: function (data) {
-      this.$api.emp.confirm({'employeeList': data.params}).then(data.callback)
-    },
     // 显示新增界面
     handleAdd: function () {
       this.dialogVisible = true
@@ -243,6 +221,43 @@ export default {
       this.dialogVisible = true
       this.operation = false
       this.dataForm = Object.assign({}, params.row)
+    },
+    // 显示导出界面
+    handleDownLoad: function () {
+      this.downloadVisible = true
+      this.downForm = {
+        type: '',
+        deptId: '',
+        deptName: ''
+      }
+    },
+    // 重置查找页面
+    resetFindPage: function () {
+      this.$refs['filters'].resetFields();
+      this.filters = {deptId: '', name: '', deptName: ''}
+      this.findPage(null);
+    },
+    // 获取分页数据
+    findPage: function (data) {
+      if (data !== null) {
+        this.pageRequest = data.pageRequest
+      }
+      this.pageRequest.params = [{name: 'name', value: this.filters.name}, {name: 'deptId', value: this.filters.deptId}]
+      this.$api.emp.findPage(this.pageRequest).then((res) => {
+        this.pageResult = res
+      }).then(data != null ? data.callback : '')
+    },
+    // 批量删除
+    handleDelete: function (data) {
+      this.$api.emp.Delete({'employeeList': data.params}).then(data.callback)
+    },
+    // 批量禁用
+    handleDisagree: function (data) {
+      this.$api.emp.unconfirmed({'employeeList': data.params}).then(data.callback)
+    },
+    // 批量恢复
+    handleAgree: function (data) {
+      this.$api.emp.confirm({'employeeList': data.params}).then(data.callback)
     },
     // 编辑
     submitForm: function () {
@@ -272,26 +287,32 @@ export default {
         this.deptData = res.data
       })
     },
-    // 菜单树选中
-    deptTreeCurrentChangeHandle(data) {
-      this.dataForm.deptId = data.id
-      this.dataForm.deptName = data.name
-      this.findEmpTree(data.id)
-    },
-    superiorChange(data) {
-      this.dataForm.superior = data.empNo
-      this.dataForm.supervisor = data.name
-    },
-    // 菜单树选中
-    deptTreeFilters(data) {
-      this.filters.deptId = data.id
-      this.filters.deptName = data.name
-    },
     // 获取职工列表
     findEmpTree: function (deptId) {
       this.$api.emp.findEmpTree({'deptId': deptId}).then((res) => {
         this.empData = res.data
       })
+    },
+    // 保存N+1选中
+    superiorChange(data) {
+      this.dataForm.superior = data.empNo
+      this.dataForm.supervisor = data.name
+    },
+    // 保存部门选中
+    saveDeptChange(data) {
+      this.dataForm.deptId = data.id
+      this.dataForm.deptName = data.name
+      this.findEmpTree(data.id)
+    },
+    // 查询部门选中
+    deptTreeFilters(data) {
+      this.filters.deptId = data.id
+      this.filters.deptName = data.name
+    },
+    // 导出部门选中
+    exportDeptChange(data) {
+      this.downForm.deptId = data.id
+      this.downForm.deptName = data.name
     },
     // 状态格式化
     statusFormat: function (row, column) {
@@ -316,7 +337,7 @@ export default {
           return '不通过'
       }
     },
-    // 上传鉴定
+    // 上传前鉴定
     beforeUpload(file) {
       let testMsg = file.name.substring(file.name.lastIndexOf('.') + 1);
       const extension = (testMsg === 'xls' || testMsg === 'xlsx')
@@ -329,6 +350,7 @@ export default {
       }
       return extension && isLt2M
     },
+    // 上传文件
     UploadFile(param) {
       const formData = new FormData()
       formData.append('file', param.file) // 要提交给后台的文件
@@ -343,30 +365,19 @@ export default {
           this.findPage(null)
         }
       })
-
     },
-    handleDownLoad: function (){
-      this.downloadVisible = true
-      this.downForm = {
-        type: '',
-        deptId:'',
-        deptName: ''
-      }
-    },
-    deptTreeCurrentChange (data) {
-      this.downForm.deptId = data.id
-      this.downForm.deptName = data.name
-    },
-    submitDown:function (){
-      this.$refs.downForm.validate((valid)=>{
-        if (valid){
-          let params = Object.assign({},this.downForm)
+    // 导出前校验
+    submitDown: function () {
+      this.$refs.downForm.validate((valid) => {
+        if (valid) {
+          let params = Object.assign({}, this.downForm)
           this.exportExcelFile(params);
           this.downloadVisible = false;
           this.$refs['downForm'].resetFields()
         }
       })
     },
+    // 导出Excel
     exportExcelFile: function (params) {
       axios.post(baseUrl + '/emp/download', params, {
         headers: {

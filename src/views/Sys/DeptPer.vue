@@ -154,7 +154,7 @@
       </div>
     </el-dialog>
     <!--新增编辑界面-->
-    <el-dialog :title="operation?'新增':'编辑'" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+    <el-dialog :title="operation?$t('action.add'):$t('action.edit')" width="30%" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="dataForm" :rules="dataFormRules" label-width="100px" @keyup.enter.native="submitForm()"
                ref="dataForm" :size="size" label-position="right" style="text-align:left;">
         <el-form-item label="ID" prop="id" v-if="false">
